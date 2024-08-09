@@ -1,0 +1,55 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+.wrapper  {
+    padding: 20px;
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .title {
+            font-size: 34px;
+            color: $font-color;
+            font-weight: bold;
+        }
+    }
+
+    .content  {
+        padding: 20px;
+        margin-top: 0;
+        border: 2px solid $primary-background;
+        border-radius: 5px;
+        background: #FFFFFF;
+
+        .section  {
+            padding-top: 20px
+        }
+    }
+}
+
+.legend {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    height: 175px;
+    width: 50%;
+    min-width: 600px;
+    background-color: rgba(255, 255, 255, 0.75);
+
+    @include ltr {
+        border-top-right-radius: 35px;
+        border-bottom-right-radius: 35px;
+        padding-left: 20px;
+        margin-left: -20px;
+    }
+    @include rtl {
+        border-top-left-radius: 35px;
+        border-bottom-left-radius: 35px;
+        padding-right: 20px;
+        margin-right: -20px;
+    }
+}

@@ -1,0 +1,19 @@
+<div
+    #modalWrapper
+    appTabFocus
+    class="modal__wrapper"
+    id="modalWrapper">
+    <div class="modal__header">
+        <div class="modal__title">
+            <ng-content select="[modal-header]"></ng-content>
+        </div>
+        <span *ngIf="isClosable" class="modal__close" (click)="closeModal(true)">&times;</span>
+    </div>
+    <div #modalContent class="modal__messages" [ngClass]="{'scrollable-modal': scrollable, 'remove-margin': removeMargin}">
+        <ng-content select="[modal-body]"></ng-content>
+    </div>
+    <div *ngIf="hasContent" [ngClass]="{'center-modal-buttons': centralizeButtons, 'modal__buttons': !centralizeButtons}">
+        <ng-content #button select="[modal-buttons]"></ng-content>
+    </div>
+</div>
+<div class="modal__overlay"></div>

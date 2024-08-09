@@ -1,0 +1,99 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~~app/shared/styles/radio';
+
+$text-color: #414042;
+$border-width: 2px;
+$popup-background: white;
+
+@mixin step($left, $right) {
+    .error {
+        border: 2px solid $incorrect-field-star;
+    }
+
+    .radio-container-all {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .notification {
+        margin: 20px 20px 20px 20px;
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+
+    .center-modal-buttons {
+        margin-top: 0px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .bottom-button-padding {
+        padding-top: 15px;
+        padding-bottom: 20px;
+    }
+
+    textarea {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 285px;
+        height: 120px;
+        margin-left: 2px;
+        margin-bottom: 5px;
+        resize: both;
+    }
+
+    .plannedDate {
+        display: flex;
+        z-index: 100;
+        margin-top: 8px;
+        label {
+            padding-right: 5px;
+        }
+    }
+
+}
+
+input:disabled {
+    &:checked ~ .checkmark {
+        border: 2px solid grey !important;
+
+        &:after {
+            background: grey !important;
+        }
+    }
+}
+
+::ng-deep tr {
+    border-bottom: 1px solid transparent !important;
+}
+
+::ng-deep app-date-input div.div-calendar {
+    position: absolute !important;
+}
+
+.modal__body {
+    padding: 15px;
+    display: inline-block;
+    width: 100%;
+
+    .modal__messages {
+        margin-left: 20px;
+
+        .primary__message {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    
+        .secondary__message {
+            font-size: 16px;
+        }
+    }
+}
+
+.wrapper {
+    @include step(left, right);
+}

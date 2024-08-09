@@ -1,0 +1,12 @@
+<app-modal [page]="(route$ | async)?.url" [scrollable]="true">
+    <div modal-header>
+        <span i18n="@@addPlaceholders">Add Placeholders</span>
+    </div>
+    <div modal-body>
+        <app-add-placeholder-table
+            [isTOIssued]="isTOIssued$ | async"
+            [urlWithoutParenthesis]="urlWithoutParenthesis$ | async">
+        </app-add-placeholder-table>
+    </div>
+</app-modal>
+

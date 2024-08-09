@@ -1,0 +1,348 @@
+<app-to-page *appLet="{
+                    security: fieldsSecurity$ | async,
+                    hasBeenDeleted: hasBeenDeleted$ | async,
+                    attachments: toAttachments$
+                } as state">
+    <div title>
+        <span title class="title" data-qa="testingOrderTitle" i18n="@@viewTestingOrderIdX">View Testing Order - {{ toId }}</span>
+        <app-generic-menu
+            *ngIf="!state.hasBeenDeleted"
+            class="option-menu"
+            hasCustomLook="true"
+            routerLinkActive="active-link"
+            [routerLinkActiveOptions]="{exact: true}"
+            (click)="onClickThreeDotMenu()">
+            <button mat-button menu-look class="menu button-background" data-qa="threeDotsButton">
+                <mat-icon style="vertical-align: baseline;" svgIcon="more_vert"></mat-icon>
+            </button>
+            <ng-container>
+                <div *appLet="isDraft$ | async as isDraft">
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.DownloadTO)"
+                        [isSidebarMenu]="false"
+                        (click)="viewTestingOrder()">
+                        <a i18n="@@dviewTestingOrder">View Testing Order</a>
+                    </app-menu-item>
+                    
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.DownloadInstructions)"
+                        disabled="true">
+                        <a i18n="@@downloadTestingOrderInstructions">Download Testing Order instructions</a>
+                    </app-menu-item>
+                    
+                    <app-menu-item
+                        *ngIf="!isDraft && (state?.security?.actions | isActionAvailable:actionRight.DownloadAuthorization)"
+                        (click)="viewAuthorization()">
+                        <a i18n="@@viewAuthorization">View Authorization</a>
+                    </app-menu-item>
+                    
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.DownloadDcoReport)"
+                        [disabled]="!(state?.attachments | async | isAttachmentTypeAvailable:attachmentType.DCO_REPORT)"
+                        [isSidebarMenu]="false"
+                        (click)="viewDcoReport()">
+                        <a i18n="@@downloadDcoReport">Download DCO Report</a>
+                    </app-menu-item>
+                    
+                    <app-menu-item
+                        [disabled]="!(state?.security?.actions | isActionAvailable:actionRight.Copy)"
+                        [isSidebarMenu]="false"
+                        (click)="createTestingOrderFromCopy()">
+                        <a i18n="@@copyTestingOrder" data-qa="copyTestingOrderButtonMenuItem">
+                            Copy Testing Order
+                        </a>
+                    </app-menu-item>
+                    
+                    <app-menu-item
+                        *ngIf="(isUserCorrector$ | async) && (state?.security?.actions | isActionAvailable:actionRight.Delete)"
+                        dataQA="deleteTestingOrderMenuItem"
+                        [disabled]="!isCancelled"
+                        [isDeletable]="isCancelled"
+                        [isTooltip]="!isCancelled"
+                        (click)="openDeleteTO()">
+                        <a i18n="@@deleteTestingOrder">Delete Testing Order</a>
+                        <span tooltip i18n="@@testingOrderCancelBeforeDeleteInfo">The Testing Order should be cancelled before it can be deleted.</span>
+                    </app-menu-item>
+                </div>
+            </ng-container>
+        </app-generic-menu>
+    </div>
+
+    <app-header
+        *ngIf="!state.hasBeenDeleted"
+        [canUserCancel]="state?.security?.actions | isActionAvailable:actionRight.Cancel"
+        [canUserComplete]="(state?.security?.actions | isActionAvailable:actionRight.Complete)"
+        [status]="status$ | async"
+        [testsWithDCF]="testsWithDCF$ | async"
+        (cancelEmitter)="cancelTO($event)"
+        (completeEmitter)="openChangeTOStatusModal(statusEnum.Completed)">
+    </app-header>
+
+    <div *ngIf="!state.hasBeenDeleted && !(isTODecommissioned$ | async)" class="float-btn-right">
+        <app-button
+            appOpenObjectInClassic
+            class="margin-btn-bottom"
+            i18n="@@viewToInClassic_uppercase"
+            type="secondary"
+            [newTab]="false"
+            [objectId]="toId"
+            [targetObject]="'MissionOrder'">
+            VIEW TESTING ORDER IN CLASSIC
+        </app-button>
+    </div>
+
+    <app-loading-frame
+        *appLet="{
+            hasBeenCancelled: hasBeenCancelled$ | async,
+            hasBeenCompleted: hasBeenCompleted$ | async,
+            hasBeenIssued: hasBeenIssued$ | async,
+            hasBeenSaved: hasBeenSaved$ | async,
+            incompatibleTestParticipants: incompatibleTestParticipants$ | async,
+            isDraft: isDraft$ | async,
+            isIssued: isIssued$ | async
+        } as notification"
+        [error]="error$ | async"
+        [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+        [loading]="loading$ | async"  
+        [unprocessableEntityError]="unprocessableEntityError$ | async">
+        <ng-container *ngIf="!state.hasBeenDeleted; else hasBeenDeletedNotification">
+            <app-notification 
+                *ngIf="notification.hasBeenSaved || notification.hasBeenCancelled || notification.isIssued || notification.hasBeenIssued || notification.hasBeenCompleted"
+                id="notificationsTO"
+                type="success">
+                <ng-container>
+                    <span *ngIf="notification.hasBeenSaved" i18n="@@testingOrderNumberXSavedAsStatusX">Testing Order number {{ (to$ | async)?.id }} has been saved as {{ toStatus$ | async }}.</span>
+                    <span *ngIf="notification.hasBeenIssued || notification.isIssued" i18n="@@testingOrderNumberXIssued">Testing Order number {{ (to$ | async)?.id }} has been issued.</span>
+                    <span *ngIf="notification.hasBeenCancelled"  i18n="@@testingOrderNumberCancelled">Testing Order number {{ (to$ | async)?.id }} has been cancelled.</span>
+                    <span *ngIf="notification.hasBeenCompleted"  i18n="@@testingOrderNumberCompleted">Testing Order number {{ (to$ | async)?.id }} has been completed.</span>
+                    <div class="success-issue">
+                        <ng-container whatsNext>
+                            <app-whats-next>
+                                <div *ngIf="notification.isDraft && !(showAuthorizationErrors || showAthletesAndAnalysesErrors || showDopingControlPersonnelErrors)">
+                                    <ul>
+                                        <li i18n="@@reviewTestingOrderPriorToFinalizing">Review the Testing Order prior to finalizing.</li>
+                                    </ul>
+                                    <div *ngIf="!notification.hasBeenIssued && (state?.security?.actions | isActionAvailable:actionRight.Issue)">
+                                        <app-button
+                                            dataQA="issueToScaButton"
+                                            i18n="@@issueToSca"
+                                            type="primary"
+                                            (click)="openChangeTOStatusModal(statusEnum.Issued)">Issue to SCA</app-button>
+                                        <div class="notification" i18n="@@notificationToLeadDco">A notification will be sent to the Lead DCO</div>
+                                    </div>
+                                </div>
+                            </app-whats-next>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </app-notification>
+
+            <app-notification
+                *ngIf=" !notification.hasBeenSaved &&
+                        notification.isDraft &&
+                        !notification.hasBeenIssued &&
+                        !(showAuthorizationErrors || showAthletesAndAnalysesErrors || showDopingControlPersonnelErrors)"
+                id="notificationsInfo"
+                type="informative">
+                <span *ngIf="copiedTestingOrderNumber$ | async" data-qa="notificationTestingOrderWasCopied" i18n="@@informativeCopyTestingOrder">The content of this Testing Order was copied from {{ copiedTestingOrderNumber$ | async }}.</span>
+                <app-whats-next>
+                    <span data-qa="notificationReviewTestingOrder" i18n="@@reviewTestingOrderPriorToFinalizing">Review the Testing Order prior to finalizing.</span>
+                <div *ngIf="state?.security?.actions | isActionAvailable:actionRight.Issue" class="success-issue informative">
+                    <div>
+                        <app-button i18n="@@issueToSca" type="primary" (click)="openChangeTOStatusModal(statusEnum.Issued)">Issue to SCA</app-button>
+                    </div>
+                    <div class="notification" data-qa="notificationToLeadDco" i18n="@@notificationToLeadDco">A notification will be sent to the Lead DCO</div>
+                </div>
+                </app-whats-next>
+            </app-notification>
+
+            <app-notification
+                *ngIf="!isCancelled && (showAuthorizationErrors || showAthletesAndAnalysesErrors || showDopingControlPersonnelErrors)"
+                id="notifications"
+                type="warning">
+                <span *ngIf="copiedTestingOrderNumber$ | async" i18n="@@warningCopyTestingOrder" style="white-space: pre-line">The content of this Testing Order was copied from {{ copiedTestingOrderNumber$ | async }}.<br></span>
+                <span i18n="@@completeMandatoryFieldBeforeIssuingTestingOrder">You need to complete the mandatory fields before issuing this Testing Oder.</span>
+                <ul links class="error-link-list">
+                    <li *ngIf="showAuthorizationErrors">
+                        <a href="{{ route$ | async }}#authorization" i18n="@@section1Authorization">Section 1 - Authorization</a>
+                    </li>
+                    <li *ngIf="showAthletesAndAnalysesErrors">
+                        <a href="{{ route$ | async }}#athletes-and-analyses" i18n="@@section2AthletesAndAnalyses">Section 2 - Athletes and Analyses</a>
+                    </li>
+                    <li *ngIf="showDopingControlPersonnelErrors">
+                        <a href="{{ route$ | async }}#doping-control-personnel" i18n="@@section3DopingControlPersonnel">Section 3 - Doping Control Personnel</a>
+                    </li>
+                </ul>
+            </app-notification>
+
+            <app-to-notifications *ngIf="exceedsMaxTestThreshold()" id="dcf-notifications" type="warning">
+                <span i18n="@@warningTestExceedsThreshold">This Testing Order has a number of tests that exceeds 100 tests. This may result in slower saving and loading of the Testing Order View.</span>
+            </app-to-notifications>
+
+            <app-notification
+                *ngIf="notification.incompatibleTestParticipants.length > 0"
+                id="notifications"
+                type="warning">
+                <ng-container *ngFor="let participant of notification.incompatibleTestParticipants">
+                    <span i18n="@@dcoXNotAllowedToTestAthlete">Participant {{ participant.displayName }} is not allowed to test an athlete in the following Sport/Discipline:</span>
+                    <ul links class="error-link-list">
+                        <li *ngFor="let sport of participant.sportDisciplines">
+                            <span>{{ sport.displayDescriptionName }}</span>
+                        </li>
+                    </ul>
+                </ng-container>
+            </app-notification>
+
+            <!-- Deletion Confirmation message -->
+            <app-notification *ngIf="dcfHasBeenDeleted" id="notificationsDCF" type="success">
+                <ng-container *ngIf="dcfArrivalDate; else defaultMessage">
+                    <span i18n="@@dcfXDatedXHasBeenDeleted">Doping Control Form for {{ dcfFullName }} dated {{ dcfArrivalDate | formatDate :'-0000' : 'DD-MMM-YYYY'  }} has been deleted.</span>
+                </ng-container>
+                <ng-template #defaultMessage>
+                    <span i18n="@@dcfXHasBeenDeleted">Doping Control Form for {{ dcfFullName }} has been deleted.</span>
+                </ng-template>
+            </app-notification>
+        </ng-container>
+
+            <app-notification #hasBeenDeletedNotification *ngIf="state.hasBeenDeleted" type="success">
+                <span data-qa="deletedTestingOrderMessage" i18n="@@testingOrderAndTestsDeleted">Testing Order number {{ toId }} and related tests have been deleted.</span>
+                <ng-container whatsNext>
+                    <app-whats-next></app-whats-next>
+                </ng-container>
+            </app-notification>
+
+            <!-- Moving tests confirmation message -->
+            <app-notification *ngIf="testsHaveBeenMoved$ | async" id="notificationsTests" type="success">
+                <ng-container *appLet="testsToMove.testIds.length as ids">
+                    <ng-container [ngSwitch]="ids">
+                        <span *ngSwitchCase="1" data-qa="successfullyAthleteMovedNotification" i18n="@@followingTestMovedToTestingOrderX">The following test was successfully moved to Testing Order number {{ testsToMove.testingOrderNumber }}</span>
+                        <span *ngSwitchDefault data-qa="successfullyAthletesMovedNotification" i18n="@@followingTestsMovedToTestingOrderX">The following tests were successfully moved to Testing Order number {{ testsToMove.testingOrderNumber }}</span>
+                    </ng-container>
+                    <ul links>
+                        <li *ngFor="let athleteName of testsToMove.names">
+                            <span data-qa="athleteMoved">{{ athleteName }}</span>
+                        </li>
+                    </ul>
+                </ng-container>
+            </app-notification>
+
+        <ng-container *appLet="to$ | async as to">
+            <app-view-content *ngIf="!state.hasBeenDeleted && to.id">
+                <app-to-authorization
+                    id="authorization"
+                    [authorization]="authorization$ | async"
+                    [behalfOfSCA]="behalfOfSCA$ | async"
+                    [canWrite]="(isMissionOrderWriter$ | async) && (state?.security?.actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                    [status]="to.testingOrderStatus"
+                    [testingOrderId]="to.id"
+                    [whiteList]="state?.security?.fields"
+                    (errors)="showAuthorizationErrors = $event">
+                </app-to-authorization>
+                <app-athletes-and-analyses
+                    id="athletes-and-analyses"
+                    [actions]="state?.security?.actions"
+                    [athleteAndAnalyses]="athleteAndAnalyses$ | async"
+                    [cancelledTests]="cancelledTests$ | async"
+                    [canWrite]="(isMissionOrderWriter$ | async) && (state?.security?.actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                    [clearTableWarnings]="clearTableWarnings$ | async"
+                    [closedAnalysis]="closedAnalysis$ | async"
+                    [closedTests]="closedTests$ | async"
+                    [isBplrReaderOrWriter]="isBplrReaderOrWriter$ | async"
+                    [isLrReaderOrWriter]="isLrReaderOrWriter$ | async"
+                    [missionOrderId]="missionOrderId$ | async"
+                    [routeState]="routeState$ | async"
+                    [status]="to?.testingOrderStatus"
+                    [statusUpdateError]="statusUpdateError$ | async"
+                    [testStatuses]="testStatuses$ | async"
+                    [testingOrder]="to"
+                    [testingOrderId]="testingOrderId$ | async"
+                    [toEndDate]="toEndDate$ | async"
+                    [toStartDate]="toStartDate$ | async"
+                    [whiteList]="state?.security?.fields"
+                    (analysisToCloseEmitter)="closeAnalysis($event)"
+                    (cleanCancelledTestsEmitter)="cleanCancelledTests($event)"
+                    (cleanClosedAnalysisEmitter)="cleanClosedAnalysis($event)"
+                    (cleanClosedTestsEmitter)="cleanClosedTests($event)"
+                    (errors)="showAthletesAndAnalysesErrors = $event"
+                    (moveToTOEmitter)="moveToTestingOrder($event)"
+                    (testsToCancelEmitter)="cancelTests($event)"
+                    (testsToCloseEmitter)="closeTests($event)">
+                </app-athletes-and-analyses>
+                <app-doping-control-personnel
+                    id="doping-control-personnel"
+                    [canWrite]="(isMissionOrderWriter$ | async) && (state?.security?.actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                    [dopingControlPersonnel]="dopingControlPersonnel$ | async"
+                    [status]="to.testingOrderStatus"
+                    [testingOrderId]="testingOrderId$ | async"
+                    [whiteList]="state?.security?.fields"
+                    (errors)="showDopingControlPersonnelErrors = $event">
+                </app-doping-control-personnel>
+                <app-test-participants
+                    [canWrite]="(isMissionOrderWriter$ | async) && (state?.security?.actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                    [testParticipants]="testParticipants$ | async"
+                    [testingOrderId]="testingOrderId$ | async"
+                    [whiteList]="state?.security?.fields">
+                </app-test-participants>
+            </app-view-content>
+        </ng-container>
+    </app-loading-frame>
+</app-to-page>
+
+<app-footer
+    [creationInfo]="creationInfo$ | async"
+    [updateInfo]="updateInfo$ | async">
+</app-footer>
+
+<div *ngIf="!(hasBeenDeleted$ | async) && (isMissionOrderActivityReaderOrWriter$ | async)" class="activity-table__wrapper">
+    <app-activity-table
+        [dataSource]="dataSource"
+        [error]="activitiesError$ | async"
+        [loading]="loading$ | async"
+        [ownerId]="testingOrderId$ | async"
+        [targetObject]="'CreateTestingOrderActivity'"
+        [userHasCreateRoles]="isMissionOrderActivityWriter$ | async">
+    </app-activity-table>
+</div>
+
+<app-delete-modal
+    *appLet="hasDeleteNotification$ | async as hasDeleteNotification"
+    [hiddenBody]="hasDeleteNotification"
+    [objectId]="toId"
+    [targetObject]="objectTargetEnum.TO"
+    (deleteObject)="deleteTestingOrder($event)">
+    <ng-container notifications>
+        <app-notification *ngIf="!hasDeleteNotification" type="warning">
+            <span i18n="@@allRelatedTestsWillBeDeleted">All related tests will be deleted.</span>
+        </app-notification>
+
+        <app-notification *ngIf="hasDeleteNotification" type="warning">
+            <span i18n="@@toDeleteTestingOrderMoveOrCancel">In order to delete this Testing Order, move or cancel:</span>
+            <ul>
+                <li *ngIf="testHasDcf$ | async">
+                    <span i18n="@@allTestsHaveDopingControlForm">All tests that have a Doping Control Form entered.</span>
+                </li>
+                <li *ngIf="testHasUA$ | async">
+                    <span i18n="@@allTestsHaveUnsuccessfulAttempt">All tests that have an Unsuccessful Attempt entered.</span>
+                </li>
+                <li *ngIf="testHasClosedStatus$ | async">
+                    <span i18n="@@allTestsHaveClosedSample">All tests that have a Closed Sample Not Collected status.</span>
+                </li>
+            </ul>
+        </app-notification>
+    </ng-container>
+</app-delete-modal>
+
+<app-change-status-modal
+    [hasActiveTests]="hasActiveTests$ | async"
+    [objectId]="toId"
+    [statusSpecificCode]="newStatus"
+    [targetObject]="objectTargetEnum.TO"
+    [hasAnalysisInTests]="hasAnalysisInTests"
+    [testsAthleteWithoutSamples]="testsAthleteWithoutSamples$ | async"
+    (changeStatusEmitter)="changeTOStatus($event)">
+    <ng-container notifications>
+        <app-notification *ngIf="(hasActiveTests$ | async) && newStatus === statusEnum.Completed" type="warning">
+            <span i18n="@@cannotCompleteTOUntilTestsAreValid">A Testing Order cannot be completed until all tests are either completed, closed or cancelled.</span>
+        </app-notification>
+    </ng-container>
+</app-change-status-modal>

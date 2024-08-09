@@ -1,0 +1,107 @@
+// Primary button colors
+$primary_color: white;
+$primary_background: #3F8532;
+$primary_border: #3F8532;
+$primary_background_hover: #2D6828;
+$primary_border_hover: #2D6828;
+$primary_color_disabled: #A1A1A1;
+$primary_background_disabled: #E4E4E4;
+$primary_border_disabled: #E4E4E4;
+
+// Secondary button colors
+$secondary_color: #595959;
+$secondary_background: #FFFFFF;
+$secondary_border: #757575;
+$secondary_background_hover: #CFCFCF;
+$secondary_color_disabled: #A1A1A1;
+$secondary_background_disabled: #F2F2F2;
+$secondary_border_disabled: #A1A1A1;
+
+// Delete button colors
+$delete_color: #AA1A1A;
+$delete_background: transparent;
+$delete_border: #AA1A1A;
+$delete_background_hover: #FDBABA;
+$delete_color_disabled: #A1A1A1;
+$delete_background_disabled: #F2F2F2;
+$delete_border_disabled: #A1A1A1;
+
+:host {
+    display: inline-block;
+}
+
+.button {
+    display: inline-block;
+    cursor: pointer;
+    opacity: 1;
+    width: 100%;
+    min-height: 42px;
+    padding-left: 25px;
+    padding-right: 25px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 5px;
+    white-space: nowrap;
+
+    &:disabled {
+        cursor: default;
+        pointer-events:none;
+    }
+
+    &__primary {
+        color: $primary_color;
+        background: $primary_background;
+        border: 2px solid $primary_border;
+        font-weight: bold;
+
+        &:hover {
+            background: $primary_background_hover;
+            border: 2px solid $primary_border_hover;
+        }
+
+        &:disabled {
+            color: $primary_color_disabled;
+            background: $primary_background_disabled;
+            border: 2px solid $primary_border_disabled;
+        }
+    }
+
+    &__secondary {
+        color: $secondary_color;
+        background: $secondary_background;
+        border: 2px solid $secondary_border;
+        font-weight: bold;
+
+        &:hover {
+            background: $secondary_background_hover;
+            opacity: 0.9;
+        }
+
+        &:disabled {
+            color: $secondary_color_disabled;
+            background: $secondary_background_disabled;
+            border: 2px solid $secondary_border_disabled;
+        }
+    }
+
+    &__delete {
+        color: $delete_color;
+        background: $delete_background;
+        border: 2px solid $delete_border;
+
+        &:hover {
+            background: $delete_background_hover;
+            opacity: 0.9;
+        }
+
+        &:disabled {
+            color: $delete_color_disabled;
+            background: $delete_background_disabled;
+            border: 2px solid $delete_border_disabled;
+        }
+    }
+}

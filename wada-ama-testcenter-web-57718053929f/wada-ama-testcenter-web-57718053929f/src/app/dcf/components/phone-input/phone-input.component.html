@@ -1,0 +1,102 @@
+<app-form-field
+    *appLet="(!newPhoneNumber && phoneNumbers.length) as showEdit"
+    class="wrapper"
+    [columns]="!showEdit ? '30% auto auto auto auto' : '30% auto min-content min-content'"
+    [hasAsterisk]="hasAsterisk"
+    [hasError]="hasError">
+    <ng-content select="label" [@fadeInOut]></ng-content>
+    <app-dropdown
+        #phoneDropDown
+        field-input
+        *ngIf="showEdit"
+        dataQA="phoneNumberDropdown"
+        size="10"
+        type="text"
+        [@fadeInOut]
+        [appDisable]="isDisabled"
+        [compare]="phoneDeepEqual"
+        [hasError]="hasError"
+        [isDisabled]="isDisabled"
+        [(ngModel)]="selectedPhone"
+        (selectedItem)="selectPhone($event)">
+        <ng-container *ngFor="let phone of phoneNumbers; let i = index">
+            <div
+                *ngIf="phone.phoneNumber"
+                class="dropdown-item"
+                data-qa="phoneNumberDropdownOption"
+                [appDropdownElement]="phone"
+                [attr.data-qa-precision]="i">
+                {{ phone | phoneInternationalFormat }}
+            </div>
+        </ng-container>
+    </app-dropdown>
+
+    <span field-top-label *ngIf="!showEdit" i18n="@@countryCode" [@fadeInOut]>Country Code</span>
+    <app-typeahead
+        #phoneInput
+        field-input
+        *ngIf="!showEdit"
+        class="countryCode"
+        dataQA="countryCodeTypeahead"
+        suggestionField="description"
+        [@fadeInOut]
+        [hasError]="hasError"
+        [isDisabled]="isDisabled"
+        [suggestions]="countryCodeSuggestions"
+        [(ngModel)]="currentCountryCode"
+        (selected)="selectCountryCode($event)">
+    </app-typeahead>
+    <div field-info>
+        <div *ngIf="hasError" class="error-message">
+            <ng-content select="[phone-errors]"></ng-content>
+        </div>
+    </div>
+
+    <span field-top-label-2 *ngIf="!showEdit" i18n="@@areaCodeAndPhoneNumber" [@fadeInOut]>Area Code and Phone Number</span>
+    <input
+        field-input-2
+        *ngIf="!showEdit"
+        appRestrictToPattern="[0-9-(). ]"
+        class="phoneNumber"
+        data-qa="phoneNumber"
+        type="text"
+        [@fadeInOut]
+        [class.error]="hasError"
+        [disabled]="isDisabled"
+        [id]="phoneNumberFieldId"
+        [(ngModel)]="phoneNumber"
+        (blur)="notify()">
+
+    <span field-top-label-3 *ngIf="!showEdit" i18n="phone extension@@extension" [@fadeInOut]>Extension</span>
+    <input
+        field-input-3
+        *ngIf="!showEdit"
+        appRestrictToPattern="^[0-9]*$"
+        class="extension"
+        data-qa="extension"
+        type="text"
+        [@fadeInOut]
+        [disabled]="isDisabled"
+        [(ngModel)]="extension"
+        (blur)="notify()">
+
+    <a
+        field-info
+        *ngIf="!showEdit && phoneNumbers.length > 0 && !isDisabled"
+        i18n="@@selectPhoneNumberFromList"
+        tabindex="0"
+        [@fadeInOut]
+        (click)="toggleNewPhoneNumber(false)"
+        (keydown.enter)="toggleNewPhoneNumber(false)">Select Phone Number from List</a>
+    
+    
+    <a
+        field-info
+        *ngIf="showEdit && !isDisabled"
+        i18n="@@enterNewPhoneNumber"
+        tabindex="0"
+        [@fadeInOut]
+        (click)="toggleNewPhoneNumber(true)"
+        (keydown.enter)="toggleNewPhoneNumber(true)">Enter New Phone Number
+    </a>
+</app-form-field>

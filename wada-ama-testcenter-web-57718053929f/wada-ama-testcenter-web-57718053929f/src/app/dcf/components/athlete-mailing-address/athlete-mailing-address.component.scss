@@ -1,0 +1,23 @@
+@import '~sass/variables';
+
+input[type="text"] {
+    width: 60%;
+}
+
+.edit-title {
+    font-size: 18px;
+    color: $link-color;
+}
+
+input.error  {
+    border: 2px solid $error-color;
+}
+
+app-typeahead {
+    width: 60%;
+    display: block;
+}
+
+app-form-field{
+    margin-bottom: 12px;
+}

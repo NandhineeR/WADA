@@ -1,0 +1,56 @@
+@import '~sass/variables';
+
+.round-borders {
+    border-radius: 5px !important;
+    border: 1px !important;
+}
+
+.disabled {
+    pointer-events:none;
+}
+
+.chevron {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 20px;
+    font-size: 18px;
+    text-align: center;
+    margin-left: 10px;
+
+    img {
+        width: 18px;
+        height: 20px;
+
+        &.disabled {
+            opacity: 0.6;
+        }
+
+        &.up {
+            transform: none;
+        }
+
+        &.down {
+            transform: rotate(180deg);
+        }
+    }
+
+    .right {
+        display: inline-block;
+    }
+}
+
+.mat-menu {
+    background-color: white;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
+    border-radius: 5px;
+    overflow: hidden;
+
+    &.sidebar-menu {
+        background-color: #C3E6B6;
+        color: #414042;
+        border-radius: 0 5px 5px 0;
+        margin-left: $menu-element-width;
+        margin-top: -$menu-element-height;
+    }
+}

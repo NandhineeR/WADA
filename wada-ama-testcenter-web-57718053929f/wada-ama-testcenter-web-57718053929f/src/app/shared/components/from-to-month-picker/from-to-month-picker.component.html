@@ -1,0 +1,89 @@
+<div class="wrapper">
+    <div class="side-column">
+        <div class="from-to" i18n="@@from">From</div>
+        <app-numeric-input
+            class="numeric-input"
+            [value]="fromToDate.fromYear"
+            (valueChanged)="fromYearChanged($event)">
+        </app-numeric-input>
+        <app-button-matrix
+            class="month-picker"
+            [labels]="monthLabels"
+            [numCols]="3"
+            [selectedIndex]="fromToDate.fromMonth"
+            (itemSelected)="fromMonthChanged($event)">
+        </app-button-matrix>
+    </div>
+
+    <div class="center-column">
+        <input
+            id="nextYear"
+            name="center_buttons"
+            type="radio"
+            value="nextYear"
+            [checked]="mode === modeEnum.NextYear"
+            (change)="modeChanged(modeEnum.NextYear)"/>
+        <label for="nextYear">{{ currentYear + 1 }}</label>
+
+        <input
+            id="year_to_date"
+            name="center_buttons"
+            type="radio"
+            value="yearToDate"
+            [checked]="mode === modeEnum.YearToDate"
+            (change)="modeChanged(modeEnum.YearToDate)"/>
+        <label for="year_to_date" i18n="@@yearToDate">Year to Date</label>
+
+        <input
+            id="lastYear"
+            name="center_buttons"
+            type="radio"
+            value="lastYear"
+            [checked]="mode === modeEnum.LastYear"
+            (change)="modeChanged(modeEnum.LastYear)"/>
+        <label for="lastYear">{{ currentYear - 1 }}</label>
+
+        <input
+            id="twoYearsAgo"
+            name="center_buttons"
+            type="radio"
+            value="twoYearsAgo"
+            [checked]="mode === modeEnum.TwoYearsAgo"
+            (change)="modeChanged(modeEnum.TwoYearsAgo)"/>
+        <label for="twoYearsAgo">{{ currentYear - 2 }}</label>
+
+        <input
+            id="threeYearsAgo"
+            name="center_buttons"
+            type="radio"
+            value="threeYearsAgo"
+            [checked]="mode === modeEnum.ThreeYearsAgo"
+            (change)="modeChanged(modeEnum.ThreeYearsAgo)"/>
+        <label for="threeYearsAgo">{{ currentYear - 3 }}</label>
+
+        <input
+            id="custom"
+            name="center_buttons"
+            type="radio" 
+            value="custom"
+            [checked]="mode === modeEnum.Custom"
+            (change)="modeChanged(modeEnum.Custom)"/>
+        <label for="custom" i18n="@@custom">Custom</label>
+    </div>
+
+    <div class="side-column">
+        <div class="from-to" i18n="@@to">To</div>
+        <app-numeric-input
+            class="numeric-input"
+            [value]="fromToDate.toYear"
+            (valueChanged)="toYearChanged($event)">
+        </app-numeric-input>
+        <app-button-matrix
+            class="month-picker"
+            [labels]="monthLabels"
+            [numCols]="3"
+            [selectedIndex]="fromToDate.toMonth"
+            (itemSelected)="toMonthChanged($event)">
+        </app-button-matrix>
+    </div>
+</div>

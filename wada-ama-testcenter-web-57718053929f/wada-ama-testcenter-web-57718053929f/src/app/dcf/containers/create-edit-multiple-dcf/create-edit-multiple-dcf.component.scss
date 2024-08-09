@@ -1,0 +1,60 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/styles/next-button-container';
+
+$arrow-size: 10px;
+$frameColor: #3f8532;
+$messageColor: #414042;
+$maxNumberOfSteps: 10;
+$stepWidth: 150px;
+
+::ng-deep .card-header {
+    padding: 0;
+    border-bottom: 0;
+    background: transparent;
+}
+
+::ng-deep .card {
+    border: 0;
+    background-color: transparent;
+}
+
+::ng-deep .card-body {
+    border: solid 2px $primary-background;
+    background: #fff;
+    padding: 0.75rem 0 1.50rem 0;
+    border-radius: 5px;
+}
+
+::ng-deep .panel-collapse {
+    overflow: visible !important;
+    margin: 8px 0 8px 0;
+}
+
+.bottom-space {
+    margin-bottom: 8px;
+}
+
+
+@mixin createEditStyle($left, $right, $dir) {
+    accordion-group {
+        margin-top: 25;
+        .next-button-container {
+            @include next-button-container($left, $right);
+        }
+    }
+}
+
+
+.wrapper {
+    @include ltr {
+        @include createEditStyle(left, right, 1);
+    }
+    @include rtl {
+        @include createEditStyle(right, left, -1);
+    }
+}
+
+.footer {
+    padding-bottom: 25px;
+}

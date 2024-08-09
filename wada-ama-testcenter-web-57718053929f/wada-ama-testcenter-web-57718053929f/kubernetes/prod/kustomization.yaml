@@ -1,0 +1,75 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../base
+#1 - Set the namespace
+namespace: testcenter
+#Service and ConfigMap patches
+#OIDC Plugin variations
+patches:
+- patch: |-
+    - op: replace
+      path: "/spec/rules/0/host"
+      value: "adams.wada-ama.org"
+  target:
+    kind: Ingress
+    name: testcenter-web-ingress
+    version: v1
+- patch: |-
+    - op: replace
+      path: "/spec/rules/0/host"
+      value: "adams.wada-ama.org"
+  target:
+    kind: Ingress
+    name: sample-management-ingress
+    version: v1
+- patch: |-
+    - op: replace
+      path: "/config/issuer"
+      value: "https://sso.wada-ama.org/auth/realms/WADA/.well-known/openid-configuration"
+    - op: replace
+      path: "/config/unauthorized_redirect_uri/0"
+      value: "https://adams.wada-ama.org/ng"
+    - op: replace
+      path: "/config/logout_redirect_uri/0"
+      value: "https://adams.wada-ama.org/ng"
+    - op: replace
+      path: "/config/session_redis_host"
+      value: "kong-redis-eks-prod-apps-master-0.kong-redis-eks-prod-apps-headless.kong.svc.cluster.local"
+  target:
+    kind: KongPlugin
+    name: testcenter-web-openid-connect-plugin
+    version: v1
+- patch: |-
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: testcenter-web-service
+    spec:
+      ports:
+        - name: https
+          protocol: TCP
+          port: 9443
+          targetPort: 4200
+          nodePort: 31443
+- patch: |-
+    - op: replace
+      path: "/spec/externalName"
+      value: "lts.wada-ama.org"
+  target:
+    kind: Service
+    name: sample-management-service
+    version: v1
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: testcenter-web-configmap
+    data:
+      CAPI_BASE_URL: "https://adams.wada-ama.org/ng/testcenter-api"
+      FAPI_LOGS_URL: "https://adams.wada-ama.org/ng/logs"
+      ADAMS_URL: "https://adams.wada-ama.org/adams"
+      SAMPLE_MANAGEMENT_URL: "https://adams.wada-ama.org/sm"
+      SAMPLE_MANAGEMENT_LINK: "https://lts.wada-ama.org/link"
+      APM_SERVER_URL: "https://k8s-app-lb-3bad9ad5fc57c6be.elb.ca-central-1.amazonaws.com:30820"
+      ELASTIC_APM_ENVIRONMENT: "prod"

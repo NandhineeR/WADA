@@ -1,0 +1,57 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/styles/dashed-line';
+
+$nameColor: #414042;
+
+@include dashed-line();
+
+@mixin header($left, $right) {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 5fr;
+    justify-content: space-between;
+    width: 100%;
+    height: 40%;
+
+    .title {
+        font-size: 34px;
+        font-weight: bold;
+        color: $title-color;
+    }
+
+    .user {
+        width: fit-content;
+        font-size: 16px;
+        color: $nameColor;
+        background-color: rgba(255, 255, 255, 0.75);
+
+        height: 40px;
+        line-height: 40px;
+        padding-#{$left}: 5px;
+        padding-#{$right}: 40px;
+        border-top-#{$right}-radius: 35px;
+        border-bottom-#{$right}-radius: 35px;
+        margin-bottom: 5px;
+
+        .space {
+            margin-left:5em;
+        }
+    }
+
+    .athlete-details{
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 2fr 1fr 2fr;
+        font-size: 12px;
+    }
+}
+
+.header {
+    @include ltr {
+        @include header(left, right);
+    }
+    @include rtl {
+        @include header(right, left);
+    }
+}

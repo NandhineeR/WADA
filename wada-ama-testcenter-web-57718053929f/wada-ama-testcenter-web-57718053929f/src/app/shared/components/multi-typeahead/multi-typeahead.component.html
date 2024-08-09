@@ -1,0 +1,30 @@
+<div
+    *ngIf="selectedSuggestions?.length >= maxTags"
+    class="max-message"
+    i18n="@@youHaveReachedLimitXitems">You have reached the limit of {{ maxTags }} items. Remove one prior to add a new one.</div>
+<app-typeahead
+    id="app-multi-typeahead"
+    [(ngModel)]="value"
+    [suggestions]="suggestionsWithoutSelected"
+    [removeItem]="removeItem"
+    [suggestionField]="suggestionField"
+    [delayMs]="delayMs"
+    [suggestionsLimit]="suggestionsLimit"
+    [scrollable]="scrollable"
+    [suggestionsInScrollableView]="suggestionsInScrollableView"
+    [itemTemplate]="itemTemplate"
+    [placeholder]="placeholder"
+    [allowArbitraryInput]="allowArbitraryInput"
+    [sortSuggestions]="sortSuggestions"
+    [isInvalid]="isInvalid"
+    [isDisabled]="selectedSuggestions?.length >= maxTags || isDisabled"
+    [dataQA]="dataQA"
+    (selected)="valueSelected($event)"
+    (noResult)="noResult"
+    (loading)="loading"
+    [dataQA]="dataQA">
+</app-typeahead>
+<div class="nationality-tag-content" *ngFor="let suggestion of selectedSuggestions; let i = index">
+    <span class="tag"> {{ suggestionField.length > 0 ? suggestion[suggestionField] : suggestion }}</span>
+    <div class="tag-remove-icon" (click)="removeValue(suggestion)">&times;</div>
+</div>

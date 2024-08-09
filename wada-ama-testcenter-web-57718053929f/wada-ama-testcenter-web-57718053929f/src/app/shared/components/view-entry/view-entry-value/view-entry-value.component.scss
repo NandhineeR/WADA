@@ -1,0 +1,8 @@
+div {
+    font-weight: bold;
+
+    & > * {
+        min-height: 18px;
+        white-space: pre-wrap;
+    }
+}

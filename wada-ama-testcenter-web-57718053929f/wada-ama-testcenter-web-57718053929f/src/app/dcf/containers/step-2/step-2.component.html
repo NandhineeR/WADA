@@ -1,0 +1,374 @@
+<div
+    appInheritDir
+    appRandomizeInput
+    *ngIf="autoCompletesAndGlobalData$ | async as autoCompletesAndGlobalData"
+    #root="appRandomizeInput"
+    class="wrapper">
+    <app-dcf-notifications
+        *ngIf="(
+            (form | formErrors:showErrors:dcfStatus) ||
+            (hasSaveConflict && (hasOptimisticLockException || hasSampleCodeValidationError)) ||
+            (saveError && !(hasSaveConflict && hasOptimisticLockException))
+        )"
+        id="dcf-notifications"
+        type="error"
+        [conflictException]="conflictException"
+        [dcfId]="dcfId$ | async"
+        [saveError]="saveError">
+        <div *ngIf="!hasSampleCodeValidationError && !saveError">
+            <span i18n="@@errorsDetectedInFollowingFields">Some error(s) were detected in the following fields:</span>
+            <ul links class="error-link-list">
+                <li *ngIf="arrivalDateHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('arrivalDate') }}" i18n="@@arrivalDate">Arrival Date</a>
+                </li>
+                <li *ngIf="timezoneHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('timezone') }}" i18n="@@dcf_timezone">Timezone</a>
+                </li>
+                <li *ngIf="testTypeHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('testType') }}" i18n="@@testType">Test Type</a>
+                </li>
+                <li *ngIf="feeForServiceHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('feeForService') }}" i18n="@@feeForServiceTest">Fee for Service Test</a>
+                </li>
+                <ng-container *ngFor="let item of samples.controls;let i=index">
+                    <ng-container *ngFor="let key of item | formControlKeys">
+                        <div *ngIf="item.controls  | controlErrors:showErrors:dcfStatus:key">
+                            <ng-container *ngIf="key !== 'witnessChaperone' && key !== 'bloodCollectionOfficial'; else witnessChaperoneOrBloodOfficial">
+                                <li>
+                                    <a href="{{ route$ | async }}#{{ root.getId(key+i) }}">
+                                        <span i18n="@@dcf_samples">Sample {{ i+1 }} - </span>
+                                        <span *ngIf="key === 'sampleCode'" i18n="@@sampleCode">Sample Code</span>
+                                        <span *ngIf="key === 'collectionDate'" i18n="@@collectionDate">Collection Date</span>
+                                        <span *ngIf="key === 'timezone'" i18n="@@timezone">Time Zone</span>
+                                        <span *ngIf="key === 'laboratory'" i18n="@@laboratory">Laboratory</span>
+                                        <span *ngIf="key === 'manufacturer'" i18n="@@manufacturer">Manufacturer</span>
+                                        <span *ngIf="key === 'manufacturerKit'" i18n="@@manufacturerKit">Manufacturer Kit</span>
+                                        <span *ngIf="key === 'volume'" i18n="@@urineVolume">Urine Volume</span>
+                                        <span *ngIf="key === 'volumeBelowMinimumReason'" i18n="@@reasonForUrineVolumeBelowMinimum">Reason For Urine Volume Below Minimum</span>
+                                        <span *ngIf="key === 'partialVolume'" i18n="@@urinePartialVolume">Urine Partial Volume</span>
+                                        <span *ngIf="key === 'specificGravity'" i18n="@@specificGravity">Specific Gravity</span>
+                                        <span *ngIf="key === 'seated'" i18n="@@seated">Seated</span>
+                                        <span *ngIf="key === 'training'" i18n="@@dcf_training">Training</span>
+                                        <span *ngIf="key === 'trainingType'" i18n="@@trainingType">Training - Training Type</span>
+                                        <span *ngIf="key === 'trainingHigh'" i18n="@@highAltitudeTraining">High Altitude Training</span>
+                                        <span *ngIf="key === 'location'" i18n="@@highAltitudeTrainingLocation">High Altitude Training - Location</span>
+                                        <span *ngIf="key === 'altitude'" i18n="@@highAltitudeTrainingAltitude">High Altitude Training - Altitude</span>
+                                        <span *ngIf="key === 'start'" i18n="@@highAltitudeTrainingStartDate">High Altitude Training - Start Date</span>
+                                        <span *ngIf="key === 'end'" i18n="@@highAltitudeTrainingEndDate">High Altitude Training - End Date</span>
+                                        <span *ngIf="key === 'simulation'" i18n="@@highAltitudeSimulation">High Altitude Simulation</span>
+                                        <span *ngIf="key === 'deviceType'" i18n="@@highAltitudeSimulationDeviceType">High Altitude Simulation - Device Type</span>
+                                        <span *ngIf="key === 'useManner'" i18n="@@highAltitudeSimulationUseManner">High Altitude Simulation - Use Manner</span>
+                                        <span *ngIf="key === 'bloodLoss'" i18n="@@bloodLoss">Blood Loss</span>
+                                        <span *ngIf="key === 'timeBloodLoss'" i18n="@@bloodLossWhen">Blood Loss - When</span>
+                                        <span *ngIf="key === 'cause'" i18n="@@bloodLossCause_errorLink">Blood Loss - Cause</span>
+                                        <span *ngIf="key === 'volumeBloodLoss'" i18n="@@bloodLossVolume">Blood Loss - Volume</span>
+                                        <span *ngIf="key === 'timeBloodTransfusion'" i18n="@@@@bloodTransfusionWhen">Blood Transfusion - When</span>
+                                        <span *ngIf="key === 'volumeBloodTransfusion'" i18n="@@bloodTransfusionVolume">Blood Transfusion - Volume</span>
+                                    </a>
+                                </li>
+                            </ng-container>
+                        </div>
+                        <ng-template #witnessChaperoneOrBloodOfficial>
+                                <li *ngIf="item.controls[key]?.errors.firstNameRequired">
+                                    <a href="{{ route$ | async }}#{{ root.getId('firstName'+i) }}">
+                                        <span i18n="@@dcf_samples">Sample {{ i+1 }} - </span>
+                                        <ng-container [ngSwitch]="key">
+                                            <span *ngSwitchCase="'bloodCollectionOfficial'" i18n="@@bloodCollectionOfficialFirstName">Blood Collection Official First Name</span>
+                                            <span *ngSwitchCase="'witnessChaperone'" i18n="@@witnessChaperoneFirstName">Witness Chaperone First Name</span>
+                                            <span *ngSwitchDefault></span>
+                                        </ng-container>                                
+                                    </a>
+                                </li>
+                                <li *ngIf="item.controls[key]?.errors.lastNameRequired">
+                                    <a href="{{ route$ | async }}#{{ root.getId('lastName'+i) }}">
+                                        <span i18n="@@dcf_samples">Sample {{ i+1 }} - </span>
+                                        <ng-container [ngSwitch]="key">
+                                            <span *ngSwitchCase="'bloodCollectionOfficial'" i18n="@@bloodCollectionOfficialLastName" >Blood Collection Official Last Name</span>
+                                            <span *ngSwitchCase="'witnessChaperone'" i18n="@@witnessChaperoneLastName">Witness Chaperone Last Name</span>
+                                            <span *ngSwitchDefault></span>
+                                        </ng-container>
+                                    </a>
+                                </li>
+                        </ng-template>
+                    </ng-container>
+                </ng-container>
+            </ul>
+        </div>
+    </app-dcf-notifications>
+    <app-dcf-notifications
+        *ngIf="formHasWarnings || hasCodeValidationWarning"
+        id="notifications2"
+        type="warning"
+        [conflictException]="conflictException"
+        [dcfId]="dcfId$ | async">
+        <ul links class="error-link-list">
+            <ng-container *ngFor="let item of samples.controls; let i=index">
+                <div *ngFor="let key of item | formControlKeys">
+                    <div *ngIf="(item.controls[key] | controlWarnings) && key === 'sampleCode'">
+                        <div *ngIf="hasCodeValidationWarning">
+                            <span i18n="@@sampleTypeXsampleCodeXWarningNotification">{{ getSampleTypeLabel(i) | titlecase }} sample {{ sampleDuplicate.get('sampleCode'+i) }} already exists in ADAMS. Make sure these values are correct.</span>
+                        </div>
+                        <li>
+                            <a href="{{ route$ | async }}#{{ root.getId(key+i) }}">
+                                <span i18n="@@sample">Sample</span> {{ i+1 }} - <span i18n="@@sampleCode">Sample Code</span>
+                            </a>
+                        </li>
+                    </div>
+                    <div *ngIf="(item.controls[key] | controlWarnings) && key === 'specificGravity'">
+                        <span i18n="@@warningsDetectedInTheFollowingFields">Some warning(s) were detected in the following fields:</span>
+                        <li>
+                            <a href="{{ route$ | async }}#{{ root.getId(key+i) }}">
+                                <span i18n="@@sample">Sample</span> {{ i+1 }} - <span *ngIf="key === 'specificGravity'" i18n="@@specificGravity">Specific Gravity</span>
+                            </a>
+                        </li>
+                    </div>
+                </div>
+            </ng-container>
+        </ul>
+    </app-dcf-notifications>
+
+    <app-notification *ngIf="!isStepValid" type="warning" >
+        <span i18n="@@stepNavigationDisabledWarning">Step navigation is disabled until all mandatory fields are filled.</span>
+    </app-notification>
+    <app-notification *ngIf="(isMatchingResultType3or2or1$ | async)" type="warning">
+        <span i18n="@@disableFieldMatchingResultInfo">Some fields are disabled due to an existing match. To edit these fields, use the “REJECT MATCH” button.</span>
+    </app-notification>
+    <app-notification *ngIf="arrivalDate.value !== null && arrivalDate.value !== undefined && dcfToBeDeleted()" type="warning">
+        <span i18n="@@warningsDCFToBeDeleted">The arrival date for this DCF is older than {{ dcfRetentionPeriod }} months. Please note that unmatched DCFs older than {{ dcfRetentionPeriod }} months will be deleted.</span>
+    </app-notification>
+    <app-notification *ngIf="isUpdatedAuthorities" type="informative">
+        <span i18n="@@updatedAuthoritiesInformation">The authorities selected on step 1 have been updated with the Major Event authorities.</span>
+    </app-notification>
+    
+    <form
+        *appLet="{security: fieldsSecurity$ | async, isEditMode: isEditMode$ | async} as state"
+        [formGroup]="form">
+        <app-form-field
+            *ngIf="!isMultipleDCF"
+            class="wrapper"
+            columns="30% 30% 30% 30%"    
+            [hasAsterisk]="true"
+            [hasError]="arrivalDateHasErrors"
+            [ngClass]="{ 'topSpace': isMultipleDCF }">
+            <label for="arrivalDate" i18n="@@arrivalDate">Arrival Date</label>
+            <app-info-bubble>
+                <span i18n="@@arrivalDateDopingControlStation">Date of Arrival to the Doping Control Station.</span>
+            </app-info-bubble>
+            <span field-top-label i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h)</span>
+            <app-datetime-picker
+                field-input
+                dataQA="arrivalDate"
+                fieldId="arrivalDate"
+                formControlName="arrivalDate"
+                [appDisable]="(isMatchingResultType3or2or1$ | async) || (controls.ARRIVAL_DATE | isInputDisabled:state?.security:state?.isEditMode)"
+                [disabled]="(isMatchingResultType3or2or1$ | async) || (controls.ARRIVAL_DATE | isInputDisabled:state?.security:state?.isEditMode)"
+                [hasError]="arrivalDateHasErrors"
+                [locale]="locale$ | async">
+            </app-datetime-picker>
+            <div field-info *ngIf="arrivalDateHasErrors" class="error-message">
+                <span *ngIf="arrivalDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span *ngIf="arrivalDate.errors.validateDatetimeFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                <span *ngIf="arrivalDate.errors.dateIsRemoved?.error?.invalid" i18n="@@arrivalDateCantBeRemoved">The arrival date can be updated but cannot be removed.</span>
+            </div>
+
+            <span field-top-label-2 id="notificationTimezone" i18n="@@timeZone">Time Zone</span>
+            <app-dropdown 
+                field-input-2
+                dataQA="timeZoneDropdownArrivalDate"
+                formControlName="timezone"
+                i18n-placeholder="@@timezone"
+                id="timezone"
+                placeholder="Time Zone"
+                property="id"
+                style="width: 100%"
+                type="text"
+                [appDisable]="(isMatchingResultType3or2or1$ | async) || (controls.ARRIVAL_DATE | isInputDisabled:state?.security:state?.isEditMode)"
+                [hasError]="timezoneHasErrors"
+                [isDisabled]="(isMatchingResultType3or2or1$ | async) || (controls.ARRIVAL_DATE | isInputDisabled:state?.security:state?.isEditMode)">
+                <ng-container *ngFor="let item of timezones$ | async; let i = index">
+                    <div [appDropdownElement]="item" class="dropdown-item" data-qa="timeZoneDropdownOptionArrivalDate" [attr.data-qa-precision]="i">{{ item.shortName }}</div>
+                </ng-container>
+            </app-dropdown>
+            <div field-info-2 *ngIf="timezoneHasErrors" class="error-message">
+                <span *ngIf="timezone.errors.validateEmptyTimezone?.error?.invalid"
+                    i18n="@@provideTimezoneWithArrivalDate">The time zone must be provided when the arrival date is set.</span>
+                <span *ngIf="timezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [hasAsterisk]="true" [hasError]="testTypeHasErrors">
+            <label for="testType" i18n="@@testType">Test Type</label>
+            <div field-input>
+                <label class="radio-container">
+                    <input
+                        data-qa="testTypeInCompetition"
+                        formControlName="testType"
+                        id="testType"
+                        name="testType"
+                        type="radio"
+                        [appDisable]="(isMatchingResultType2or1$ | async) || (controls.TEST_TYPE | isInputDisabled:state?.security:state?.isEditMode)"
+                        [value]="true"
+                        (change)="onChangeInCompetition()">
+                    <span class="checkmark"></span>
+                    <span i18n="@@inCompetition" class="radio-label">In Competition</span>
+                </label>
+                <label class="radio-container">
+                    <input 
+                        data-qa="testTypeOutCompetition"
+                        formControlName="testType"
+                        name="testType"
+                        type="radio"
+                        [appDisable]="(isMatchingResultType2or1$ | async) || (controls.TEST_TYPE | isInputDisabled:state?.security:state?.isEditMode)"
+                        [value]="false"
+                        (change)="onChangeOutCompetition()">
+                    <span class="checkmark"></span>
+                    <span i18n="@@outOfCompetition" class="radio-label">Out of Competition</span>
+                </label>
+            </div>
+        </app-form-field>
+
+        <app-form-field
+            *ngIf="isInCompetition || testType?.value === true"
+            columns="30% auto auto auto">
+            <label for="majorEvent" i18n="@@majorEvent">Major Event</label>
+            <label
+                field-input
+                *ngIf="!isMajorEventEditable; else editable"
+                [isDisabled]="true">
+                {{ majorEvent?.value?.description }}
+            </label>
+            <ng-template #editable>
+                <app-dropdown
+                    field-input
+                    dataQA="majorEventDropdown"
+                    formControlName="majorEvent"
+                    i18n-placeholder="@@majorEvent"
+                    id="majorEvent"
+                    placeholder="Major Event"
+                    property="id"
+                    type="text"
+                    [appDisable]="controls.MAJOR_EVENT | isInputDisabled:state?.security:state?.isEditMode"
+                    [disableMouseOver]="true"
+                    [isDisabled]="controls.MAJOR_EVENT | isInputDisabled:state?.security:state?.isEditMode"
+                    [value]="majorEvent?.value"
+                    (selectedItem)="selectedMajorEvent($event)">
+                    <div [appDropdownElement]="null" class="dropdown-item" i18n="@@select">Select</div>
+                    <ng-container *ngFor="let item of majorEvents; let i = index">
+                        <div
+                            class="dropdown-item"
+                            data-qa="majorEventDropdownOption"
+                            [appDropdownElement]="item"
+                            [attr.data-qa-precision]="i">{{ item.description }}</div>
+                    </ng-container>
+                </app-dropdown>
+            </ng-template>
+            <a
+                appOpenObjectInClassic
+                field-input-2
+                *ngIf="majorEvent?.value?.id !== null" 
+                href="" i18n="@@viewMajorEvent"
+                [objectId]="majorEvent?.value?.id"
+                [targetObject]="'MajorGame'">View Major Event</a>
+        </app-form-field>
+
+        <app-form-field
+            *ngIf="isInCompetition || testType?.value === true"
+            columns="30% auto auto auto">
+            <label for="competitionName" i18n="@@competitionName">Competition Name</label>
+            <label
+                field-input
+                *ngIf="!isCompetitionNameEditable; else notEditable"
+                [isDisabled]="true">
+                {{ competitionName.value }}
+            </label>
+            <ng-template #notEditable>
+                <input
+                    field-input
+                    data-qa="competitionName"
+                    formControlName="competitionName"
+                    id="competitionName"
+                    type="text"
+                    [appDisable]="controls.COMPETITION_NAME | isInputDisabled:state?.security:state?.isEditMode">
+            </ng-template>
+        </app-form-field>
+
+        <app-form-field [hasAsterisk]="true" [appDisable]="controls.FEE_FOR_SERVICE | isInputDisabled:state?.security:state?.isEditMode">
+            <label for="feeForService" i18n="@@dcf_feeForService">Fee for service test</label>
+            <div field-input>
+                <label class="radio-container">
+                    <input
+                        data-qa="feeForServiceTestYes"
+                        formControlName="feeForService"
+                        id="feeForService"
+                        name="feeForService"
+                        type="radio"
+                        [value]="true">
+                    <span class="checkmark"></span>
+                    <span class="radio-label" i18n="@@yes">Yes</span>
+                </label>
+                <label class="radio-container">
+                    <input
+                        data-qa="feeForServiceTestNo"
+                        formControlName="feeForService"
+                        name="feeForService"
+                        type="radio"
+                        [value]="false">
+                    <span class="checkmark"></span>
+                    <span class="radio-label" i18n="@@no">No</span>
+                </label>
+            </div>
+        </app-form-field>
+
+        <div *ngIf="(sampleTypes$ | async).length > 0 && (sampleTypes$ | async) as sampleTypes; else loadingAnimation">
+            <div formArrayName="samples">
+                <div *ngFor="let item of samples.controls; let i=index">
+                    <app-sample-input
+                        [@fadeOutChild]
+                        [bloodCollectionOfficer]="bloodCollectionOfficer"
+                        [bloodCollectionOfficials]="autoCompletesAndGlobalData.bloodOfficials"
+                        [collectionDateDisabled]="isMatchResult(item, 2)"
+                        [dcfStatus]="dcfStatus"
+                        [fieldsSecurity]="state?.security"
+                        [formGroup]="item"
+                        [inCreation]="inCreation"
+                        [isEditMode]="state?.isEditMode"
+                        [isMatchingResultType2or1]="isMatchResult(item, 2)"
+                        [isMatchingResultType3or2or1]="isMatchResult(item, 3)"
+                        [laboratories]="laboratories$ | async"
+                        [locale]="locale$ | async"
+                        [manufacturers]="manufacturers$ | async"
+                        [readonly]="readonlySample[i]"
+                        [sampleIndex]="i"
+                        [sampleTypes]="sampleTypes"
+                        [samples]="samplesFormValues$ | async"
+                        [showDelete]="samples.length > 1"
+                        [showErrors]="showErrors"
+                        [tempLoggerStatus]="tempLoggerStatus$ | async"
+                        [timezones]="timezones$ | async"
+                        [urineSampleBoundaries]="urineSampleBoundaries$ | async"
+                        [witnessChaperone]="witnessChaperone"
+                        [witnessChaperones]="autoCompletesAndGlobalData.witnessChaperones"
+                        (delete)="deleteSample(i)"
+                        (updateSample)="changeSample($event)"
+                        (validateSampleCodeDuplicate)="dispatchSampleCodeValidation()"
+                        (validateABPFields)="executeABPFieldsValidation($event)">
+                    </app-sample-input>
+                </div>
+            </div>
+            <app-form-field>
+                <app-button
+                    field-input
+                    *ngIf="samples.length < MAX_NUMBER_OF_SAMPLES"
+                    dataQA="addSampleButton"
+                    i18n="@@addSample_uppercase"        
+                    type="secondary"
+                    (click)="addSample()">
+                    ADD SAMPLE
+                </app-button>
+            </app-form-field>
+        </div>
+        <ng-template #loadingAnimation>
+            <app-loading-animation [isTemplate]="true"></app-loading-animation>
+        </ng-template>
+    </form>
+</div>

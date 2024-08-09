@@ -1,0 +1,56 @@
+<app-modal
+    *ngIf="isOpened"
+    [centralizeButtons]="true"
+    [isModalLocked]="true"
+    [minHeight]="'250px'"
+    [minWidth]="'680px'"
+    [removeMargin]="true"
+    [resizeModal]="true"
+    [scrollable]="true"
+    (modalClose)="onClose()">
+    <div modal-header>
+        <span i18n="deleteTargetObjectX_uppercase">DELETE {{ translations$ | getTargetObject:targetObject:shortName | async }} </span>
+    </div>
+
+    <div modal-body class="modal__body">
+        <ng-content select="[notifications]"></ng-content>
+
+        <div *ngIf="!hiddenBody">
+            <label class="primary__message">
+                <span i18n="@@deleteThisObjectTargetX">Are you sure you want to delete this {{ translations$ | getTargetObject:targetObject | async }} </span>
+                <ng-container [ngSwitch]="targetObject">
+                    <span *ngSwitchCase="objectTargetEnum.TO" i18n= "@@number_lowercase">number</span>
+                    <span *ngSwitchDefault i18n="@@for_lowercase">for</span>
+                </ng-container>
+                {{ name }}?
+            </label>
+
+            <form [formGroup]="form">
+                <label>
+                    <span class="secondary__message" i18n="@@reason">Reason</span><span class="field-asterisk" [class.error]="reasonHasErrors">*</span>
+                </label>
+                <div field-error *ngIf="reasonHasErrors" class="div__errorReasonMandatory" i18n="@@pleaseEnterAValue">Please enter a value.</div>
+                <textarea
+                #textareaReason
+                field-input
+                class="textarea__reason"
+                data-qa="reasonToDelete"
+                fieldId="reason"
+                formControlName="reason"
+                maxlength="4000"
+                rows="5"
+                [class.error]="reasonHasErrors">
+            </textarea>
+           </form>
+        </div>
+        <div class="center-modal-buttons bottom-button-padding">
+            <ng-container *ngIf="hiddenBody; else defaultButtons">
+                <app-button class="button" i18n="@@backToForm" type="primary" (click)="onClose()">BACK TO FORM</app-button>
+            </ng-container>
+            <ng-template #defaultButtons>
+                <app-button class="button" dataQA="confirmDelete" i18n="@@yesDelete_uppercase" type="primary" (click)="onDelete()">YES, DELETE</app-button>
+                <app-button class="button" dataQA="cancelDelete" i18n="@@no_uppercase" type="secondary" (click)="onClose()">NO</app-button>
+            </ng-template>
+        </div>
+    </div>
+</app-modal>

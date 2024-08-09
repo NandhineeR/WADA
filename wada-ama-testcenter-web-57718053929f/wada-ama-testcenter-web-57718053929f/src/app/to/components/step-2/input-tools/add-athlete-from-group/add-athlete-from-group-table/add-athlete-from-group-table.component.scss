@@ -1,0 +1,32 @@
+@import '~sass/variables';
+@import '~~app/shared/styles/fake-link';
+
+$table-border-width: 3px;
+$table-border-color: #c0c0c0;
+
+.add-athlete-from-group-table__wrapper {
+    width: 1200px;
+
+    @include fake-link(left, right);
+
+    .link {
+        text-decoration: underline;
+        margin-left: 15px;
+        cursor: pointer;
+    }
+
+    .disabled-link {
+        color: $disabled-color;
+        pointer-events: none;
+        cursor: default;
+    }
+
+    .disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+}
+
+::ng-deep tr.mat-row:last-of-type {
+    border-bottom: 0px !important;
+}

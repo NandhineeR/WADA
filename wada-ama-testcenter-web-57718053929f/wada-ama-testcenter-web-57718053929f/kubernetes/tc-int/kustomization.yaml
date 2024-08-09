@@ -1,0 +1,74 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../base
+#1 - Set the namespace
+namespace: tc-int
+#Service and ConfigMap patches
+#OIDC Plugin variations
+patches:
+- patch: |-
+    - op: replace
+      path: "/spec/rules/0/host"
+      value: "adams-int.wada-ama.org"
+  target:
+    kind: Ingress
+    name: testcenter-web-ingress
+    version: v1
+- patch: |-
+    - op: replace
+      path: "/spec/rules/0/host"
+      value: "adams-int.wada-ama.org"
+  target:
+    kind: Ingress
+    name: sample-management-ingress
+    version: v1
+- patch: |-
+    - op: replace
+      path: "/config/issuer"
+      value: "https://sso-int.wada-ama.org/auth/realms/WADA/.well-known/openid-configuration"
+    - op: replace
+      path: "/config/unauthorized_redirect_uri/0"
+      value: "https://adams-int.wada-ama.org/ng"
+    - op: replace
+      path: "/config/logout_redirect_uri/0"
+      value: "https://adams-int.wada-ama.org/ng"
+    - op: replace
+      path: "/config/session_redis_host"
+      value: "kong-redis-eks-dev-apps-master-0.kong-redis-eks-dev-apps-headless.kong.svc.cluster.local"
+  target:
+    kind: KongPlugin
+    name: testcenter-web-openid-connect-plugin
+    version: v1
+- patch: |-
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: testcenter-web-service
+    spec:
+      ports:
+        - name: https
+          protocol: TCP
+          port: 9443
+          targetPort: 4200
+          nodePort: 31924
+- patch: |-
+    - op: replace
+      path: "/spec/externalName"
+      value: "intlts.wada-ama.org"
+  target:
+    kind: Service
+    name: sample-management-service
+    version: v1
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: testcenter-web-configmap
+    data:
+      CAPI_BASE_URL: "https://adams-int.wada-ama.org/ng/testcenter-api"
+      FAPI_LOGS_URL: "https://adams-int.wada-ama.org/ng/logs"
+      ADAMS_URL: "https://adams-int.wada-ama.org/adams"
+      SAMPLE_MANAGEMENT_URL: "https://adams-int.wada-ama.org/sm"
+      SAMPLE_MANAGEMENT_LINK: "https://intlts.wada-ama.org/link"
+      APM_SERVER_URL: "https://208.94.107.244:9500"

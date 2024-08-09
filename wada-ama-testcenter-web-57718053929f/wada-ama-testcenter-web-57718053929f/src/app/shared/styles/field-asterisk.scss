@@ -1,0 +1,15 @@
+@import '~sass/variables';
+
+@mixin field-asterisk() {
+    .field-asterisk {
+        padding-left: 4px;
+        color: $asterisk-color;
+        font-weight: bold;
+
+        &.error {
+            color: $error-color;
+        }
+    }
+}
+
+

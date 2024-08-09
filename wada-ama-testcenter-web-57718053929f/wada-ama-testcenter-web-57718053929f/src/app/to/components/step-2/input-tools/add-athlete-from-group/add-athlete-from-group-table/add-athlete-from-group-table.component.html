@@ -1,0 +1,115 @@
+<div class="add-athlete-from-group-table__wrapper">
+    <app-data-table
+        [showRemove]="false"
+        [showSelect]="true"
+        [dataSource]="dataSource" 
+        [showPaginator]="false"
+        [showFooter]="false"
+        [showTableFooter]="false"
+        [columnDefs]="columns"
+        (selections)="updateSelections($event)">
+        <ng-container header>
+            <div *ngIf="((fieldsSecurity?.actions | isActionAvailable:actionRight.EditAnalyses) || inCreation); else noAnalyses">
+                <app-button
+                    dataQA="athletesFromGroup_addAnalysesToAthleteButton"
+                    type="secondary"
+                    [class.disabled]="selectedRowCount === 0"
+                    [disabled]="selectedRowCount === 0"
+                    (click)="addAnalysesToAthlete()">
+                        <span i18n="@@addAnalysesToAthletes">Add Analyses to Athletes</span>
+                </app-button>
+                <span>&nbsp;</span>
+                <a 
+                    *ngIf="!isTOIssued"
+                    dataQA="athletesFromGroup_skipAnalysesAndAddAthletesButton"
+                    [ngClass]="{'disabled-link': selectedRowCount === 0, 'fake-link':selectedRowCount > 0 }"
+                    (click)="skipAnalyses()">
+                    <span i18n="@@skipAnalysesAddAthletes" data-qa="athletesFromGroup_skipAnalyses">or skip analyses for now and add athletes</span>
+                </a>
+            </div>
+            <ng-template #noAnalyses>
+                <app-button
+                    dataQA="athletesFromGroup_addAthletesButton"    
+                    type="primary"
+                    (click)="skipAnalyses()">
+                    <span i18n="@@addAthletes">Add Athletes</span>
+                </app-button>
+            </ng-template>
+        </ng-container>
+
+        <ng-container *columnCell="'name'; let e; let i=index;">
+            <span *ngIf="e.accessible"><a appOpenObjectInClassic [attr.data-qa]="'athletesFromGroup.athleteName'" [attr.data-qa-precision]="i" [objectId]="e.id" [targetObject]="'Athlete'" href="" class="underline">{{ e.name }}</a></span>
+            <span *ngIf="!e.accessible">{{ e.name }}</span>
+            <app-info-bubble *ngIf="e.duplicateTest"
+                             [infoBubbleSource]="infoBubbleSource"
+                             i18n="@@athleteTestedByOrgXWithinXDays">This athlete has been tested or will be tested by {{ e.duplicateTest?.organizationShortName }} within {{ e.duplicateTest?.warningPeriod }} days.</app-info-bubble>
+        </ng-container>
+
+        <app-data-table-selected-count-label>
+            <strong>{{ selectedRowCount }} </strong>
+            <span  class="selected-athlete" > {{ translations$ | getAthleteSelected:selectedRowCount | async }}</span>
+        </app-data-table-selected-count-label>
+    </app-data-table>
+
+    <ng-template #genderHeader>
+        <div
+            appTooltip
+            tooltipPlacement="top"
+            tooltipContent="Athlete Gender"
+            i18n-tooltipContent="@@athleteGender"
+            i18n="@@sportGender">Sport Gender</div>
+    </ng-template>
+
+    <ng-template #athleteHeader>
+        <div
+            appTooltip
+            tooltipPlacement="top"
+            tooltipContent="Athlete (Last Name, First Name)"
+            i18n-tooltipContent="@@AthleteLastNameFirstName"
+            i18n="@@athleteName">Athlete Name</div>
+    </ng-template>
+
+    <ng-template #sportNationalityHeader>
+        <div
+            appTooltip
+            tooltipPlacement="top"
+            tooltipContent="Athlete Sport Nationality"
+            i18n-tooltipContent="@@athleteSportNationality"
+            i18n="@@sportNationality">Sport Nationality</div>
+    </ng-template>
+
+    <ng-template #sportDisciplineHeader>
+        <div
+            appTooltip
+            tooltipPlacement="top"
+            tooltipContent="Athlete Sport / Discipline"
+            i18n-tooltipContent="@@athleteSportDiscipline_slash"
+            i18n="@@sportDiscipline">Sport Discipline</div>
+    </ng-template>
+
+    <ng-template #latestTestHeader>
+        <div
+            appTooltip
+            tooltipPlacement="top"
+            tooltipContent="Latest test correspond to the &quot;Arrival Date&quot; of the most recent Doping Control Form for the Athlete when Status of this Doping Control Form is &quot;Draft&quot; or &quot;Completed&quot;"
+            i18n-tooltipContent="@@latestTestingTooltip"
+            i18n="@@latestTest">Latest Test</div>
+    </ng-template>
+
+    <app-duplicate-athlete-leave #duplicateAthlete (confirm)="redirectOnConfirm($event)">
+        <div warning-message>
+            <ng-container [ngSwitch]="duplicateAthletesString.length">
+                <span *ngSwitchCase="1" i18n="@@followingAthleteAlreadyIncluded">The following athlete is already included to the Testing Order with the analyses below:</span>
+                <span *ngSwitchDefault i18n="@@followingAthletesAlreadyIncluded">The following athletes are already included to the Testing Order with the analyses below:</span>
+            </ng-container>
+            <ul>
+                <li *ngFor="let duplicate of duplicateAthletesString">
+                    <span>{{ duplicate }}</span>
+                </li>
+            </ul>
+        </div>
+        <div primary-message>
+            <span i18n="@@doYouWantToContinue">Do you want to continue?</span>
+        </div>
+    </app-duplicate-athlete-leave>
+</div>

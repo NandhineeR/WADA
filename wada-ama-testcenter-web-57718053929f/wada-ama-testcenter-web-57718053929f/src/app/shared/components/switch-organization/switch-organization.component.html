@@ -1,0 +1,25 @@
+<app-popover appInheritDir (closePopover)="onClose()" (openPopover)="onOpen()">
+    <label class="org-name" i18n="@@viewingPageXForOrgX">Viewing {{ page }} for: {{ organizationName }}</label>
+    <a>
+        <img alt="change user" data-qa="changeTestingAuthority" src="assets/change_user.png"/>
+        <span i18n="@@change">Change</span>
+    </a>
+    <div popover-title i18n="@@changeTestingAuthority">Change Testing Authority</div>
+    <div popover-body class="popover-body">
+        <label>
+            <span i18n="@@testingAuthority">Testing Authority</span>
+            <span class="green-asterisk">*</span>
+        </label>
+        <app-typeahead
+            #typeaheadRef
+            dataQA="changeTestingAuthorityTypeahead"
+            suggestionField="displayName"
+            [suggestions]="organizationsSuggestions"
+            (selected)="selected($event)">
+        </app-typeahead>
+        <div class="popover-buttons">
+            <app-button dataQA="showButton" i18n="@@showPageX" type="primary" (click)="changeOrg()">SHOW {{ page }}</app-button>
+            <app-button dataQA="cancelButton" i18n="@@cancel_uppercase" type="secondary" (click)="requestClose()">CANCEL</app-button>
+        </div>
+    </div>
+</app-popover>

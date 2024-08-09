@@ -1,0 +1,86 @@
+@import '~sass/variables';
+@import '~app/shared/styles/radio';
+@import '~sass/mixins';
+
+$bg-color-white: #ffffff;
+
+@mixin step($left, $right) {
+    .form-body {
+        width: 100%;
+
+        .form-body-content {
+            background-color: $bg-color-white;
+        }
+    }
+
+    .test {
+        width: 30% !important;
+    }
+
+    .field-info {
+        font-size: 0.9rem;
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    .checkbox-field {
+        color: $checkbox-color;
+        margin-top: 5px;
+        margin-bottom: -5px;
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+    .jump-section {
+        margin-bottom: 30px;
+    }
+
+    app-participant-input {
+        margin-bottom: 12px;
+    }
+
+    .attemptTimeTo {
+        width: 100%;
+    }
+
+    .attemptTimeFrom {
+        width: 100%;
+    }
+
+    .location-form-label {
+        font-size: 18px;
+        color: $link-color;
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+
+    app-typeahead, app-multi-typeahead, app-date-input {
+        width: 60%;
+        display: block;
+    }
+
+    input[type="text"] {
+        width: 60%;
+
+        &.error {
+            border: 2px solid $error-color;
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}

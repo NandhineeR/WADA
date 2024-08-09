@@ -1,0 +1,94 @@
+@import '~sass/variables';
+
+$fontColor: #515151;
+
+.modal__photo{
+    padding:20px;
+    img{
+        width: 100%;
+    }
+}
+
+.right-buttons-modal {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    flex-direction: column;
+    app-button{
+        margin-top: 30px;
+        margin-bottom:0;
+    }
+}
+
+app-notification, .margin-content{
+    display: block;
+    padding-bottom: 15px;
+}
+
+.activity-table__wrapper {
+    margin-bottom: 80px;
+}
+
+.button {
+    margin-bottom:30px;
+}
+
+.first-save-message {
+    display: block;
+}
+
+.first-save-message-header {
+    display: block;
+    color: $fontColor;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 10px;
+    list-style-type: circle;
+}
+
+.first-save-message-content {
+    display: block;
+    color: $fontColor;
+    font-size: 14px;
+}
+
+div.float-btn-right{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.button-background {
+    background-color: initial;
+}
+
+.cdk-mouse-focused {
+  outline: none !important;
+  border: 0 !important;
+}
+
+.mat-icon {
+    svg {
+        vertical-align: baseline;
+    }
+}
+
+.option-menu {
+    float: right;
+}
+
+h3 {
+    font-size: 20px;
+    font-weight: 600;
+    background-image: linear-gradient($gradient-one, $gradient-two);
+    stroke: $stroke-color;
+    stroke-width: 1px;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: opx;
+    margin-bottom: 20px;
+}

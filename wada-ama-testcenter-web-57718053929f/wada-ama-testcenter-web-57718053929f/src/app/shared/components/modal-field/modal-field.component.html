@@ -1,0 +1,27 @@
+<div class="field" appInheritDir [style.grid-template-columns]="columns">
+
+    <!-- First row -->
+    <div class="field-top-message-1">
+        <div class="field-warning field-message">
+            <ng-content select="[field-warning]"></ng-content>
+        </div>
+        <div class="field-error field-message">
+            <ng-content select="[field-error]"></ng-content>
+        </div>
+        <div class="field-top-label field-message">
+            <ng-content select="[field-top-label]"></ng-content>
+        </div>
+    </div>
+
+    <!-- Second row -->
+    <div class="field-label">
+        <ng-content></ng-content>
+        <span class="field-asterisk" [class.error]="hasError" *ngIf="hasAsterisk">*</span>
+        <ng-content select="app-info-bubble"></ng-content>
+    </div>
+
+    <div class="field-input-1">
+        <ng-content select="[field-input]"></ng-content>
+    </div>
+
+</div>

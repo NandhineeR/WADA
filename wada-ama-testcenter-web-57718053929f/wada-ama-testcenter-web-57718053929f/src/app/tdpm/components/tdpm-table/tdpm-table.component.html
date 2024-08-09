@@ -1,0 +1,242 @@
+<div class="wrapper" *ngIf="tdpmSheetInfo" appInheritDir>
+    <table appSticky (lengthCovered)="lengthCoveredChanged($event)" aria-label="tdpm-table">
+        <thead #headerRef>
+            <tr>
+                <th colspan="2" rowspan="1" class="headerTitle no-bottom-border" scope="row">
+                    <div
+                        appTooltip
+                        tooltipPlacement="top"
+                        tooltipContent="Sport / Discipline"
+                        i18n-tooltipContent="@@sportDiscipline_slash"
+                        i18n="@@sportDiscipline_slash">Sport / Discipline</div>
+                </th>
+                <th rowspan="2" class="headerTitle" scope="row">
+                    <div
+                        [appTooltip]="totalTooltip"
+                        tooltipPlacement="top"
+                        i18n="@@totalSamples">Total Samples</div>
+                    <ng-template #totalTooltip>
+                        <span i18n="@@totalSamplesTooltip">Total Samples (Urine, Blood, Blood Passport and Dried Blood Spot)<br>IC: In Competition<br>OOC: Out of Competition</span>
+                    </ng-template>
+                </th>
+                <th [attr.colspan]="4 * 2" class="headerTitle no-left-border" scope="col">
+                    <span i18n="@@sampleTypes">Sample Types</span>
+                </th>
+                <th [attr.colspan]="3 * 2" class="headerTitle" scope="col">
+                    <span i18n="@@analyses">Analyses</span>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="2" class="headerTitle no-bottom-border" scope="row">
+                    <input class="search-bar" type="text" #searchBarRef/>
+                </th>
+                <ng-container *ngFor="let sample of tdpmSheetInfo.tdpTotals.samples; trackBy:customTrackBy">
+                    <th colspan="2" class="headerSubTitle" scope="colgroup">
+                        <div
+                            [appTooltip]="sampleTooltip"
+                            [tooltipContext]="{ sample: sample }"
+                            tooltipPlacement="top">
+                            {{ translations$ | getSampleType:sample.sampleType | async }}
+                        </div>
+                        <ng-template #sampleTooltip>
+                            <span i18n="@@sampleTypeTooltip">{{ translations$ | getSampleType:sample.sampleType | async }} Samples<br>IC: In Competition<br>OOC: Out of Competition</span>
+                        </ng-template>
+                    </th>
+                </ng-container>
+                <ng-container *ngFor="let analysis of tdpmSheetInfo.tdpTotals.analyses; trackBy:customTrackBy; index as i">
+                    <th colspan="2" class="headerSubTitle" scope="colgroup">
+                        <div
+                            [appTooltip]="analysisTooltip"
+                            [tooltipContext]="{ analysis: analysis }"
+                            tooltipPlacement="top">
+                            {{ translations$ | getAnalysisCategory:analysis.analysisCategory | async }}
+                        </div>
+                        <ng-template #analysisTooltip>
+                            {{ translations$ | getExtendedAnalysisCategory:analysis.analysisCategory | async }}
+                            <span i18n="@@analysisCategoryTooltip">({{ translations$ | getAnalysisCategory:analysis.analysisCategory | async }}) Analyses<br>IC: In competition<br>OOC: Out of competition</span>
+                        </ng-template>
+                    </th>
+                </ng-container>
+            </tr>
+            <tr>
+                <th class="collapse-button" scope="col">
+                    <app-collapse-button
+                        [collapsed]="true"
+                        [disabled]="!anyCollapsed"
+                        (click)="showAll(true)">
+                        <span class="collapse-label" [class.collapse-label-disabled]="!anyCollapsed" i18n="@@showAll">Show All</span>
+                    </app-collapse-button>
+                </th>
+                <th class="collapse-button no-left-border" scope="col">
+                    <app-collapse-button
+                        [collapsed]="false"
+                        [disabled]="!anyExpanded"
+                        (click)="showAll(false)">
+                        <span class="collapse-label" [class.collapse-label-disabled]="!anyExpanded" i18n="@@hideAll">Hide All</span>
+                    </app-collapse-button>
+                </th>
+                <th class="headerSubTitle" scope="col">
+                    <span i18n="@@icAndOoc">IC and OOC</span>
+                </th>
+                <ng-container *ngFor="let analysis of tdpmSheetInfo.tdpTotals.samples; trackBy:customTrackBy">
+                    <th class="headerSubTitle input-col" scope="col">
+                        <span i18n="IC=in competition@@ic_uppercase">IC</span>
+                    </th>
+                    <th class="headerSubTitle input-col" scope="col">
+                        <span i18n="OOC=out of competition@@ooc_uppercase">OOC</span>
+                    </th>
+                </ng-container>
+                <ng-container *ngFor="let analysis of tdpmSheetInfo.tdpTotals.analyses; trackBy:customTrackBy; index as i">
+                    <th class="headerSubTitle input-col" scope="col">
+                        <span i18n="IC=in competition@@ic_uppercase">IC</span>
+                    </th>
+                    <th class="headerSubTitle input-col" scope="col">
+                        <span i18n="OOC=out of competition@@ooc_uppercase">OOC</span>
+                    </th>
+                </ng-container>
+            </tr>
+            <tr class="totalRow" #grandTotalRowRef>
+                <th colspan="2" class="grandTotalHeader" scope="colgroup">
+                    <span class="grandTotalHeader" i18n="@@grandTotal">Grand Total</span>
+                </th>
+                <th class="alignRight" scope="col">
+                    <span *ngIf="showType === showTypeEnum.Complete; else elseCompleteNoLabResult">{{ tdpmSheetInfo.tdpTotals.completeSampleTotal }}</span>
+                    <span #elseCompleteNoLabResult *ngIf="showType === showTypeEnum.CompleteNoLabResultMatched; else elsePlannedAndComplete">{{ tdpmSheetInfo.tdpTotals.completeWithoutLabResultSampleTotal }}</span>
+                    <span #elsePlannedAndComplete *ngIf="showType === showTypeEnum.PlannedAndComplete;">{{ tdpmSheetInfo.tdpTotals.plannedAndCompleteSampleTotal }}</span>
+                </th>
+                <ng-container *ngFor="let sample of tdpmSheetInfo.tdpTotals.samples; trackBy:customTrackBy">
+                    <th class="alignRight" scope="col">
+                        <span>{{ sample | getTestValueByType: showType : true : true }}</span>
+                    </th>
+                    <th class="alignRight" scope="col">
+                        <span>{{ sample | getTestValueByType: showType : false : true }}</span>
+                    </th>
+                </ng-container>
+                <ng-container *ngFor="let analysis of tdpmSheetInfo.tdpTotals.analyses; trackBy:customTrackBy">
+                    <th class="alignRight" scope="col">
+                        <span>{{ analysis | getTestValueByType: showType : true : true }}</span>
+                    </th>
+                    <th class="alignRight" scope="col">
+                        <span>{{ analysis | getTestValueByType: showType : false : true }}</span>
+                    </th>
+                </ng-container>
+            </tr>
+        </thead>
+        <tbody *ngIf="tdpmSheetInfo" #tableBodyRef>
+            <tr *ngIf="tableLoading" class="loading-overlay" #loadingOverlayRef>
+                <div class="overlay-spacer-before"></div>
+                <img #imgLoadingRef class="loading-img" src="assets/loading.png" alt="Loading Icon" i18n-alt="@@loadingIcon">
+                <div #textLoadingRef class="loading-text" i18n="@@loadingValuesForYou_threeDots">Loading values for you...</div>
+                <div class="overlay-spacer-after"></div>
+            </tr>
+            <ng-container *ngFor="let sport of tdpmSheetInfo.rows; trackBy: customTrackBy">
+                <tr class="sportRow">
+                    <td colspan="2" class="sportHeader">
+                        <app-collapse-button
+                            [collapsed]="!visibilityMap[sport.sportId]"
+                            class="sportHeader"
+                            (click)="toggleVisibility(sport.sportId)"
+                            *ngIf="!visibilityMap[sport.sportId]">
+                            <span>{{ sport.sportName }}</span>
+                        </app-collapse-button>
+                        <app-collapse-button
+                            [collapsed]="!visibilityMap[sport.sportId]"
+                            class="sportHeader"
+                            (click)="toggleVisibility(sport.sportId)"
+                            *ngIf="visibilityMap[sport.sportId]">
+                            <span>{{ sport.sportName }}</span>
+                        </app-collapse-button>
+                    </td>
+                    <td class="alignRight">
+                        <span *ngIf="!sport.isDisabled && showType === showTypeEnum.Complete; else elseCompleteNoLabResult">{{ sport.tdpTotals.completeSampleTotal }}</span>
+                        <span #elseCompleteNoLabResult *ngIf="!sport.isDisabled && showType === showTypeEnum.CompleteNoLabResultMatched; else elsePlannedAndComplete">{{ sport.tdpTotals.completeWithoutLabResultSampleTotal }}</span>
+                        <span #elsePlannedAndComplete *ngIf="!sport.isDisabled && showType === showTypeEnum.PlannedAndComplete;">{{ sport.tdpTotals.plannedAndCompleteSampleTotal }}</span>
+                    </td>
+                    <ng-container *ngFor="let sample of sport.tdpTotals.samples">
+                        <td class="alignRight">
+                            <span>{{ sample | getTestValueByType: showType : true : true }}</span>
+                        </td>
+                        <td class="alignRight">
+                            <span>{{ sample | getTestValueByType: showType : false : true }}</span>
+                        </td>
+                    </ng-container>
+                    <ng-container *ngFor="let analysis of sport.tdpTotals.analyses">
+                        <td class="alignRight">
+                            <span>{{ analysis | getTestValueByType: showType : true : true }}</span>
+                        </td>
+                        <td class="alignRight">
+                            <span>{{ analysis | getTestValueByType: showType : false : true }}</span>
+                        </td>
+                    </ng-container>
+                </tr>
+                <ng-container *ngFor="let disc of sport.subRows; trackBy: customTrackBy">
+                    <tr *ngIf="visibilityMap[sport.sportId]"
+                        class="disciplineRow"
+                        [id]="'row' + disc.disciplineId">
+                        <td colspan="2">
+                            <div class="sport-discipline-padding">{{ sport.sportName }} - {{ disc.disciplineName }}</div>
+                        </td>
+                        <td class="alignRight">
+                            <span *ngIf="!sport.isDisabled && showType === showTypeEnum.Complete; else elseCompleteNoLabResult">{{ disc.tdpTotals.completeSampleTotal }}</span>
+                            <span #elseCompleteNoLabResult *ngIf="!sport.isDisabled && showType === showTypeEnum.CompleteNoLabResultMatched; else elsePlannedAndComplete">{{ disc.tdpTotals.completeWithoutLabResultSampleTotal }}</span>
+                            <span #elsePlannedAndComplete *ngIf="!sport.isDisabled && showType === showTypeEnum.PlannedAndComplete;">{{ disc.tdpTotals.plannedAndCompleteSampleTotal }}</span>
+                        </td>
+                        <ng-container *ngFor="let sample of disc.tdpTotals.samples; trackBy: customTrackBy">
+                            <td class="alignRight input-padding input-col">
+                                <app-progressbar-with-tooltip
+                                    sportName="{{ sport.sportName | sportDisciplineName : disc.disciplineName }}"
+                                    type="{{ sample.sampleType }}"
+                                    [icTotal]="sample | getTestValueByType: showType : true : true"
+                                    [ocTotal]="sample | getTestValueByType: showType : false : true"
+                                    [icForecast]="sample | getTestValueByType: showType : true : false"
+                                    [ocForecast]="sample | getTestValueByType: showType : false : false"
+                                    [isIc]="true"
+                                    [isSample]="true">
+                                </app-progressbar-with-tooltip>
+                            </td>
+                            <td class="alignRight input-padding input-col">
+                                <app-progressbar-with-tooltip
+                                    sportName="{{ sport.sportName | sportDisciplineName : disc.disciplineName }}"
+                                    type="{{ sample.sampleType }}"
+                                    [icTotal]="sample | getTestValueByType: showType : true : true"
+                                    [ocTotal]="sample | getTestValueByType: showType : false : true"
+                                    [icForecast]="sample | getTestValueByType: showType : true : false"
+                                    [ocForecast]="sample | getTestValueByType: showType : false : false"
+                                    [isIc]="false"
+                                    [isSample]="true">
+                                </app-progressbar-with-tooltip>
+                            </td>
+                        </ng-container>
+                        <ng-container *ngFor="let analysis of disc.tdpTotals.analyses; trackBy: customTrackBy">
+                            <td class="alignRight input-padding input-col">
+                                <app-progressbar-with-tooltip
+                                    sportName="{{ sport.sportName | sportDisciplineName : disc.disciplineName }}"
+                                    type="{{ analysis.analysisCategory }}"
+                                    [icTotal]="analysis | getTestValueByType: showType : true : true"
+                                    [ocTotal]="analysis | getTestValueByType: showType : false : true"
+                                    [icForecast]="analysis | getTestValueByType: showType : true : false"
+                                    [ocForecast]="analysis | getTestValueByType: showType : false : false"
+                                    [isIc]="true"
+                                    [isSample]="false">
+                                </app-progressbar-with-tooltip>
+                            </td>
+                            <td class="alignRight input-padding input-col">
+                                <app-progressbar-with-tooltip
+                                    sportName="{{ sport.sportName | sportDisciplineName : disc.disciplineName }}"
+                                    type="{{ analysis.analysisCategory }}"
+                                    [icTotal]="analysis | getTestValueByType: showType : true : true"
+                                    [ocTotal]="analysis | getTestValueByType: showType : false : true"
+                                    [icForecast]="analysis | getTestValueByType: showType : true : false"
+                                    [ocForecast]="analysis | getTestValueByType: showType : false : false"
+                                    [isIc]="false"
+                                    [isSample]="false">
+                                </app-progressbar-with-tooltip>
+                            </td>
+                        </ng-container>
+                    </tr>
+                </ng-container>
+            </ng-container>
+        </tbody>
+    </table>
+</div>
+

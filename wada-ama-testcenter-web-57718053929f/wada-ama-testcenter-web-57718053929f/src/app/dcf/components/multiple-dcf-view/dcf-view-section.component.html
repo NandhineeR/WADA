@@ -1,0 +1,173 @@
+<app-view-section-content
+    appHideControl
+    *ngIf="dcf"
+    [permissions]="fieldsSecurity.fields">
+    
+    <app-view-entry id="address">
+        <app-view-entry-name
+            i18n="@@mailingAddress"
+            [invalid]="(errors | setHas:requiredfields.City)"
+            [required]="true">Mailing Address</app-view-entry-name>
+        <app-view-entry-value *ngIf="dcf.address">
+            {{ dcf.address | formatAddress }}
+        </app-view-entry-value>
+    </app-view-entry>
+
+    <app-view-entry id="sportDiscipline">
+        <app-view-entry-name
+            i18n="@@sportDiscipline_slash"
+            [invalid]="(errors | setHas:requiredfields.SportDiscipline)"
+            [required]="true">Sport / Discipline</app-view-entry-name>
+        <app-view-entry-value *ngIf="dcf.sportDiscipline">{{ dcf.sportDiscipline.displayDescriptionName }}</app-view-entry-value>
+    </app-view-entry>
+
+    <app-multiple-field-row-view
+        id="testNotification"
+        dataQA="notificationDate"
+        [items]="[dcf?.notificationTimezone?.shortName]"
+        [mainItem]="dcf?.notificationDate | formatDatetime | uppercase">
+        <app-view-entry-name
+            i18n="@@notificationDate"
+            role="mainField"
+            [invalid]="(errors | setHas:requiredfields.NotificationDate)"
+            [required]="true">Notification Date</app-view-entry-name>
+        <app-view-entry-name
+            i18n="@@timeZone"
+            role="field-0"
+            [invalid]="errors | setHas:requiredfields.NotificationTimezone"
+            [required]="true">Time Zone</app-view-entry-name>
+    </app-multiple-field-row-view>
+
+    <app-view-entry id="notifyingChaperone">
+        <app-view-entry-name
+            i18n="@@notifyingChaperone"
+            [invalid]="errors | setHas:requiredfields.NotifyingChaperone"
+            [required]="true">Notifying Chaperone</app-view-entry-name>
+        <app-view-entry-value *ngIf="dcf.notifyingChaperone">
+            <span>{{ dcf.notifyingChaperone.lastName | formatParticipantName:dcf.notifyingChaperone.firstName }}</span>
+        </app-view-entry-value>
+    </app-view-entry>
+
+    <app-view-entry id="coach">
+        <app-view-entry-name
+            i18n="@@coach"
+            [invalid]="errors | setHas:requiredfields.Coach"
+            [required]="true">Coach</app-view-entry-name>
+        <app-view-entry-value>
+            <span *ngIf="dcf?.coach; else coachNotApplicable">{{ dcf?.coach?.lastName | formatParticipantName:dcf?.coach?.firstName  }}</span>
+            <ng-template #coachNotApplicable>
+                <span *ngIf="dcf.coachNotApplicable" i18n="@@notApplicable_parentheses">(Not applicable)</span>
+            </ng-template>
+        </app-view-entry-value>
+    </app-view-entry>
+
+    <app-view-entry id="doctor">
+        <app-view-entry-name
+            i18n="@@doctor"
+            [invalid]="errors | setHas:requiredfields.Doctor"
+            [required]="true">Doctor</app-view-entry-name>
+        <app-view-entry-value>
+            <span *ngIf="dcf?.doctor; else doctorNotApplicable">{{ dcf?.doctor?.lastName | formatParticipantName:dcf?.doctor?.firstName  }} </span>
+            <ng-template #doctorNotApplicable>
+                <span *ngIf="dcf.doctorNotApplicable" i18n="@@notApplicable_parentheses">(Not applicable)</span>
+            </ng-template>
+        </app-view-entry-value>
+    </app-view-entry>
+
+    <app-multiple-field-row-view
+        id="arrivalDate"
+        dataQA="arrivalDate"
+        [items]="[ dcf?.arrivalTimezone?.shortName]"
+        [mainItem]="dcf?.arrivalDate | formatDatetime | uppercase">
+        <app-view-entry-name
+            i18n="@@arrivalDate"
+            role="mainField"
+            [invalid]="(errors | setHas:requiredfields.ArrivalDate)"
+            [required]="true">Arrival Date</app-view-entry-name>
+        <app-view-entry-name
+            i18n="@@timeZone"
+            role="field-0"
+            [invalid]="errors | setHas:requiredfields.arrivalTimezone"
+            [required]="true">Time Zone</app-view-entry-name>
+    </app-multiple-field-row-view>
+
+    <app-view-subsection *ngFor="let sample of urineSamples; index as i">
+        <app-view-subsection-title i18n="@@sampleXUrineX">Sample {{ getSampleIndex(sample, i) }} - Urine {{ sample.sampleCode }}</app-view-subsection-title>
+        <app-urine-sample-view
+            [isMultipleDCF]="true"
+            [required]="(fieldsSecurity.actions | isActionAvailable:actionRight.Edit)"
+            [sample]="sample"
+            [urineSampleBoundaries]="urineSampleBoundaries"
+            [whiteList]="fieldsSecurity.fields">
+        </app-urine-sample-view>
+    </app-view-subsection>
+
+    <app-view-subsection *ngFor="let sample of bloodSamples; index as i">
+        <app-view-subsection-title i18n="@@sampleXBloodX">Sample {{ getSampleIndex(sample, i) }} - Blood {{ sample.sampleCode }}</app-view-subsection-title>
+        <app-blood-sample-view
+            [isMultipleDCF]="true"
+            [required]="(fieldsSecurity.actions | isActionAvailable:actionRight.Edit)"
+            [sample]="sample"
+            [whiteList]="fieldsSecurity.fields">
+        </app-blood-sample-view>
+    </app-view-subsection>
+
+    <app-view-subsection *ngFor="let sample of bloodPassportSamples; index as i">
+        <app-view-subsection-title i18n="@@sampleXBloodPassportX">Sample {{ getSampleIndex(sample, i) }} - Blood Passport {{ sample.sampleCode }}</app-view-subsection-title>
+        <app-blood-passport-sample-view
+            [athleteId]="athleteId"
+            [isMultipleDCF]="true"
+            [required]="(fieldsSecurity.actions | isActionAvailable:actionRight.Edit)"
+            [sample]="sample"
+            [whiteList]="fieldsSecurity.fields">
+        </app-blood-passport-sample-view>
+    </app-view-subsection>
+
+    <app-view-subsection *ngFor="let sample of driedBloodSpotSamples; index as i">
+        <app-view-subsection-title i18n="@@sampleXDriedBloodSpotX">Sample {{ getSampleIndex(sample, i) }} - Dried Blood Spot {{ sample.sampleCode }}</app-view-subsection-title>
+        <app-dried-blood-spot-sample-view
+            [isMultipleDCF]="true"
+            [required]="(fieldsSecurity.actions | isActionAvailable:actionRight.Edit)"
+            [sample]="sample"
+            [whiteList]="fieldsSecurity.fields">
+        </app-dried-blood-spot-sample-view>
+    </app-view-subsection>
+    
+    <app-view-entry id="dco">
+        <app-view-entry-name
+            i18n="@@dopingControlOfficer"
+            [invalid]="(errors | setHas:requiredfields.DCO)"
+            [required]="(fieldsSecurity.actions | isActionAvailable:actionRight.Edit)">Doping Control Officer</app-view-entry-name>
+        <app-view-entry-value>
+            <div
+                *ngIf="dcfProceduralInformation.dco; else noDco"
+                class="value">{{ dcfProceduralInformation.dco!.lastName | formatParticipantName:dcfProceduralInformation.dco!.firstName }}</div>
+            <ng-template #noDco>
+                <div class="value"></div>
+            </ng-template>
+        </app-view-entry-value>
+    </app-view-entry>
+
+    <app-view-entry id="consentForResearch">
+        <app-view-entry-name
+            i18n="@@consentForResearch"
+            [invalid]="(errors | setHas:requiredfields.ConsentForResearch)"
+            [required]="(fieldsSecurity.actions | isActionAvailable:actionRight.Edit)">Consent for Research</app-view-entry-name>
+        <app-view-entry-value>
+            <div
+                *ngIf="dcfProceduralInformation.consentForResearch === true;"
+                class="value"
+                data-qa="consentForResearchYes"
+                i18n="@@yes">Yes</div>
+            <div
+                *ngIf="dcfProceduralInformation.consentForResearch === false;"
+                class="value"
+                data-qa="consentForResearchNo"
+                i18n="@@no">No</div>
+            <div
+                *ngIf="dcfProceduralInformation.consentForResearch !== true && dcfProceduralInformation.consentForResearch !== false;"
+                class="value"></div>
+        </app-view-entry-value>
+    </app-view-entry>
+
+</app-view-section-content>

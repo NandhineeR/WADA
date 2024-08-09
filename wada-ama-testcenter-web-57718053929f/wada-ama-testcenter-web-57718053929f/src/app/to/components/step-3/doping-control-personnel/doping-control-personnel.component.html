@@ -1,0 +1,28 @@
+<app-view-section [isLoading]="!dopingControlPersonnel">
+    <app-view-section-title
+        sectionNumber=3
+        i18n-sectionTitle="@@dopingControlPersonnel"
+        sectionTitle="Doping Control Personnel"
+        [canWrite]="canWrite"
+        [link]="['/', 'to', 'edit', (testingOrderId || ''), 'step', 3]"
+        dataQA="editDopingControlPersonnelButton"
+        [numberErrors]="missingFieldsCount">
+    </app-view-section-title>
+
+    <app-view-section-content *ngIf="dopingControlPersonnel" appHideControl [permissions]="whiteList">
+        <app-view-participants-table
+            [participants]="dopingControlPersonnel.dcpParticipants"
+            [whiteList]="whiteList">
+        </app-view-participants-table>
+        <app-view-entry id="{{controls.DCP_INSTRUCTIONS}}">
+            <app-view-entry-name i18n="@@instructionsAdditionalInformation">Instructions / Additional Information</app-view-entry-name>
+            <app-view-entry-value>
+                <app-show-more-less
+                    [text]="dopingControlPersonnel.instructions"
+                    [maxLength]="1000"
+                    dataQA="additionalInformation">
+                </app-show-more-less>
+            </app-view-entry-value>
+        </app-view-entry>
+    </app-view-section-content>
+</app-view-section>

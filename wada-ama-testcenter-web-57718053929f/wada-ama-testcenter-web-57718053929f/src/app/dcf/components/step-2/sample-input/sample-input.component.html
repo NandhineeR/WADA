@@ -1,0 +1,139 @@
+<div
+    appInheritDir
+    class="wrapper"
+    [@fadeInOut]
+    [formGroup]="actualForm">
+    <div class="titleColor sampleHeader">
+        <label>
+            <span i18n="@@sample">Sample</span> {{ sampleIndex + 1 }}  <ng-container *ngIf="isMultipleDCF"> - {{ translations$ | getSampleType:sample?.sampleTypeSpecificCode | async }}</ng-container>
+        </label>
+        <div *ngIf="!readonly && showDelete" class="delete-button" (click)="deleteSample()">
+            <img #deleteButton
+                alt="delete sample image"
+                class="delete-image"
+                src="assets/delete.svg"
+                tabindex="0"
+                (keydown.enter)="deleteSample()"/>
+        </div>
+    </div>
+
+    <app-form-field *ngIf="!isMultipleDCF" [hasAsterisk]="true">
+        <label for="sampleTypeSpecificCode" i18n="@@sampleType">Sample Type</label>
+        <div appRadioArrowFocus field-input>
+            <label #focusOnSampleType *ngFor="let item of sampleTypes" class="radio-container">
+                <input
+                    appRadioOnFocus
+                    formControlName="sampleTypeSpecificCode"
+                    id="sampleTypeSpecificCode"
+                    type="radio"
+                    [appDisable]="isMatchingResultType3or2or1 || (controls.SAMPLE_TYPE | isInputDisabled:fieldsSecurity:isEditMode)"
+                    [attr.data-qa]="getDataQAName(item.specificCode)"
+                    [attr.disabled]="readonly ? true : undefined"
+                    [value]="item.specificCode"
+                    (change)="onSampleTypeValueChange(item.specificCode); ">
+                <span class="checkmark"></span>
+                <span class="radio-label">{{ item.description | titlecase }}</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <app-urine-input
+        *ngIf="sample?.sampleTypeSpecificCode === sampleType.Urine"
+        [@fadeOutChild]
+        [collectionDateDisabled]="collectionDateDisabled"
+        [dcfStatus]="dcfStatus"
+        [fieldsSecurity]="fieldsSecurity"
+        [form]="actualForm"
+        [inCreation]="inCreation"
+        [isEditMode]="isEditMode"
+        [isMatchingResultType3or2or1]="isMatchingResultType3or2or1"
+        [isMultipleDCF]="isMultipleDCF"
+        [laboratories]="laboratories"
+        [locale]="locale"
+        [manufacturers]="manufacturers"
+        [previousSampleCode]="sample?.sampleCode || ''"
+        [readonly]="readonly"
+        [sampleIndex]="sampleIndex"
+        [showErrors]="showErrors && !inCreation"
+        [timezones]="timezones"
+        [urineSampleBoundaries]="urineSampleBoundaries"
+        [witnessChaperones]="witnessChaperones"
+        (sampleValuesOnChange)="updateSampleValues()"
+        (updatePartialSample)="changePartialSample($event)"
+        (validateSampleCodeDuplication)="validateSampleCodeDuplication()">
+    </app-urine-input>
+
+    <app-blood-input
+        *ngIf="sample?.sampleTypeSpecificCode === sampleType.Blood"
+        [@fadeOutChild]
+        [bloodCollectionOfficials]="bloodCollectionOfficials"
+        [collectionDateDisabled]="collectionDateDisabled"
+        [dcfStatus]="dcfStatus"
+        [fieldsSecurity]="fieldsSecurity"
+        [form]="actualForm"
+        [inCreation]="inCreation"
+        [isEditMode]="isEditMode"
+        [inCreation]="inCreation"
+        [isMatchingResultType3or2or1]="isMatchingResultType3or2or1"
+        [isMultipleDCF]="isMultipleDCF"
+        [laboratories]="laboratories"
+        [locale]="locale"
+        [manufacturers]="manufacturers"
+        [previousSampleCode]="sample?.sampleCode || ''"
+        [readonly]="readonly"
+        [sampleIndex]="sampleIndex"
+        [showErrors]="showErrors"
+        [timezones]="timezones"
+        (sampleValuesOnChange)="updateSampleValues()"
+        (validateSampleCodeDuplication)="validateSampleCodeDuplication()">
+    </app-blood-input>
+
+    <app-dried-blood-spot-input
+        *ngIf="sample?.sampleTypeSpecificCode === sampleType.DriedBloodSpot"
+        [@fadeOutChild]
+        [collectionDateDisabled]="collectionDateDisabled"
+        [dcfStatus]="dcfStatus"
+        [fieldsSecurity]="fieldsSecurity"
+        [form]="actualForm"
+        [inCreation]="inCreation"
+        [isEditMode]="isEditMode"
+        [isMatchingResultType3or2or1]="isMatchingResultType3or2or1"
+        [isMultipleDCF]="isMultipleDCF"
+        [laboratories]="laboratories"
+        [locale]="locale"
+        [manufacturers]="manufacturers"
+        [previousSampleCode]="sample?.sampleCode || ''"
+        [readonly]="readonly"
+        [sampleIndex]="sampleIndex"
+        [showErrors]="showErrors"
+        [timezones]="timezones"
+        (sampleValuesOnChange)="updateSampleValues()"
+        (validateSampleCodeDuplication)="validateSampleCodeDuplication()">
+    </app-dried-blood-spot-input>
+
+    <app-blood-passport-input
+        *ngIf="sample?.sampleTypeSpecificCode === sampleType.BloodPassport"
+        [@fadeOutChild]
+        [bloodCollectionOfficials]="bloodCollectionOfficials"
+        [collectionDateDisabled]="collectionDateDisabled"
+        [dcfStatus]="dcfStatus"
+        [fieldsSecurity]="fieldsSecurity"
+        [form]="actualForm"
+        [inCreation]="inCreation"
+        [isEditMode]="isEditMode"
+        [isMatchingResultType3or2or1]="isMatchingResultType3or2or1"
+        [isMultipleDCF]="isMultipleDCF"
+        [laboratories]="laboratories"
+        [locale]="locale"
+        [manufacturers]="manufacturers"
+        [previousSampleCode]="sample?.sampleCode || ''"
+        [readonly]="readonly"
+        [sampleIndex]="sampleIndex"
+        [showErrors]="showErrors"
+        [tempLoggerStatus]="tempLoggerStatus"
+        [timezones]="timezones"
+        (sampleValuesOnChange)="updateSampleValues()"
+        (validateABPFieldsEmitter)="emitValidateABPFields($event)"
+        (validateSampleCodeDuplication)="validateSampleCodeDuplication()">
+    </app-blood-passport-input>
+</div>

@@ -1,0 +1,71 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/styles/fake-link';
+
+@include fake-link(left, right);
+
+$linkColor: #3A782C;
+$nameColor: #414042;
+$statusColor: #414042;
+
+@mixin header($left, $right) {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    width: 100%;
+
+    .options {
+        display: inline;
+    }
+
+    .link__changeStatus {
+        color: $linkColor;
+        font-family: Montserrat, sans-serif;
+        font-size: 13px;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+
+    .spacer {
+        width: 10px;
+        display: inline-block;
+    }
+
+    .status {
+        font-size: 13px;
+        color: $statusColor;
+        background-color: rgba(255, 255, 255, 0.75);
+
+        height: 40px;
+        line-height: 40px;
+        padding-#{$right}: 25px;
+        padding-#{$left}: 40px;
+        border-top-#{$left}-radius: 35px;
+        border-bottom-#{$left}-radius: 35px;
+
+        .inner-status {
+            font-weight: bold;
+        }
+
+        .draft {
+            color: #952406;
+        }
+
+        .completed, .issued {
+            color: #3A782C;
+        }
+
+        .cancelled {
+            color: #9A5713;
+        }
+    }
+}
+
+.header {
+    @include ltr {
+        @include header(left, right);
+    }
+    @include rtl {
+        @include header(right, left);
+    }
+}

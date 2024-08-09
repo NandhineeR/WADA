@@ -1,0 +1,36 @@
+@import '~sass/mixins';
+
+$error-color: #AA1A1A;
+
+@mixin wrapper($left, $right) {
+    input {
+        width: 100%;
+
+        &.error {
+            border: 2px solid $error-color;
+        }
+    }
+
+    div {
+        position: relative;
+    }
+
+    app-calendar {
+        display: block;
+        position: absolute;
+        width: 300px;
+        background: white;
+        #{$left}: 0;
+        top: 0;
+        z-index: 999;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include wrapper(left, right);
+    }
+    @include rtl {
+        @include wrapper(right, left);
+    }
+}

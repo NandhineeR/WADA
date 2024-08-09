@@ -1,0 +1,27 @@
+<div
+    [appTooltip]="tooltip"
+    tooltipSize="400">
+    <div class="label" [class.alone]="displayAlone">{{ competitionForecastTotal ? (competitionTotal | calculatePercentage:competitionForecastTotal:0) + '%' : competitionTotal }}</div>
+    <app-progressbar-simple *ngIf="competitionForecastTotal" [value]="competitionTotal / competitionForecastTotal"></app-progressbar-simple>
+</div>
+
+<ng-template #tooltip>
+    <span class="uppercase"><strong>{{ sportName }} - {{ isSample ? (translations$ | getSampleType:type  | async) : (translations$ | getAnalysisCategory:type  | async) }}</strong></span>
+    <br />
+    <br />
+    <span i18n="@@total_colon">Total:</span>
+    <span *ngIf="!totalForecast" i18n="@@totalXRecoded"><strong>{{ total }}</strong> recorded</span>
+    <span *ngIf="totalForecast" i18n="@@totalXRecordedOutOfXForecast"><strong>{{ total }}</strong> recorded out of <strong>{{ totalForecast }}</strong> forecast</span>
+    <span *ngIf="totalForecast" i18n="@@valueXpercent_parentheses">(<strong>{{ total | calculatePercentage:totalForecast:1 }}%</strong>)</span>
+    <br />
+    <br />
+    <span i18n="@@inCompetition_colon">In Competition:</span>
+    <span *ngIf="!icForecast" i18n="@@totalXRecoded"><strong>{{ icTotal }}</strong> recorded</span>
+    <span *ngIf="icForecast" i18n="@@totalXRecordedOutOfXForecast"><strong>{{ icTotal }}</strong> recorded out of <strong>{{ icForecast }}</strong> forecast</span>
+    <span *ngIf="icForecast" i18n="@@valueXpercent_parentheses">(<strong>{{ icTotal | calculatePercentage:icForecast:1 }}%</strong>)</span>
+    <br />
+    <span i18n="@@outOfCompetition_colon">Out of Competition:</span>
+    <span *ngIf="!ocForecast" i18n="@@totalXRecoded"><strong>{{ ocTotal }}</strong> recorded</span>
+    <span *ngIf="ocForecast" i18n="@@totalXRecordedOutOfXForecast"><strong>{{ ocTotal }}</strong> recorded out of <strong>{{ ocForecast }}</strong> forecast</span>
+    <span *ngIf="ocForecast" i18n="@@valueXpercent_parentheses">(<strong>{{ ocTotal | calculatePercentage:ocForecast:1 }}%</strong>)</span>
+</ng-template>

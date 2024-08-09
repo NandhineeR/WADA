@@ -1,0 +1,56 @@
+@import '~sass/variables';
+$error-color: #AA1A1A;
+
+.dropdown-wrapper {
+    background-color: $dropdown-background-color;
+    border-radius: 5px;
+    display: block;
+
+    .dropdown-container {
+        color: $form-input-color;
+        font-weight: 500;
+        border: 1px solid #757575;
+        border-radius: 5px;
+        padding: 0 6px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        &:after {
+            content: '\25bc';
+            color: #555;
+        }
+
+        &.open:after{
+            content : '\25b2';
+        }
+
+        &.error {
+            border: 2px solid $error-color;
+        }
+
+        &:hover {
+            cursor: default;
+        }
+    }
+
+    .dropdown-options-container {
+        position: absolute;
+        max-height: 300px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background-color: white;
+        border: 1px solid #dbdbdb;
+        border-radius: 5px;
+        min-width: 60px;
+        z-index: 999;
+
+        &:hover {
+            cursor: default;
+        }
+    }
+}
+
+.fullWidth {
+    width: 100%;
+}

@@ -1,0 +1,76 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/components/notification/mixins';
+
+@mixin step($left, $right) {
+    .authorization {
+        width: 100%;
+
+        .authorization-content {
+            padding-top: 20px;
+            padding-bottom: 40px;
+            text-align: center;
+            font-size: 12px;
+            background-color: $section-content-background;
+
+            .content-title {
+                width: 40%;
+                text-align: $right;
+                overflow: hidden;
+                float: $left;
+            }
+
+            .content-value {
+                width: 60%;
+                padding-#{$left}: 25px;
+                font-weight: bold;
+                text-align: $left;
+                overflow: hidden;
+            }
+
+            .valid-field {
+                color: $valid-field-star;
+            }
+
+            .error-field {
+                color: $incorrect-field-star;
+            }
+
+            .value {
+                min-height: 18px;
+            }
+        }
+
+        .loading {
+            padding-top: 20px;
+            padding-bottom: 40px;
+            text-align: center;
+            vertical-align: middle;
+            width: 100%;
+
+            .loading-img {
+                display: inline-block;
+                height: 60px;
+                animation: rotation 2s infinite linear;
+            }
+
+            @keyframes rotation {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(359deg);
+                }
+            }
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}

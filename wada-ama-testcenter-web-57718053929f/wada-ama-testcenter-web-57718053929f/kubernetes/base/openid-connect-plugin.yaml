@@ -1,0 +1,40 @@
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: testcenter-web-openid-connect-plugin
+  namespace: default
+config:
+  session_secret: SOMESESSIONSECRET
+  auth_methods:
+  - authorization_code
+  - session
+  session_storage: redis
+  upstream_access_token_header: authorization:bearer
+  session_redis_port: 6379
+  issuer: https://localhost:8080/auth/realms/WADA/.well-known/openid-configuration
+  session_redis_host: kong-redis-master
+  session_redis_username: kong
+  session_redis_password: SOMEREDISPASSWORD
+  session_redis_ssl_verify: false
+  client_secret:
+  - SOMECLIENTSECRET
+  ssl_verify: false
+  session_cookie_lifetime: 1800
+  client_id:
+  - ADAMS-TestCenter
+  login_action: redirect
+  preserve_query_args: true
+  session_cookie_renew: 600
+  scopes:
+  - openid
+  unauthorized_redirect_uri:
+  - https://localhost:9443/ng
+  logout_methods:
+  - POST
+  - DELETE
+  - GET
+  logout_redirect_uri:
+  - https://host.docker.internal:8543/auth/realms/WADA/protocol/openid-connect/auth?response_type=code&client_id=ADAMS-TestCenter&response_mode=query&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fng&scope=openid
+  logout_query_arg: logout
+plugin: openid-connect

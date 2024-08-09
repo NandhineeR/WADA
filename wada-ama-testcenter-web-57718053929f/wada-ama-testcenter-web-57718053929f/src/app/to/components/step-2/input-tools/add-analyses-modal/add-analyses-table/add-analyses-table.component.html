@@ -1,0 +1,243 @@
+<div class="wrapper">
+    <div #errorRef class="error-wrapper" tabindex="0">
+        <app-notification  
+            *ngIf="analysesErrors > 0"
+            class="wrapper"
+            type="error"
+            [changeTableStyles]="true">
+            <span *ngIf="analysesErrors === 1" i18n="@@errorDetectedInFollowingField">An error was detected in the following field:</span>
+            <span *ngIf="analysesErrors > 1" i18n="@@errorsDetectedInFollowingFields">Some error(s) were detected in the following fields:</span>
+            <ul links class="error-link-list">
+                <ng-container *ngFor="let laboratoryError of laboratoryErrors">
+                    <li>
+                        <a href="{{ url }}#{{ laboratoryError?.inputId }}" i18n="@@laboratorySampleTypeX">Laboratory ({{ translations$ | getSampleType:laboratoryError?.sampleType | async }} Sample)</a>
+                    </li>
+                </ng-container>
+                <ng-container *ngFor="let sportDisciplineError of sportDisciplineErrors">
+                    <li>
+                        <a href="{{ url }}#{{ sportDisciplineError?.inputId }}" i18n="@@mandatorySportDiscipline">Sport / Discipline is mandatory</a>
+                    </li>
+                </ng-container>
+            </ul>
+        </app-notification>
+    </div>
+    <div class="limePieHeader">
+        <label class="remove-margin" i18n="@@athletes">Athletes</label>
+    </div>
+    <app-data-table
+        [allowMultiSelect]="false"
+        [changeTableStyles]="true"
+        [dataSource]="dataSource"
+        [marginTop]="'10px'"
+        [showDrag]="false"
+        [showOrder]="false"
+        [showPaginator]="false"
+        [showRemove]="false"
+        [showSelect]="false"
+        [showTableFooter]="false"
+        [showTopHeader]="false"
+        [columnDefs]="columns">
+        <ng-container *columnCell="'name'; let e">
+            <input
+                *ngIf="e.name === '' && (e.placeholder || e.placeholder !== '' || e.athleteId == ''); else name"
+                class="table-input"
+                [(ngModel)]="e.placeholder"
+                (click)="$event.stopPropagation()">
+            <ng-template #name>
+                <span *ngIf="e.athleteAccessible">
+                    <a
+                        appOpenObjectInClassic
+                        href=""
+                        [objectId]="e.athleteId"
+                        [targetObject]="'Athlete'">{{ e.name }}</a>
+                </span>
+                <span *ngIf="!e.athleteAccessible">{{ e.name }}</span>
+            </ng-template>
+        </ng-container>
+
+        <ng-container *columnCell="'sportDiscipline'; let e">
+                <app-typeahead
+                #sportDiscipline
+                appRandomizeInput
+                class="table-input"
+                dataQA="sportDisciplineTypeahead"
+                fieldId="sportDiscipline{{ e.tempId }}"
+                suggestionField="displayDescriptionName"
+                [suggestions]="sportDisciplineSuggestions"
+                [(ngModel)]="e.sportDiscipline"
+                (click)="$event.stopPropagation()"
+                (selected)="onSelectSportDiscipline()">
+                </app-typeahead>
+        </ng-container>
+
+        <ng-container *columnCell="'team'; let e">
+            <app-dropdown
+                dataQA="teamDropdown"
+                defaultValue="true"
+                i18n-placeholder="@@team"
+                id="team"
+                property="id"
+                type="text"
+                [minWidth]="150"
+                [useMinWidth]="true"
+                [(ngModel)]="e.team">
+                <ng-container *ngFor="let item of e.teams; let i = index">
+                    <div class="dropdown-item" data-qa="teamDropdownOption" [appDropdownElement]="item" [attr.data-qa-precision]="i">{{ item.name }}</div>
+                </ng-container>
+                <div class="dropdown-item" [appDropdownElement]="">
+                    <span i18n="@@notApplicable">Not Applicable</span>
+                </div>
+            </app-dropdown>
+        </ng-container>
+
+        <ng-container *columnCell="'athleteLevel'; let e">
+            <app-dropdown
+                dataQA="athleteLevelDropdown"
+                defaultValue="true"
+                i18n-placeholder="@@athleteLevel"
+                id="athleteLevel"
+                type="text"
+                [minWidth]="150"
+                [useMinWidth]="true"
+                [(ngModel)]="e.athleteLevel">
+                <ng-container *ngFor="let item of ATHLETE_LEVEL_LIST; let i = index">
+                    <div
+                        class="dropdown-item"
+                        data-qa="athleteLevelDropdownOption"
+                        [appDropdownElement]="item"
+                        [attr.data-qa-precision]="i">{{ translations$ | getAthleteLevel:item | async }}</div>
+                </ng-container>
+            </app-dropdown>
+        </ng-container>
+
+        <ng-template #analyses let-element="element" let-column="column">
+            <div *ngFor="let el of column.cell(element); let idx = index">
+                <span *ngIf="el.name === sampleTypeEnum.Urine" class="bold underline" i18n="@@urine">Urine</span>
+                <span *ngIf="el.name === sampleTypeEnum.Blood" class="bold underline" i18n="@@blood">Blood</span>
+                <span *ngIf="el.name === sampleTypeEnum.BloodPassport" class="bold underline" i18n="@@bloodPassport">Blood Passport</span>
+                <span *ngIf="el.name === sampleTypeEnum.DriedBloodSpot" class="bold underline" i18n="@@driedBloodSpot">Dried Blood Spot</span>
+                <span> {{ el.attribute | removeParenthesis }}</span>
+            </div>
+            <div *ngIf="column.cell(element).length === 0">
+                <span class="bold underline" i18n="@@none">None</span>
+            </div>
+        </ng-template>
+
+        <div *columnCell="'y'; let e" [appLinkRowHeights]="e.name">
+            <div *ngFor="let row of e.y">{{ row }}</div>
+        </div>
+
+        <ng-template #toolTipAthleteLevel let-column="column">
+            <span i18n="@@athleteLevel">Athlete Level</span>
+            <app-tooltip-athlete-level></app-tooltip-athlete-level>
+        </ng-template>
+    </app-data-table>
+
+    <div class="limePieHeader analysesHeader">
+        <label class="remove-margin" i18n="@@analyses">Analyses</label>
+    </div>
+
+    <div class="notification-wrapper">
+        <app-notification type="informative">
+            <span i18n="@@analysesSelectedAppliedToAthletes">Analyses selected will be applied to athletes in above list</span>
+        </app-notification>
+    </div>
+   
+
+    <div class="analyses-wrapper">
+        <div
+            *ngIf="sampleTypes$ | async as sampleTypes; else loadingAnimation"
+            class="analyses-row">
+            <div *ngFor="let sampleType of sampleTypes" class="column">
+                <div class="analyses-cell">
+                    <h4 class="analyses-title">{{ sampleType?.description | titlecase }}&nbsp;<span i18n="@@sample">Sample</span></h4>
+                    <div class="empty-yellow-line"></div>
+                    <div *ngFor="let analysis of getSelectedAnalysesBySampleType(sampleType); let i = index">
+                        <div class="analysis-title">Analysis {{ i + 1 }}
+                            <div class="delete-button" (click)="deleteAnalysis(analysis.tempId)">
+                                <img
+                                    #deleteButton
+                                    alt="delete analysis icon"
+                                    class="delete-image"
+                                    src="assets/delete.svg"
+                                    tabindex="0"/>
+                            </div>
+                        </div>
+                        <app-analysis-selector
+                            id="{{sampleType?.specificCode}}"
+                            [analysisSelected]="analysis"
+                            [defaultLaboratory]="defaultLaboratory$ | async"
+                            [laboratories]="laboratories$ | async"
+                            [multipleAthleteSelection]="multipleAthleteSelection"
+                            [sampleType]="sampleType"
+                            (analysisEmitter)="updateAnalysis($event)">
+                        </app-analysis-selector>
+                        <br>
+                        <div class="empty-yellow-line"></div>
+                    </div>
+
+                    <div class="add-sample-analysis-button-wrapper">
+                        <div
+                            *ngIf="!isAddAnalysisButtonEnabledMap.get(sampleType.specificCode)"
+                            class="warning-wrapper">
+                            <div *ngIf="showAddWarning(sampleType); else showDefaultWarning">
+                                <app-notification type="success">
+                                    <span i18n="@@atLeastOneAthleteHasReachedMax">At least one selected athlete has reached the max number of analyses ({{ MAX_NUMBER_OF_ANALYSES_PER_SAMPLE_TYPE }}) for this type</span>
+                                </app-notification>
+                            </div>
+                            <ng-template #showDefaultWarning>
+                                <app-notification *ngIf="isMaxReachedMap.get(sampleType.specificCode)" type="success">
+                                    <span i18n="@@maxReachedForThisType">Max reached for this type</span>
+                                </app-notification>
+
+                                <app-notification *ngIf="isMaxExceededMap.get(sampleType.specificCode)" type="warning">
+                                    <span i18n="@@maxExceededForThisType">Max of {{ MAX_NUMBER_OF_ANALYSES_PER_SAMPLE_TYPE }} exceeded for this type</span>
+                                </app-notification>
+                            </ng-template>
+                        </div>
+                       
+                        <app-button
+                            field-input
+                            i18n="@@addAnalysis"
+                            type="secondary"
+                            [dataQA]="'addAnalysis' + sampleType.specificCode"
+                            [disabled]="!isAddAnalysisButtonEnabledMap.get(sampleType.specificCode)"
+                            [ngClass]="{'disabled-button': !isAddAnalysisButtonEnabledMap.get(sampleType.specificCode)}"
+                            (click)="addAnalysis(sampleType)">Add Analysis</app-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ng-template #loadingAnimation>
+            <app-loading-animation [isTemplate]="true"></app-loading-animation>
+        </ng-template>
+    </div>
+
+    <div class="center-modal-buttons bottom-button-padding">
+        <app-button dataQA="cancelModifications" type="secondary" (click)="goBackToTO(false)">
+            <span *ngIf="isEditAnalyses" i18n="@@cancelModifications">Cancel Modifications</span>
+            <span *ngIf="!isEditAnalyses" i18n="@@cancel">Cancel</span>
+        </app-button>
+
+        <app-button
+            *ngIf="isSearchAthlete"
+            dataQA="addAndSearchOtherAthletes"
+            type="secondary"
+            [disabled]="!isSaveButtonEnabled()"
+            [ngClass]="{'disabled-button': !isSaveButtonEnabled()}"
+            (click)="goToSearchAthlete(true)">
+            <span i18n="@@addAndSearchOtherAthletes">Add and Search for Other Athletes</span>
+        </app-button>
+
+        <app-button
+            class="button"
+            dataQA="doneButton"
+            type="primary"
+            [disabled]="!isSaveButtonEnabled()"
+            [ngClass]="{'disabled-button': !isSaveButtonEnabled()}"
+            (click)="goBackToTO(true)">
+            <span i18n="@@done">Done</span>
+        </app-button>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+::ng-deep accordion-group {
+    .card {
+        border: none;
+    }
+    
+    .card-header {
+        padding: none;
+        background-color: white;
+        border-bottom: none;
+    }
+
+    .card-body {
+        border: none;
+    }
+}
+
+::ng-deep .card-header {
+    padding: 0.75rem 1.25rem;
+}

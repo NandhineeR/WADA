@@ -1,0 +1,457 @@
+<ng-template #translationsRef>
+    <!--
+        The translations are identified in the project via their class name
+        Two class names can be used, the first one being a 'scope' for a group
+        of translations. The second class name is the tag that is calculated or
+        received from the backend. Any space in the calculated key is replaced by an
+        underscore and the key is lowercased before accessing the following translations.
+        For example, if the key received from the backend is EPO B, then we will use
+        epo_b to access the translation, and the class name for the translation must be epo_b.
+    -->
+
+    <!-- Global -->
+    <span class="global title" i18n="@@global_title">ADAMS NextGen</span>
+
+    <!-- Months -->
+    <span class="month 0" i18n="@@jan_uppercase">JAN</span>
+    <span class="month 1" i18n="@@feb_uppercase">FEB</span>
+    <span class="month 2" i18n="@@mar_uppercase">MAR</span>
+    <span class="month 3" i18n="@@apr_uppercase">APR</span>
+    <span class="month 4" i18n="@@may_uppercase">MAY</span>
+    <span class="month 5" i18n="@@jun_uppercase">JUN</span>
+    <span class="month 6" i18n="@@jul_uppercase">JUL</span>
+    <span class="month 7" i18n="@@aug_uppercase">AUG</span>
+    <span class="month 8" i18n="@@sep_uppercase">SEP</span>
+    <span class="month 9" i18n="@@oct_uppercase">OCT</span>
+    <span class="month 10" i18n="@@nov_uppercase">NOV</span>
+    <span class="month 11" i18n="@@dec_uppercase">DEC</span>
+
+    <span class="me" i18n="@@me">Me</span>
+
+    <!-- Analysis categories -->
+    <span class="analysisCategory esas" i18n="@@eras">ERAs</span>
+    <span class="analysisCategory gh" i18n="@@gh">GH</span>
+    <span class="analysisCategory ghrfs" i18n="@@ghrfs">GHRFs</span>
+
+    <!-- Analysis sub-categories -->
+    <span class="analysisSubCategory epo" i18n="@@urine">Urine</span>
+    <span class="analysisSubCategory epob" i18n="@@blood">Blood</span>
+    <span class="analysisSubCategory epoepob" i18n="@@urineBlood">Urine + Blood</span>
+    <span class="analysisSubCategory hgh" i18n="@@isoforms">Isoforms</span>
+    <span class="analysisSubCategory hgh_markers" i18n="@@bioMarkers">BioMarkers</span>
+    <span class="analysisSubCategory hghhgh_markers" i18n="@@isoformsBioMarkers">Isoforms + BioMarkers</span>
+    <span class="analysisSubCategory gh" i18n="@@ghsGhrP">GHS/GHRP</span>
+    <span class="analysisSubCategory ghrh" i18n="@@ghrh">GHRH</span>
+    <span class="analysisSubCategory ghghrh" i18n="@@ghrhGhsGhrp">GHRH + GHS/GHRP</span>
+
+    <!-- Extended analysis categories -->
+    <span class="extendedAnalysisCategory esas" i18n="@@erythropoietinReceptorAgonists">Erythropoietin-Receptor agonists</span>
+    <span class="extendedAnalysisCategory gh" i18n="@@growthHormone">Growth hormone</span>
+    <span class="extendedAnalysisCategory ghrfs" i18n="@@GrowthHormoneReleasingHormone">Growth hormone–releasing hormone</span>
+
+    <!-- Sample types -->
+    <span class="sampleType urine" i18n="@@sampleType_urine">Urine</span>
+    <span class="sampleType blood" i18n="@@sampleType_blood">Blood</span>
+    <span class="sampleType blood_passport" i18n="@@bloodAbp">Blood ABP</span>
+    <span class="sampleType Urine" i18n="@@urine">Urine</span>
+    <span class="sampleType Blood" i18n="@@blood">Blood</span>
+    <span class="sampleType Blood_passport" i18n="@@bloodPassport">Blood Passport</span>
+    <span class="sampleType Dried_blood_spot" i18n="@@dried_blood_spot">Dried Blood Spot</span>
+
+    <!-- Sample Corrector -->
+    <span class="sampleCorrector matchType" i18n="@@breakTheMatch_lowercase">break the match</span>
+    <span class="sampleCorrector sampleCode" i18n="@@code_lowercase">code</span>
+    <span class="sampleCorrector sampleType" i18n="@@type_lowercase">type</span>
+    <span class="sampleCorrector validity" i18n="@@validity">validity</span>
+
+    <!-- Target Objects -->
+    <span class="targetObject dcf" i18n="@@dopingControlForm">Doping Control Form</span>
+    <span class="targetObject dcfShortName" i18n="@@dcf_uppercase">DCF</span>
+    <span class="targetObject to" i18n="@@testingOrder">Testing Order</span>
+    <span class="targetObject ua" i18n="@@unsuccessfulAttempt">Unsuccessful Attempt</span>
+
+    <!-- Unprocessable Entity Types -->
+    <span class="unprocessableEntityType tests" i18n="@@tests_lowercase">tests</span>
+    <span class="unprocessableEntityType ados" i18n="@@ados">ADOs</span>
+
+    <!-- Participant types -->
+    <span class="participantType lead_dco" i18n="@@leadDopingControlOfficer">Lead Doping Control Officer</span>
+
+    <!-- TDPM tdpmCsv column names -->
+    <!-- General translations -->
+    <span class="tdpmCsv grandTotal" i18n="@@grandTotal">Grand Total</span>
+    <span class="tdpmCsv sport" i18n="@@sport">Sport</span>
+    <span class="tdpmCsv discipline" i18n="@@discipline">Discipline</span>
+    <span class="tdpmCsv total" i18n="@@total">Total</span>
+
+    <!-- The keys (second class name) must have the following 3-part structure: -->
+    <!-- {ic|ooc}{sample type|analysis category code}{Test|Forecast|Percent} -->
+    <span class="tdpmCsv icUrineTest" i18n="@@icUrineTest">Urine IC Test</span>
+    <span class="tdpmCsv icUrineForecast" i18n="@@icUrineForecast">Urine IC Forecast</span>
+    <span class="tdpmCsv icUrinePercent" i18n="@@icUrinePercent">Urine IC %</span>
+    <span class="tdpmCsv oocUrineTest" i18n="@@oocUrineTest">Urine OOC Test</span>
+    <span class="tdpmCsv oocUrineForecast" i18n="@@oocUrineForecast">Urine OOC Forecast</span>
+    <span class="tdpmCsv oocUrinePercent" i18n="@@oocUrinePercent">Urine OOC %</span>
+
+    <span class="tdpmCsv icBloodTest" i18n="@@icBloodTest">Blood IC Test</span>
+    <span class="tdpmCsv icBloodForecast" i18n="@@icBloodForecast">Blood IC Forecast</span>
+    <span class="tdpmCsv icBloodPercent" i18n="@@icBloodPercent">Blood IC %</span>
+    <span class="tdpmCsv oocBloodTest" i18n="@@oocBloodTest">Blood OOC Test</span>
+    <span class="tdpmCsv oocBloodForecast" i18n="@@oocBloodForecast">Blood OOC Forecast</span>
+    <span class="tdpmCsv oocBloodPercent" i18n="@@oocBloodPercent">Blood OOC %</span>
+
+    <span class="tdpmCsv icBlood_passportTest" i18n="@@icBloodPassportTest">Blood Passport IC Test</span>
+    <span class="tdpmCsv icBlood_passportForecast" i18n="@@icBloodPassportForecast">Blood Passport IC Forecast</span>
+    <span class="tdpmCsv icBlood_passportPercent" i18n="@@icBloodPassportPercent">Blood Passport IC %</span>
+    <span class="tdpmCsv oocBlood_passportTest" i18n="@@oocBloodPassportTest">Blood Passport OOC Test</span>
+    <span class="tdpmCsv oocBlood_passportForecast" i18n="@@oocBloodPassportForecast">Blood Passport OOC Forecast</span>
+    <span class="tdpmCsv oocBlood_passportPercent" i18n="@@oocBloodPassportPercent">Blood Passport OOC %</span>
+
+    <span class="tdpmCsv icDried_blood_spotTest" i18n="@@icDriedBloodSpotTest">Dried Blood Spot IC Test</span>
+    <span class="tdpmCsv icDried_blood_spotForecast" i18n="@@icDriedBloodSpotForecast">Dried Blood Spot IC Forecast</span>
+    <span class="tdpmCsv icDried_blood_spotPercent" i18n="@@icDriedBloodSpotPercent">Dried Blood Spot IC %</span>
+    <span class="tdpmCsv oocDried_blood_spotTest" i18n="@@oocDriedBloodSpotTest">Dried Blood Spot OOC Test</span>
+    <span class="tdpmCsv oocDried_blood_spotForecast" i18n="@@oocDriedBloodSpotForecast">Dried Blood Spot OOC Forecast</span>
+    <span class="tdpmCsv oocDried_blood_spotPercent" i18n="@@oocDriedBloodSpotPercent">Dried Blood Spot OOC %</span>
+
+    <span class="tdpmCsv icESAsTest" i18n="@@icErasTest">ESA IC Test</span>
+    <span class="tdpmCsv icESAsForecast" i18n="@@icErasForecast">ESA IC Forecast</span>
+    <span class="tdpmCsv icESAsPercent" i18n="@@icErasPercent">ESA IC %</span>
+    <span class="tdpmCsv oocESAsTest" i18n="@@oocErasTest">ESA OOC Test</span>
+    <span class="tdpmCsv oocESAsForecast" i18n="@@oocErasForecast">ESA OOC Forecast</span>
+    <span class="tdpmCsv oocESAsPercent" i18n="@@oocErasPercent">ESA OOC %</span>
+
+    <span class="tdpmCsv icGHTest" i18n="@@icGhTest">GH IC Test</span>
+    <span class="tdpmCsv icGHForecast" i18n="@@icGhForecast">GH IC Forecast</span>
+    <span class="tdpmCsv icGHPercent" i18n="@@icGhPercent">GH IC %</span>
+    <span class="tdpmCsv oocGHTest" i18n="@@oocGhTest">GH OOC Test</span>
+    <span class="tdpmCsv oocGHForecast" i18n="@@oocGhForecast">GH OOC Forecast</span>
+    <span class="tdpmCsv oocGHPercent" i18n="@@oocGhPercent">GH OOC %</span>
+
+    <span class="tdpmCsv icGHRFsTest" i18n="@@icGhrfsTest">GHRFs IC Test</span>
+    <span class="tdpmCsv icGHRFsForecast" i18n="@@icGhrfsForecast">GHRFs IC Forecast</span>
+    <span class="tdpmCsv icGHRFsPercent" i18n="@@icGhrfsPercent">GHRFs IC %</span>
+    <span class="tdpmCsv oocGHRFsTest" i18n="@@oocGhrfsTest">GHRFs OOC Test</span>
+    <span class="tdpmCsv oocGHRFsForecast" i18n="@@oocGhrfsForecast">GHRFs OOC Forecast</span>
+    <span class="tdpmCsv oocGHRFsPercent" i18n="@@oocGhrfsPercent">GHRFs OOC %</span>
+
+    <span class="tdssa yearToDate" i18n="@@yearToDate">Year to Date</span>
+    <span class="tdssa custom" i18n="@@custom">Custom</span>
+
+    <span class="gender M" i18n="@@male">Male</span>
+    <span class="gender F" i18n="@@female">Female</span>
+    <span class="gender X" i18n="@@unknown">Unknown</span>
+    <span class="gender XU" i18n="@@xUnknown">X(Unknown)</span>
+
+    <span class="retired yes" i18n="@@yes">Yes</span>
+    <span class="retired no" i18n="@@no">No</span>
+
+    <span class="athleteLevel International" i18n="@@international">International</span>
+    <span class="athleteLevel National" i18n="@@national">National</span>
+    <span class="athleteLevel Other" i18n="@@other">Other</span>
+
+    <span class="athleteSelected singular" i18n="@@athleteSelected_lowercase">athlete selected</span>
+    <span class="athleteSelected plural" i18n="@@athletesSelected_lowercase">athletes selected</span>
+    <span class="athlete singular" i18n="@@athlete_lowercase">athlete</span>
+    <span class="athlete plural" i18n="@@athletes_lowercase">athletes</span>
+
+    <!-- Generic Activities Table -->
+    <span class="tableHeader referenceDate" i18n="@@referenceDate">Reference Date</span>
+    <span class="tableHeader subject" i18n="@@subject">Subject</span>
+    <span class="tableHeader activityType" i18n="@@activityType">Type</span>
+    <span class="tableHeader createdBy" i18n="@@createdBy">Created By</span>
+    <span class="tableHeader lastUpdatedBy" i18n="@@lastUpdatedBy">Last Updated By</span>
+
+    <span class="tableHeader testingOrderNumber" i18n="@@testingOrderNumber">Testing Order Number</span>
+    <span class="tableHeader adoReferenceNumber" i18n="@@adoReferenceNumber">ADO Reference Number</span>
+    <span class="tableHeader testingAuthority" i18n="@@testingAuthority">Testing Authority</span>
+    <span class="tableHeader description" i18n="@@testingDescription">Description of Testing</span>
+    <span class="tableHeader testingOrderStatus" i18n="@@testingOrderStatus">Testing Order Status</span>
+    <span class="tableHeader issuedDate" i18n="@@issuedDate">Issued Date</span>
+    <span class="tableHeader startDate" i18n="@@startDate">Start Date</span>
+    <span class="tableHeader city" i18n="@@testingCity">City of Testing</span>
+
+    <span class="tableHeader age" i18n="@@age">Age</span>
+    <span class="tableHeader analyses" i18n="@@analyses">Analyses</span>
+    <span class="tableHeader arrivalTime" i18n="@@arrivalTime">Arrival Time</span>
+    <span class="tableHeader athleteLevel" i18n="@@athleteLevel">Athlete Level</span>
+    <span class="tableHeader comment" i18n="@@message">Message</span>
+    <span class="tableHeader dateOfBirth" i18n="@@dateOfBirth">Date of Birth</span>
+    <span class="tableHeader athleteId" i18n="@@athleteId">Athlete ID</span>
+    <span class="tableHeader athleteIdHeaderAdamsValue" i18n="@@athleteId">Athlete ID</span>
+    <span class="tableHeader disabilities" i18n="@@disabilities">Disabilities</span>
+    <span class="tableHeader firstName" i18n="@@firstName">First Name</span>
+    <span class="tableHeader laboratories" i18n="@@laboratories">Laboratories</span>
+    <span class="tableHeader lastName" i18n="@@lastName">Last Name</span>
+    <span class="tableHeader name" i18n="@@athleteName">Athlete Name</span>
+    <span class="tableHeader placeholder" i18n="@@placeholderDescription">Placeholder description</span>
+    <span class="tableHeader sex" i18n="@@sportGender">Sport Gender</span>
+    <span class="tableHeader sportDiscipline" i18n="@@sportDiscipline">Sport Discipline</span>
+    <span class="tableHeader sportDisciplines" i18n="@@sportDisciplines">Sport Disciplines</span>
+    <span class="tableHeader sportNationality" i18n="@@sportNationality">Sport Nationality</span>
+    <span class="tableHeader sportsDiscipline" i18n="@@sportDiscipline_asterisk">Sport / Discipline *</span>
+    <span class="tableHeader status" i18n="@@status">Status</span>
+    <span class="tableHeader team" i18n="@@team">Team</span>
+    <span class="tableHeader results" i18n="@@results">Results</span>
+    <span class="tableHeader teams" i18n="@@teams">Teams</span>
+    <span class="tableHeader type" i18n="@@role">Role</span>
+
+    <span class="tableHeader formerLastName" i18n="@@formerLastName">Former Last Name</span>
+    <span class="tableHeader preferredName" i18n="@@preferredName">Preferred Name</span>
+    <span class="tableHeader testingPoolTypes" i18n="@@rtp_uppercase">RTP</span>
+    <span class="tableHeader whereaboutsCustodianOrganization" i18n="@@whereaboutsCustodian">Whereabouts Custodian</span>
+    <span class="tableHeader passportCustodian" i18n="@@abpCustodian">ABP Custodian</span>
+    <span class="tableHeader nationalFederations" i18n="@@nationalFederation">National Federation</span>
+    <span class="tableHeader adamsId" i18n="@@adamsId_uppercase">ADAMS ID</span>
+    <span class="tableHeader bloodPassportIdNumber" i18n="@@abpNumber">ABP Number</span>
+    <span class="tableHeader ifIdNumber" i18n="@@ifId_uppercase">IF ID</span>
+    <span class="tableHeader nfIdNumber" i18n="@@nfId_uppercase">NF ID</span>
+    <span class="tableHeader naDOIdNumber" i18n="@@nadoId_uppercase">NADO ID</span>
+    <span class="tableHeader retiredAthlete" i18n="@@retiredAthlete">Retired Athlete</span>
+    <span class="tableHeader latestTest" i18n="@@latestTest">Latest Test</span>
+
+    <span class="tableHeader closedTestName" i18n="@@athleteLastFirst">Athlete (Last, First)</span>
+    <span class="tableHeader closedTestReason" i18n="@@reason">Reason</span>
+    <span class="tableHeader closedTestDetails" i18n="@@details">Details</span>
+
+    <span class="unsuccessfulAttemptStatus savedAsComplete" i18n="@@savedAndComplete">Saved and Completed</span>
+    <span class="unsuccessfulAttemptStatus savedAsDraft" i18n="@@savedAsDraft">Saved as Draft</span>
+
+    <span class="dcf completed" i18n="@@savedAndComplete">Saved and Completed</span>
+    <span class="dcf draft" i18n="@@savedAsDraft">Saved as Draft</span>
+
+    <span class="status completed" i18n="@@completed">Completed</span>
+    <span class="status issued" i18n="@@issued">Issued</span>
+
+    <span class="toasterMessage error" i18n="@@changesCouldNotBeSavedSystemWillTryAgain">Your changes could not be saved. The system will try again once a connection is re-established.</span>
+    <span class="toasterMessage reload" i18n="@@cannotUpdateValueSportDisciplineNotAvailable">You cannot update this value as the sport/discipline is no longer available. Please refresh your page and try again.</span>
+
+    <!-- Common error messages -->
+    <span class="errorMessage persistenceError" i18n="@@persistenceErrorMsg">The object could not be persisted in the database</span>
+    <span class="errorMessage unknownMessageKey" i18n="@@unknownMessageKeyMsg">An unknown error occurred</span>
+    <span class="errorMessage objectPermanentlyRetired" i18n="@@objectPermanentlyRetiredMsg">The object you are trying to retrieve is permanently retired</span>
+    <span class="errorMessage badLastUpdateTimeStamp" i18n="@@badLastUpdateTimeStampMsg">A newer version of the record already exists</span>
+
+    <!-- Data validation error messages -->
+    <span class="errorMessage invalidCacheIdEnum" i18n="@@invalidCacheIdEnumMsg">Error [INVALID_CACHE_ID]</span>
+    <span class="errorMessage unknownMimeType" i18n="@@unknownMimeTypeMsg">Error [UNKNOWN_MIME_TYPE]</span>
+    <span class="errorMessage missingXwadaNote" i18n="@@missingXwadaNoteMsg">Error [MISSING_XWADA_NOTE]</span>
+    <span class="errorMessage unmatchedSample" i18n="@@unmatchedSampleMsg">The sample must be matched</span>
+    <span class="errorMessage dcfUnrelatedToFile" i18n="@@dcfUnrelatedToFileMsg">The file you tried to retrieve is not related to this DCF</span>
+    <span class="errorMessage badUsername" i18n="@@badUsernameMsg">Error [BAD_USERNAME]</span>
+    <span class="errorMessage retireActivePerson" i18n="@@retireActivePersonMsg">Error [RETIRE_ACTIVE_PERSON]</span>
+    <span class="errorMessage reasonRequired" i18n="@@reasonRequiredMsg">A reason must be provided to update this data</span>
+    <span class="errorMessage reasonIsMandatory" i18n="@@reasonIsMandatoryMsg">Error [REASON_IS_MANDATORY]</span>
+    <span class="errorMessage duplicatedSamples" i18n="@@duplicatedSamplesMsg">Some samples in the DCF are duplicated</span>
+    <span class="errorMessage unprocessableTestingOrder" i18n="@@unprocessableTestingOrderMsg">Testing Order could not be processed</span>
+    <span class="errorMessage subStatusRequired" i18n="@@subStatusRequiredMsg">You must provide a status to update this data</span>
+    <span class="errorMessage testStatusAlreadyClosedCanceled" i18n="@@testStatusAlreadyClosedCanceledMsg">The test status could not be updated</span>
+    <span class="errorMessage cannotBindTestToCanceledTestingOrder" i18n="@@cannotBindTestToCanceledTestingOrder">The test cannot be bound to a canceled Testing Order</span>
+    <span class="errorMessage cannotBindCanceldTest" i18n="@@cannotBindCanceldTestMsg">A canceled Test cannot be bound</span>
+    <span class="errorMessage cannotSaveCanceledDcf" i18n="@@cannotSaveCanceledDcfMsg">A canceled DCF cannot be saved</span>
+    <span class="errorMessage testingOrderReachedTestLimit" i18n="@@testingOrderReachedTestLimitMsg">The Testing Order has reached the maximum capacity of Tests</span>
+    <span class="errorMessage blankTestOrToId" i18n="@@blankTestOrToIdMsg">Error [BLANK_TEST_OR_TO_ID]</span>
+    <span class="errorMessage blankToId" i18n="@@blankToIdMsg">Error [BLANK_TO_ID]</span>
+    <span class="errorMessage dcfNotCancelable" i18n="@@dcfNotCancelableMsg">The DCF cannot be canceled</span>
+    <span class="errorMessage testNotLinkedWithToId" i18n="@@testNotLinkedWithToIdMsg">Error [TEST_NOT_LINKED_WITH_TO_ID]</span>
+    <span class="errorMessage invalidAttachmentTypes" i18n="@@invalidAttachmentTypesMsg">The type of attachment is invalid</span>
+    <span class="errorMessage invalidPhoneNumber" i18n="@@invalidPhoneNumber">Invalid Phone Number</span>
+    <span class="errorMessage testingOrderFromCreationToComplete" i18n="@@testingOrderFromCreationToCompleteMsg">Error [TESTING_ORDER_FROM_CREATION_TO_COMPLETE]</span>
+    <span class="errorMessage testingOrderFromIssuedToCreation" i18n="@@testingOrderFromIssuedToCreationMsg">Error [TESTING_ORDER_FROM_ISSUED_TO_CREATION]</span>
+    <span class="errorMessage testingOrderTestCountExceeded" i18n="@@testingOrderTestCountExceeded">This Testing Order is incompatible with NextGen, because it exceeds the number of tests permitted. The maximum allowed is 99. Please edit in Classic to make it compliant with NextGen, or contact support at adams@wada-ama.org for more assistance.</span>
+    <span class="errorMessage testingOrderFromCompleteOrCanceled" i18n="@@testingOrderFromCompleteOrCanceledMsg">Error [TESTING_ORDER_FROM_COMPLETE_OR_CANCELED]</span>
+    <span class="errorMessage testAlreadyBoundToDcf" i18n="@@testAlreadyBoundToDcfMsg">The Test has already been associated with a DCF</span>
+    <span class="errorMessage testAlreadyBoundToTestingOrder" i18n="@@testAlreadyBoundToTestingOrderMsg">The Test has already been associated with a Testing Order</span>
+    <span class="errorMessage dcfIsRequired" i18n="@@dcfIsRequiredMsg">Error [DCF_IS_REQUIRED]</span>
+    <span class="errorMessage existingDcfWHenDeletingTest" i18n="@@existingDcfWhenDeletingTestMsg">This test cannot be deleted because it is bound to a DCF</span>
+    <span class="errorMessage existingUnsuccessfulAttemptWhenDeletingTest" i18n="@@existingUnsuccessfulAttemptWhenDeletingTestMsg">This test cannot be deleted because it is bound to one or more Unsuccessful Attempts</span>
+    <span class="errorMessage testIsRequired" i18n="@@testIsRequiredMsg">Error [TEST_IS_REQUIRED]</span>
+    <span class="errorMessage invalidQueryParameter" i18n="@@invalidQueryParameterMsg">Error [INVALID_QUERY_PARAMETER]</span>
+    <span class="errorMessage sampleCorrectionRestrictionWithoutAafOrAtf" i18n="@@sampleCorrectionRestrictionWithoutAafOrAtfMsg">Error [SAMPLE_CORRECTION_RESTRICTION_WITHOUT_AAF_OR_ATF]</span>
+    <span class="errorMessage tdpIntegrityValidation" i18n="@@tdpIntegrityValidationMsg">Error [TDP_INTEGRITY_VALIDATION]</span>
+    <span class="errorMessage canOnlyDeletePendingOrNotProcessedTo" i18n="@@canOnlyDeletePendingOrNotProcessedToMsg">The Testing Order must have a pending or not processed status in order to be deleted</span>
+    <span class="errorMessage existingClosedTest" i18n="@@existingClosedTestMsg">The Testing Order cannot be deleted because it is bound to one or more closed Tests</span>
+    <span class="errorMessage missingFieldsForUnsuccessfulAttemptSave" i18n="@@missingFieldsForUnsuccessfulAttemptSaveMsg">The Unsuccessful Attempt cannot be saved due to missing mandatory fields</span>
+    <span class="errorMessage dcfRequiredToBind" i18n="@@dcfRequiredToBindMsg">Error [DCF_REQUIRED_TO_BIND]</span>
+    <span class="errorMessage cannotBindDcfWithoutTest" i18n="@@cannotBindDcfWithoutTestMsg">A DCF without Test cannot be bound to a Testing Order</span>
+    <span class="errorMessage missingFieldsForDcfDraftSave" i18n="@@missingFieldsForDcfDraftSaveMsg">A Draft DCF cannot be saved due to missing mandatory-for-draft fields</span>
+    <span class="errorMessage missingFieldsForCompletedDcfSave" i18n="@@missingFieldsForCompletedDcfSaveMsg">A Completed DCF cannot be saved due to missing mandatory fields</span>
+    <span class="errorMessage invalidMatchingResultStatus" i18n="@@invalidMatchingResultStatusMsg">The Matching result status is invalid</span>
+    <span class="errorMessage unsuccessfulAttemptTestMismatch" i18n="@@unsuccessfulAttemptTestMismatchMsg">A Test cannot be updated inside the Unsuccessful Attempt</span>
+    <span class="errorMessage unsuccessfulAttemptIdMismatch" i18n="@@unsuccessfulAttemptIdMismatchMsg">Error [UNSUCCESSFULATTEMPT_ID_MISMATCH]</span>
+    <span class="errorMessage testingOrderIdMismatch" i18n="@@testingOrderIdMismatchMsg">Error [TESTINGORDER_ID_MISMATCH]</span>
+    <span class="errorMessage invalidJarCodeProvided" i18n="@@invalidJarCodeProvidedMsg">The provided Jar code is invalid</span>
+    <span class="errorMessage jarCodeUnmatchingSampleResults" i18n="@@jarCodeUnmatchingSampleResultsMsg">The provided Jar code does not match any of thee sample results in the Sample</span>
+    <span class="errorMessage invalidJsonPatch" i18n="@@invalidJsonPatchMsg">Error [INVALID_JSON_PATCH]</span>
+    <span class="errorMessage sportIsRequired" i18n="@@sportIsRequiredMsg">The Sport Discipline field is required</span>
+    <span class="errorMessage testParticipantTypeInvalid" i18n="@@testParticipantTypeInvalidMsg">The type of at least one Test Participant is invalid</span>
+    <span class="errorMessage testParticipantLeadDcoParticipantRequired" i18n="@@testParticipantLeadDcoParticipantRequiredMsg">The Lead DCO is required</span>
+    <span class="errorMessage matchingResultAlreadyConfirmedOrRejected" i18n="@@matchingResultAlreadyConfirmedOrRejectedMsg">The matching result has already been either confirmed or rejected</span>
+    <span class="errorMessage invalidSampleType" i18n="@@invalidSampleTypeMsg">The Sample type is invalid</span>
+    <span class="errorMessage invalidTestPoolType" i18n="@@invalidTestPoolTypeMsg">The type of the Test pool is invalid</span>
+    <span class="errorMessage invalidStatusCode" i18n="@@invalidStatusCodeMsg">The status code is invalid</span>
+    <span class="errorMessage invalidFileExtension" i18n="@@invalidFileExtensionMsg">The file extension is invalid</span>
+    <span class="errorMessage typeInsteadOfStatusOrSubStatus" i18n="@@typeInsteadOfStatusOrSubStatusMsg">Error [TYPE_INSTEAD_OF_STATUS_OR_SUB_STATUS]</span>
+    <span class="errorMessage invalidCountryCode" i18n="@@invalidCountryCodeMsg">The country code is invalid</span>
+    <span class="errorMessage missingAdrvId" i18n="@@missingAdrvIdMsg">Error [MISSING_ADRV_ID]</span>
+    <span class="errorMessage invalidUserAccountType" i18n="@@invalidUserAccountTypeMsg">The type of user account is invalid</span>
+    <span class="errorMessage missingSanctionId" i18n="@@missingSanctionIdMsg">Error [MISSING_SANCTION_ID]</span>
+    <span class="errorMessage missingDcfSampleId" i18n="@@missingDcfSampleIdMsg">Error [MISSING_DCF_SAMPLE_ID]</span>
+    <span class="errorMessage missingLabResultId" i18n="@@missingLabResultIdMsg">Error [MISSING_LAB_RESULT_ID]</span>
+    <span class="errorMessage invalidFolderId" i18n="@@invalidFolderIdMsg">Error [INVALID_FOLDER_ID]</span>
+    <span class="errorMessage missingAthleteId" i18n="@@missingAthleteIdMsg">Error [MISSING_ATHLETE_ID]</span>
+    <span class="errorMessage missingAthlete" i18n="@@missingAthleteMsg">The Test is not bound to an athlete</span>
+    <span class="errorMessage missingAthleteOrPlaceholderInTest" i18n="@@missingAthleteOrPlaceholderInTestMsg">The Test must be bound to either an athlete or a placeholder</span>
+    <span class="errorMessage tpSourceOrgDifferentFromCache" i18n="@@tpSourceOrgDifferentFromCacheMsg">Error [TP_SOURCE_ORG_DIFFERENT_FROM_CACHE]</span>
+    <span class="errorMessage tooManyUserReportsInQueue" i18n="@@tooManyUserReportsInQueueMsg">The current user has exceeded the number of reports in queue</span>
+    <span class="errorMessage cannotCancelMatchedBpLabResult" i18n="@@cannotCancelMatchedBpLabResultMsg">A Matched Blood Passport Laboratory Result cannot be canceled</span>
+    <span class="errorMessage cannotCancelMatchedLabResult" i18n="@@cannotCancelMatchedLabResultMsg">A Matched Laboratory Result cannot be canceled</span>
+    <span class="errorMessage invalidPickerInfoProvided" i18n="@@invalidPickerInfoProvidedMsg">Error [INVALID_PICKER_INFO_PROVIDED]</span>
+    <span class="errorMessage pickerHelperUnavailable" i18n="@@pickerHelperUnavailableMsg">Error [PICKER_HELPER_UNAVAILABLE]</span>
+    <span class="errorMessage invalidLocaleForTranslation" i18n="@@invalidLocaleForTranslationMsg">The request locale is not supported</span>
+    <span class="errorMessage invalidLastnameFirstname" i18n="@@invalidLastnameFirstnameMsg">The first name and/or last name are invalid</span>
+    <span class="errorMessage athleteTypeRequired" i18n="@@athleteTypeRequiredMsg">Error [ATHLETE_TYPE_REQUIRED]</span>
+    <span class="errorMessage missingSanctionType" i18n="@@missingSanctionTypeMsg">Error [MISSING_SANCTION_TYPE]</span>
+    <span class="errorMessage invalidAdrvCategory" i18n="@@invalidAdrvCategoryMsg">Error [INVALID_ADRV_CATEGORY]</span>
+    <span class="errorMessage bannedTueRoute" i18n="@@bannedTueRouteMsg">Error [BANNED_TUE_ROUTE]</span>
+    <span class="errorMessage missingAtheleteReportDefTitle" i18n="@@missingAtheleteReportDefTitleMsg">Error [MISSING_ATHLETE_REPORT_DEF_TITLE]</span>
+    <span class="errorMessage invalidEnterpriseTemplate" i18n="@@invalidEnterpriseTemplateMsg">Error [INVALID_ENTERPRISE_TEMPLATE]</span>
+    <span class="errorMessage athleteDoctorTypeRequired" i18n="@@athleteDoctorTypeRequiredMsg">The type of doctor is invalid</span>
+    <span class="errorMessage invalidPickerKeyProvided" i18n="@@invalidPickerKeyProvidedMsg">Error [INVALID_PICKER_KEY_PROVIDED]</span>
+    <span class="errorMessage invalidWhereaboutsDescriptorCategory" i18n="@@invalidWhereaboutsDescriptorCategoryMsg">The category is required for Whereabouts descriptor</span>
+    <span class="errorMessage identificationDocNumberCannotBeSetWithoutDocInfo" i18n="@@identificationDocNumberCannotBeSetWithoutDocInfoMsg">Error [IDENTIFICATION_DOC_NUMBER_CANNOT_BE_SET_WITHOUT_DOC_INFO]</span>
+    <span class="errorMessage samplesCannotBeSetWithoutCollectionDate" i18n="@@samplesCannotBeSetWithoutCollectionDate">All samples with sample codes must have a collection date</span>
+    <span class="errorMessage samplesCannotBeSetWithoutTimezone" i18n="@@samplesCannotBeSetWithoutTimezone">All samples with sample codes or collection dates must have a time zone</span>
+    <span class="errorMessage taIsRequired" i18n="@@taIsRequiredMsg">The Test Authority is required</span>
+    <span class="errorMessage sampleTypeRequired" i18n="@@sampleTypeRequiredMsg">The sample type is required</span>
+    <span class="errorMessage laboratoryRequired" i18n="@@laboratoryRequiredMsg">The laboratory is required</span>
+    <span class="errorMessage scaIsRequired" i18n="@@scaIsRequiredMsg">The Sample Collection Authority is required</span>
+    <span class="errorMessage rmaIsRequired" i18n="@@rmaIsRequiredMsg">The Result Management Authorithy is required</span>
+    <span class="errorMessage sportIdentityRequiredSport" i18n="@@sportIdentityRequiredSportMsg">The Sport Identity requires a sport</span>
+    <span class="errorMessage sportIdentityRequiredAthlete" i18n="@@sportIdentityRequiredAthleteMsg">The Sport Identity requires an athlete</span>
+    <span class="errorMessage testDateIsRequiredForSubmittedDcf" i18n="@@testDateIsRequiredForSubmittedDcfMsg">The Arrival Date field is required for a submitted DCF</span>
+    <span class="errorMessage multipleMajorGameEventItemsFound" i18n="@@multipleMajorGameEventItemsFoundMsg">Multiple items for the same Major Event have been found</span>
+    <span class="errorMessage invalidParameter" i18n="@@invalidParameterMsg">Error [INVALID_PARAMETER]</span>
+    <span class="errorMessage invalidDate" i18n="@@invalidDateMsg">The date invalid</span>
+    <span class="errorMessage unknownAnalysisSample" i18n="@@unknownAnalysisSample">Unknown Analysis Sample</span>
+
+    <!-- Permission error messages -->
+    <span class="errorMessage noRightToAccessAbstractWhereAbouts" i18n="@@noRightToAccessAbstractWhereAboutsMsg">Error [NO_RIGHT_TO_ACCESS_ABSTRACTWHEREABOUTS]</span>
+    <span class="errorMessage noRightToAccessMissionOrder" i18n="@@noRightToAccessMissionOrderMsg">You do not have the rights to access the Testing Order</span>
+    <span class="errorMessage noRightToAccessTest" i18n="@@noRightToAccessTestMsg">You do not have the rights to access the Test</span>
+    <span class="errorMessage noRightToAccessTue" i18n="@@noRightToAccessTueMsg">You do not have the rights to access the Therapeutic Use Exemptions (TUE)</span>
+    <span class="errorMessage noRightToViewMessage" i18n="@@noRightToViewMessageMsg">You do not have the rights to view the message</span>
+    <span class="errorMessage noRightToAccessLabResult" i18n="@@noRightToAccessLabResultMsg">You do not have the rights to access the Laboratory Result</span>
+    <span class="errorMessage missionTestpoolAndAthleteSportWriteRoles" i18n="@@missionTestpoolAndAthleteSportWriteRolesMsg">Error [MISSING_TESTPOOL_AND_ATHLETESPORT_WRITE_ROLES]</span>
+    <span class="errorMessage noRightToAccessResource" i18n="@@noRightToAccessResourceMsg">You do not have the rights to access the the current resource</span>
+    <span class="errorMessage noRightToAccessLabResultImport" i18n="@@noRightToAccessLabResultImportMsg">You do not have the rights to use Laboratory Result Import</span>
+    <span class="errorMessage noRightToAccessDcf" i18n="@@noRightToAccessDcfMsg">You do not have the rights to access the DCF</span>
+    <span class="errorMessage noRightToCreateDcfForTest" i18n="@@noRightToCreateDcfForTestMsg">You do not have the rights to create a DCF for a Test</span>
+    <span class="errorMessage noRightToAccessAaf" i18n="@@noRightToAccessAafMsg">Error [NO_RIGHT_TO_ACCESS_AAF]</span>
+    <span class="errorMessage noRightToAccessAdrv" i18n="@@noRightToAccessAdrvMsg">Error [NO_RIGHT_TO_ACCESS_ADRV]</span>
+    <span class="errorMessage noRightToAccessSanction" i18n="@@noRightToAccessSanctionMsg">Error [NO_RIGHT_TO_ACCESS_SANCTION]</span>
+    <span class="errorMessage noRightToAccessWhereaboutsNc" i18n="@@noRightToAccessWhereaboutsNcMsg">Error [NO_RIGHT_TO_ACCESS_WHEREABOUTSNC]</span>
+    <span class="errorMessage noRightToCreateWhereaboutsNc" i18n="@@noRightToCreateWhereaboutsNcMsg">Error [NO_RIGHT_TO_CREATE_WHEREABOUTSNC]</span>
+    <span class="errorMessage noRightToAccessGroup" i18n="@@noRightToAccessGroupMsg">Error [NO_RIGHT_TO_ACCESS_GROUP]</span>
+    <span class="errorMessage noRightToAccessMajorGame" i18n="@@noRightToAccessMajorGameMsg">You do not have the rights to access the Major Game</span>
+    <span class="errorMessage noRightToAccessMajorGameItems" i18n="@@noRightToAccessMajorGameItemsMsg">You do not have the rights to access the Major Game Items</span>
+    <span class="errorMessage noRightToAccessCompetitionLevel" i18n="@@noRightToAccessCompetitionLevelMsg">You do not have the rights to access the Competition Level</span>
+    <span class="errorMessage noRightToAccessBplrExpertReport" i18n="@@noRightToAccessBplrExpertReportMsg">You do not have the rights to access the Blood Passport Laboratory Result Expert Report</span>
+    <span class="errorMessage noRightToAccessSteroidApmuReport" i18n="@@noRightToAccessSteroidApmuReportMsg">You do not have the rights to access the Steroid APMU Report</span>
+    <span class="errorMessage noRightToAccessAthletePassport" i18n="@@noRightToAccessAthletePassportMsg">You do not have the rights to access the Athlete Passport</span>
+    <span class="errorMessage noRightToAccessChainOfCustody" i18n="@@noRightToAccessChainOfCustodyMsg">You do not have the rights to access the Chain of Custody</span>
+    <span class="errorMessage noRightToAccessBloodPassport" i18n="@@noRightToAccessBloodPassportMsg">You do not have the rights to access the Blood Passport</span>
+    <span class="errorMessage noRightToAccessSteroidPassport" i18n="@@noRightToAccessSteroidPassportMsg">You do not have the rights to access the Steroid Passport</span>
+    <span class="errorMessage noRightToAccessAllApmuReportHistory" i18n="@@noRightToAccessAllApmuReportHistoryMsg">You do not have the rights to access the APMU History Report</span>
+    <span class="errorMessage noRightToAccessApmuOrgReport" i18n="@@noRightToAccessApmuOrgReportMsg">You do not have the rights to access the APMU Organization Report</span>
+    <span class="errorMessage noRightToAccessAthlete" i18n="@@noRightToAccessAthleteMsg">You do not have the rights to access the Athlete</span>
+    <span class="errorMessage noRightToAccessUnsuccessfulAttempt" i18n="@@noRightToAccessUnsuccessfulAttemptMsg">You do not have the rights to access the Unsuccessful Attempt</span>
+    <span class="errorMessage noRightToBindDcfTo" i18n="@@noRightToBindDcfToMsg">You do not have the rights to bind DCF to a Testing Order</span>
+    <span class="errorMessage noRightToDeleteDcf" i18n="@@noRightToDeleteDcfMsg">You do not have the rights to delete a DCF</span>
+    <span class="errorMessage noRightToAccessMatchResult" i18n="@@noRightToAccessMatchResultMsg">You do not have the rights to access the a Match Result</span>
+    <span class="errorMessage noRightToProficiencyTest" i18n="@@noRightToProficiencyTestMsg">Error [NO_RIGHT_TO_CREATE_PROFICIENCYTEST]</span>
+    <span class="errorMessage noRightToAccessTestpool" i18n="@@noRightToAccessTestpoolMsg">You do not have the rights to access the a Test Pool</span>
+    <span class="errorMessage noRightToAddPlaceHolderInMajorGame" i18n="@@noRightToAddPlaceHolderInMajorGameMsg">You do not have the rights to add a placeholder in a Major game</span>
+    <span class="errorMessage noRightToAccessUnsubmittedWhereabouts" i18n="@@noRightToAccessUnsubmittedWhereaboutsMsg">You do not have the rights to access the unsubmitted Whereabouts</span>
+    <span class="errorMessage noRightToAccessNonAthlete" i18n="@@noRightToAccessNonAthleteMsg">Error [NO_RIGHT_TO_ACCESS_NONATHLETE]</span>
+    <span class="errorMessage noRightToAccessOrganization" i18n="@@noRightToAccessOrganizationMsg">Error [NO_RIGHT_TO_ACCESS_ORGANIZATION]</span>
+    <span class="errorMessage noRightToAccessUserAccount" i18n="@@noRightToAccessUserAccountMsg">Error [NO_RIGHT_TO_ACCESS_USERACCOUNT]</span>
+    <span class="errorMessage noRightToUpdateSportIdentity" i18n="@@noRightToUpdateSportIdentityMsg">Error [NO_RIGHT_TO_UPDATE_SPORTIDENTITY]</span>
+    <span class="errorMessage noRightToUpdateOrganization" i18n="@@noRightToUpdateOrganizationMsg">Error [NO_RIGHT_TO_UPDATE_ORGANIZATION]</span>
+    <span class="errorMessage noRightToCreateSportIdentity" i18n="@@noRightToCreateSportIdentityMsg">Error [NO_RIGHT_TO_CREATE_SPORTIDENTITY]</span>
+    <span class="errorMessage noRightToCreateOrganization" i18n="@@noRightToCreateOrganizationMsg">Error [NO_RIGHT_TO_CREATE_ORGANIZATION]</span>
+    <span class="errorMessage noRightToReadMissionOrder" i18n="@@noRightToReadMissionOrderMsg">You do not have the rights to view a Testing Order</span>
+    <span class="errorMessage noRightToViewThirdPartyContract" i18n="@@noRightToViewThirdPartyContractMsg">Error [NO_RIGHT_TO_VIEW_THIRDPARTYCONTRACT]</span>
+    <span class="errorMessage noRightToEditThirdPartyContract" i18n="@@noRightToEditThirdPartyContractMsg">Error [NO_RIGHT_TO_EDIT_THIRDPARTYCONTRACT]</span>
+    <span class="errorMessage noRightToDeleteThirdPartyContract" i18n="@@noRightToDeleteThirdPartyContractMsg">Error [NO_RIGHT_TO_DELETE_THIRDPARTYCONTRACT]</span>
+    <span class="errorMessage noRightToReadLabResults" i18n="@@noRightToReadLabResultsMsg">You do not have the rights to view a Laboratory Result</span>
+    <span class="errorMessage noRightToReadDcf" i18n="@@noRightToReadDcfMsg">You do not have the rights to view a DCF</span>
+    <span class="errorMessage noRightToViewOrganizationRelationship" i18n="@@noRightToViewOrganizationRelationshipMsg">Error [NO_RIGHT_TO_VIEW_ORGANIZATIONRELATIONSHIP]</span>
+    <span class="errorMessage noRightToReadUsergroup" i18n="@@noRightToReadUsergroupMsg">Error [NO_RIGHT_TO_READ_USERGROUP]</span>
+    <span class="errorMessage noRightToSaveOrgRelationship" i18n="@@noRightToSaveOrgRelationshipMsg">Error [NO_RIGHT_TO_SAVE_ORG_RELATIONSHIP]</span>
+    <span class="errorMessage noRightToDeleteOrgRelationship" i18n="@@noRightToDeleteOrgRelationshipMsg">Error [NO_RIGHT_TO_DELETE_ORG_RELATIONSHIP]</span>
+    <span class="errorMessage noRightToRetireAthlete" i18n="@@noRightToRetireAthleteMsg">Error [NO_RIGHT_TO_RETIRE_ATHLETE]</span>
+    <span class="errorMessage noRightToMoveNonAthletePassportCustody" i18n="@@noRightToMoveNonAthletePassportCustodyMsg">Error [NO_RIGHT_TO_MOVE_NONATHLETE_PASSPORTCUSTODY]</span>
+    <span class="errorMessage noRightToMoveAthletePassportCustody" i18n="@@noRightToMoveAthletePassportCustodyMsg">Error [NO_RIGHT_TO_MOVE_ATHLETE_PASSPORTCUSTODY]</span>
+    <span class="errorMessage noRightToReadChainOfCustody" i18n="@@noRightToReadChainOfCustodyMsg">Error [NO_RIGHT_TO_READ_CHAINOFCUSTODY]</span>
+    <span class="errorMessage noRightToSearchOrganization" i18n="@@noRightToSearchOrganizationMsg">Error [NO_RIGHT_TO_SEARCH_ORGANIZATION]</span>
+    <span class="errorMessage noRightToUpdateBPLR" i18n="@@noRightToUpdateBPLRMsg">Error [NO_RIGHT_TO_UPDATE_BPLR]</span>
+    <span class="errorMessage noRightToImportBiologicalResult" i18n="@@noRightToImportBiologicalResultMsg">Error [NO_RIGHT_TO_IMPORT_BIOLOGICALRESULT]</span>
+    <span class="errorMessage noRightToImportAthlete" i18n="@@noRightToImportAthleteMsg">Error [NO_RIGHT_TO_IMPORT_ATHLETE]</span>
+    <span class="errorMessage noRightToImportHemodilution" i18n="@@noRightToImportHemodilutionMsg">Error [NO_RIGHT_TO_IMPORT_HEMODILUTION]</span>
+    <span class="errorMessage noAccessOnGroup" i18n="@@noAccessOnGroupMsg">Error [NO_ACCESS_ON_GROUP]</span>
+    <span class="errorMessage missingContractToCreateAdrv" i18n="@@missingContractToCreateAdrvMsg">The Peding Case cannot be created without an active contract</span>
+    <span class="errorMessage missingContractToCreateMissionOrder" i18n="@@missingContractToCreateMissionOrderMsg">The Testing Order cannot be created without an active contract</span>
+    <span class="errorMessage missingContractToCreateTUE" i18n="@@missingContractToCreateTUEMsg">Therapeutic Use Exemptions (TUE) cannot be created without an active contract</span>
+    <span class="errorMessage missingContractToCreateTest" i18n="@@missingContractToCreateTestMsg">The Test cannot be created without an active contract</span>
+    <span class="errorMessage missingAdminRole" i18n="@@missingAdminRoleMsg">You do not have administrator permissions</span>
+    <span class="errorMessage missingContractToCreateSanction" i18n="@@missingContractToCreateSanctionMsg">Error [MISSING_CONTRACT_TO_CREATE_SANCTION]</span>
+    <span class="errorMessage nullCallerOrOrg" i18n="@@nullCallerOrOrgMsg">You have not been properly authenticated</span>
+    <span class="errorMessage labResultInaccessibleToNullCaller" i18n="@@labResultInaccessibleToNullCallerMsg">Error [LABRESULT_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage matchResultInaccessibleToNullCaller" i18n="@@matchResultInaccessibleToNullCallerMsg">Error [MATCHRESULT_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage abstractWhereaboutsInaccessibleToNullCaller" i18n="@@abstractWhereaboutsInaccessibleToNullCallerMsg">Error [ABSTRACTWHEREABOUTS_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage labResultImportInaccessibleToNullCaller" i18n="@@labResultImportInaccessibleToNullCallerMsg">Error [LABRESULTIMPORT_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage missionOrderInaccessibleToNullCaller" i18n="@@missionOrderInaccessibleToNullCallerMsg">Error [MISSIONORDER_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage testInaccessibleToNullCaller" i18n="@@testInaccessibleToNullCallerMsg">Error [TEST_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage aafInaccessibleToNullCaller" i18n="@@aafInaccessibleToNullCallerMsg">Error [AAF_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage adrvInaccessibleToNullCaller" i18n="@@adrvInaccessibleToNullCallerMsg">Error [ADRV_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage sanctionInaccessibleToNullCaller" i18n="@@sanctionInaccessibleToNullCallerMsg">Error [SANCTION_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage whereaboutsNcInaccessibleToNullCaller" i18n="@@whereaboutsNcInaccessibleToNullCallerMsg">Error [WHEREABOUTSNC_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage tueInaccessibleToNullCaller" i18n="@@tueInaccessibleToNullCallerMsg">Error [TUE_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage majorGameInaccessibleToNullCaller" i18n="@@majorGameInaccessibleToNullCallerMsg">Error [MAJORGAME_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage majorGameItemsInaccessibleToNullCaller" i18n="@@majorGameItemsInaccessibleToNullCallerMsg">Error [MAJORGAMEITEMS_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage testpoolInaccessibleToNullCaller" i18n="@@testpoolInaccessibleToNullCallerMsg">Error [TESTPOOL_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage competitionLevelInaccessibleToNullCaller" i18n="@@competitionLevelInaccessibleToNullCallerMsg">Error [COMPETITIONLEVEL_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage bplrExpertReportInaccessibleToNullCaller" i18n="@@bplrExpertReportInaccessibleToNullCallerMsg">Error [BPLREXPERTREPORT_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage steroidApmuReportInaccessibleToNullCaller" i18n="@@steroidApmuReportInaccessibleToNullCallerMsg">Error [STEROIDAPMUREPORT_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage athletePassportInaccessibleToNullCaller" i18n="@@athletePassportInaccessibleToNullCallerMsg">Error [ATHLETEPASSPORT_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage chainOfCustodyInaccessibleToNullCaller" i18n="@@chainOfCustodyInaccessibleToNullCallerMsg">Error [CHAINOFCUSTODY_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage resourcesInaccessibleToEnterprise" i18n="@@resourcesInaccessibleToEnterpriseMsg">Error [RESOURCES_INACCESSIBLE_TO_ENTERPRISE]</span>
+    <span class="errorMessage selectionListInaccessibleToUser" i18n="@@selectionListInaccessibleToUserMsg">Error [SELECTIONLIST_INACCESSIBLE_TO_USER]</span>
+    <span class="errorMessage organizationIsNotNF" i18n="@@organizationIsNotNFMsg">Your organization is not a National Federation</span>
+    <span class="errorMessage callerOrganizationIsNotNadoOrIf" i18n="@@callerOrganizationIsNotNadoOrIfMsg">Your organization is neither a National Anti-Doping Agency nor an International Federation</span>
+    <span class="errorMessage missingBusinessRole" i18n="@@missingBusinessRole">You do not have the corrector business role</span>
+    <span class="errorMessage missingTaRmaWriteAccessToEditSample" i18n="@@missingTaRmaWriteAccessToEditSampleMsg">You must be from the Test Authority or Result Management Authority to edit a sample</span>
+    <span class="errorMessage athleteSportInaccessibleToCaller" i18n="@@athleteSportInaccessibleToCallerMsg">Error [ATHLETE_SPORT_INACCESSIBLE_TO_CALLER]</span>
+    <span class="errorMessage dcfInaccessibleToNullCaller" i18n="@@dcfInaccessibleToNullCallerMsg">Error [DCF_INACCESSIBLE_TO_NULL_CALLER]</span>
+    <span class="errorMessage athleteSportNationalityInaccessibleToCaller" i18n="@@athleteSportNationalityInaccessibleToCallerMsg">Error [ATHLETE_SPORT_NATIONALITY_INACCESSIBLE_TO_CALLER]</span>
+    <span class="errorMessage testingOrderInaccessibleByCaller" i18n="@@testingOrderInaccessibleByCallerMsg">Error [TESTINGORDER_INACCESSIBLE_BY_CALLER]</span>
+    <span class="errorMessage unknownUserCustodialOrg" i18n="@@unknownUserCustodialOrgMsg">Error [UNKNOWN_USER_CUSTODIAL_ORG]</span>
+    <span class="errorMessage accessDenied" i18n="@@accessDeniedMsg">Access denied</span>
+    
+    <!-- Not found error messages -->
+    <span class="errorMessage sampleNotFound" i18n="@@sampleNotFoundMsg">The sample was not found</span>
+    <span class="errorMessage resourceNotFound" i18n="@@resourceNotFoundMsg">The requested resource was not found</span>
+    <span class="errorMessage majorGameEventItemsNotFound" i18n="@@majorGameEventItemsNotFoundMsg">The Major Event items were not found</span>
+    <span class="errorMessage rolesNotFound" i18n="@@rolesNotFoundMsg">Error [ROLES_NOT_FOUND]</span>
+    <span class="errorMessage logoNotFound" i18n="@@logoNotFoundMsg">Error [LOGO_NOT_FOUND]</span>
+    <span class="errorMessage userAccountNotFound" i18n="@@userAccountNotFoundMsg">Error [USER_ACCOUNT_NOT_FOUND]</span>
+    <span class="errorMessage testingOrderNotFound" i18n="@@testingOrderNotFoundMsg">The Testing Order was not found</span>
+    <span class="errorMessage athleteNotFound" i18n="@@athleteNotFoundMsg">The athlete was not found</span>
+    <span class="errorMessage testPoolParticipantNotFound" i18n="@@testPoolParticipantNotFoundMsg">The Test Pool Participant was not found</span>
+    <span class="errorMessage stateTranslationNotFound" i18n="@@stateTranslationNotFoundMsg">Error [STATE_TRANSLATION_NOT_FOUND]</span>
+    <span class="errorMessage unsuccessfulAttemptNotFound" i18n="@@unsuccessfulAttemptNotFoundMsg">The Unsuccessful Attempt was not found</span>
+    <span class="errorMessage completionLevelParticipantNotFound" i18n="@@completionLevelParticipantNotFoundMsg">Error [COMPLETION_LEVEL_PARTICIPANT_NOT_FOUND]</span>
+    <span class="errorMessage addressNotBoundToAthleteAgent" i18n="@@addressNotBoundToAthleteAgentMsg">The address is unregistered for the Athlete Agent</span>
+    <span class="errorMessage addressNotBoundToActivePerson" i18n="@@addressNotBoundToActivePersonMsg">The address is unregistered for the Active Person</span>
+</ng-template>

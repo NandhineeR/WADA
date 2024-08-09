@@ -1,0 +1,84 @@
+$border-color: #ddd;
+$border-thickness: 7px;
+$border-radius: 5px;
+$spacing: 5px;
+$buttons-spacing: 3px;
+$button-color: #3F8532;
+$font-color: #414042;
+$button-height: 30px;
+
+:host {
+    display: block;
+}
+
+.wrapper {
+    display: inline-flex;
+    font-size: 13px;
+    color: $font-color;
+    background: white;
+    padding: 10px;
+    border-radius: $border-radius;
+
+    .side-column {
+        .from-to {
+            font-weight: bold;
+            margin-bottom: 2 * $spacing;
+        }
+
+        .numeric-input {
+            background: $border-color;
+            border-radius: $border-radius;
+            margin-bottom: $spacing;
+            padding: 0 $spacing 0 $spacing;
+        }
+
+        .month-picker {
+            border: $border-thickness solid $border-color;
+            border-radius: $border-radius;
+            background: white;
+            padding: $spacing;
+        }
+    }
+
+    .center-column {
+        margin: 0 $spacing 0 $spacing;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+
+        input {
+            position: absolute !important;
+            clip: rect(0, 0, 0, 0);
+            height: 1px;
+            width: 1px;
+            border: 0;
+            overflow: hidden;
+        }
+
+        label {
+            border: 1px solid transparent;
+            border-radius: $border-radius;
+            width: 100%;
+            line-height: $button-height;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 $spacing 0 $spacing;
+            cursor: pointer;
+
+            &:not(:last-of-type) {
+                margin-bottom: $buttons-spacing;
+            }
+
+            &:hover {
+                color:#2d6828;
+                border: 1px solid $button-color;
+            }
+        }
+
+        input:checked + label {
+            background: $button-color;
+            color: white;
+        }
+    }
+}

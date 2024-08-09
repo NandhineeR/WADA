@@ -1,0 +1,48 @@
+<div appInheritDir class="wrapper">
+    <div class="header">
+        <div class="title">
+            <span i18n="@@tdpMonitoring">TDP Monitoring</span>&nbsp;-&nbsp;{{ organizationShortName$ | async }}
+        </div>
+        <app-switch-organization
+            *ngIf="isWada$ | async"
+            page="TDP Monitoring"
+            [organizationName]="organizationName$ | async"
+            [organizationsSuggestions]="organizationSuggestions"
+            (changeOrganization)="changeOrganization($event)">
+        </app-switch-organization>
+    </div>
+    <div class="content">
+        <app-tdpm-filters
+            [dateRange]="dateRange$ | async"
+            [showType]="showType$ | async">
+        </app-tdpm-filters>
+
+        <div *ngIf="loading; else error" class="section">
+            <app-loading-animation [isTable]="true"></app-loading-animation>
+        </div>
+
+        <ng-template #error>
+            <div *ngIf="getError$ | async; else tdp" class="section">
+                <div class="bottom-message">
+                    <span i18n="@@error">Error</span>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #tdp>
+            <div class="section">
+                <app-button class="export-button" type="secondary" (click)="exportToCSV()">
+                    <div class="export-button-content">
+                        <div class="export-button-icon"></div>
+                        <span i18n="@@exportCsv_uppercase">EXPORT.CSV</span>
+                    </div>
+                </app-button>
+                <app-tdpm-table
+                    [showType]="showType$ | async"
+                    [tdpmSheetInfo]="tdpmSheetInfoFiltered$ | async"
+                    (search)="onSearch($event)">
+                </app-tdpm-table>
+            </div>
+        </ng-template>
+    </div>
+</div>

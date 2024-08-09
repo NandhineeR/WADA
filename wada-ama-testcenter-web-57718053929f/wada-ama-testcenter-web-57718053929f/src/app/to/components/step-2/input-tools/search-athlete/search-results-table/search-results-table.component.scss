@@ -1,0 +1,35 @@
+@import '~sass/variables';
+@import '~~app/shared/styles/fake-link';
+
+.search-results-table__wrapper {
+    .underline {
+        text-decoration: underline;
+    }
+
+    @include fake-link(left, right);
+
+    .result-message {
+        margin-left: 20px;
+        margin-right: 15px;
+        line-height: 35px;
+    }
+
+    .disabled-link {
+        color: $disabled-color;
+        pointer-events: none;
+        cursor: default;
+    }
+
+    .multiline {
+        white-space: pre-wrap;
+    }
+
+    .disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+}
+
+:host ::ng-deep .table-container {
+    margin-bottom: 20px !important;
+}

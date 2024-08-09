@@ -1,0 +1,94 @@
+@import '~sass/mixins';
+
+$messageColor: #414042;
+$textColor: #444;
+$whiteColor: #EFEFEF;
+$whiteBackground: #fff;
+$whiteSectionBackground: #e4e4e4;
+
+.athlete-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 4.4fr;
+    grid-template-rows: 100%;
+    background-color: $whiteBackground;
+    color: $textColor;
+    height: -webkit-fill-available;
+    font-family: Montserrat, sans-serif;
+}
+
+.athlete-section {
+    background-color: $textColor;
+    font-family: Montserrat, sans-serif;
+
+    &.left-menu {
+        background-color: $whiteSectionBackground;
+    }
+}
+
+.photo-area {
+    width: 100%;
+    height: 333px;
+}
+
+table {
+    border-collapse: collapse;
+    height: 100%;
+    width: 100%;
+
+    tr:first-of-type {
+        height: 66%;
+        background-color: white;
+        border: 2px dashed gray;
+    }
+
+    tr {
+        background-color: $whiteSectionBackground;
+    }
+
+    td {
+        vertical-align: middle;
+        text-align: center;
+        white-space: nowrap;
+
+        p {
+            color: black;
+            font-size: 12px;
+            font-family: Montserrat, sans-serif;
+            margin: auto;
+        }
+
+        .athlete-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    }
+}
+
+.menu-container {
+    display: grid;
+    grid-template-columns: 100%;
+    height: -webkit-fill-available;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.menu-item {
+    padding-left: 20px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    text-align: start;
+    color: $messageColor;
+
+    &:hover,
+    &.highlight-menu-item {
+        background-color: $textColor;
+        color: white;
+        cursor: pointer;
+    }
+}
+
+.add-circle-outline {
+    &:hover {
+        cursor: pointer;
+    }
+}

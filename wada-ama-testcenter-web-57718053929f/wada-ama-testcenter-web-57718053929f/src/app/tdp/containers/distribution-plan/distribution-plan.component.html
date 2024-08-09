@@ -1,0 +1,69 @@
+<div class="wrapper" *appLet="tdpSheetInfo$ | async as tdpSheetInfo" appInheritDir>
+    <div class="header">
+        <span class="title" i18n="@@testingDistributionPlanOrgX">Test Distribution Plan - {{ organizationShortName$ | async }}</span>
+        <div *appLet="saveError$ | async as saveError">
+            <ng-container *appLet="saving$ | async as saving">
+                <ng-container *ngIf="isTouched && !loading && tdpSheetInfo && !saveError && !(deleteException$ | async) && tdpSheetInfo.year >= currentYear">
+                    <div *ngIf="saving; else saved" class="top-message">
+                        <span i18n="@@saving_threeDots">Saving...</span>
+                    </div>
+                    <ng-template #saved>
+                        <div [@fadeIn] class="top-message" data-qa="TDPSavedIndicator">
+                            <img class="saved-image" src="assets/saved.svg" alt="Saved" i18n-alt="@@saved"/>
+                            <span i18n="@@tdp_saved">Saved</span>
+                        </div>
+                    </ng-template>
+                </ng-container>
+            </ng-container>
+            <div [@fadeIn] *ngIf="saveError || (deleteException$ | async)" class="top-message save-failed">
+                <img class="save-failed-image" src="assets/error.svg" alt="Error" i18n-alt="@@error" />
+                <span i18n="@@savefailed">Save Failed</span>
+            </div>
+            <app-switch-organization
+                *ngIf="isWada$ | async"
+                [organizationsSuggestions]="organizationSuggestions"
+                (changeOrganization)="changeOrganization($event)"
+                [organizationName]="organizationName$ | async"
+                page="TDP">
+            </app-switch-organization>
+        </div>
+    </div>
+    <div class="content" *appLet="tdpSheet$ | async as tdpSheet">
+        <app-frequency
+            [orgName]="organizationShortName$ | async">
+        </app-frequency>
+
+        <div *ngIf="loading; else error" class="section">
+            <app-loading-animation [isTable]="true"></app-loading-animation>
+        </div>
+
+        <ng-template #error>
+            <div *ngIf="(getError$ | async) || (tdpSheet | isEmpty); else tdp" class="section">
+                <div class="bottom-message">
+                    <span class="no-tdp" i18n="@@thereIsNoTDPForTheYearX">There is no TDP for the selected year.</span>
+                    <a class="view-tdpm" [routerLink]="['/', 'tdpm', (requestedYear$ | async)]" data-qa="viewTDPMonitoringForRequestedYear" i18n="@@viewTDPMonitoringForX">View TDP monitoring for {{ requestedYear$ | async }}</a>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #tdp>
+            <div class="section" *ngIf="tdpSheetInfo">
+                <app-tdp-table
+                    [tdpSheetInfo]="tdpSheetInfo"
+                    [tdpSheet]="tdpSheet"
+                    [readonly]="isTdpReadonly$ | async"
+                    [highlightedSportDiscipline]="highlightedSportDiscipline$ | async"
+                    (editTDPCell)="onEditTDPCell($event)"
+                    (updateTDPCell)="onUpdateTDPCell()"
+                    (deleteSportDiscipline)="onDeleteSportDiscipline($event)">
+                </app-tdp-table>
+                <div class="section" *ngIf="tdpSheetInfo.year >= currentYear && (isTdpReadonly$ | async) === false">
+                    <app-add-sport-discipline
+                        [sportDisciplinesSuggestions]="sportDisciplinesSuggestions"
+                        (addSportDiscipline)="onAddSportDiscipline($event)">
+                    </app-add-sport-discipline>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+</div>

@@ -1,0 +1,101 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/radio';
+
+$error-color: #AA1A1A;
+$edit-title-color: #2f66a0;
+$text-area-border-color: #757575;
+
+@mixin step($left, $right) {
+    .error-link-list {
+        @include notification-error-list($left, $right);
+    }
+
+    input.error, textarea.error {
+        border: 2px solid $error-color;
+    }
+
+    app-participant-input {
+        margin-bottom: 12px;
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    input[type="text"] {
+        width: 60%;
+    }
+    app-typeahead, app-date-input, app-dropdown {
+        width: 60%;
+        display: block;
+    }
+    app-custom-datepicker {
+        width: 60%;
+        display: block;
+    }
+
+    textarea {
+        width:60%;
+        border: 1px solid $text-area-border-color;
+        border-radius: 5px;
+        padding: 0 6px;
+        min-height: 50px;
+    }
+
+    .lastName {
+        width: 100%;
+    }
+    input.firstName {
+        width: 100%;
+    }
+
+    .disabled {
+        pointer-events: none;
+        opacity: 0.4;
+    }
+
+    .edit-title {
+        color: $edit-title-color;
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+
+    .checkbox-field {
+        color: $checkbox-color;
+        margin-top: 5px;
+        margin-bottom: -5px;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+
+    .error-message {
+        color: $error-color;
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+
+    .lastName {
+        width: 100%;
+    }
+
+    .timezone {
+        width: 100%;
+    }
+}

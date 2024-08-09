@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- configmap.yaml
+- cors-plugin.yaml
+- deployment.yaml
+- ingress-sm.yaml
+- ingress.yaml
+- namespace.yaml
+- openid-connect-plugin.yaml
+- response-transformer-plugin.yaml
+- service-sm.yaml
+- service.yaml

@@ -1,0 +1,10 @@
+<div class="loading-animation" [class.loading-container]="isTemplate" [class.loading-table]="isTable">
+    <div *ngIf="error; else loading">
+        <span class="loading-error" i18n="@@error">Error</span>
+    </div>
+    <ng-template #loading>
+        <img class="loading-img" [class.dashboard]="isDashboard" src="assets/loading.png" alt="Loading Icon" i18n-alt="@@loadingIcon">
+        <span i18n="@@loadingValuesForYou_threeDots">Loading values for you...</span>
+    </ng-template>
+    
+</div>

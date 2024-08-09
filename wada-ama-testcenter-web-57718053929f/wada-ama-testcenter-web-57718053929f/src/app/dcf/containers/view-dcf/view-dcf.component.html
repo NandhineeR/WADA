@@ -1,0 +1,373 @@
+<app-dcf-page *appLet="{
+        athlete: athlete$ | async,
+        attachments: attachments$ | async,
+        dcfHasBeenDeleted: dcfHasBeenDeleted$ | async,
+        isUserAnonymous: isUserAnonymous$ | async,
+        security: fieldsSecurity$ | async,
+        wasSampleValidityUpdated: wasSampleValidityUpdated$ | async
+    } as state">
+    <div title>
+        <span title class="title" i18n="@@viewDopingControlForm">View Doping Control Form</span><span>&nbsp;-&nbsp;{{ dcfId$ | async }}</span>
+
+        <app-generic-menu
+            class="option-menu"
+            hasCustomLook="true"
+            routerLinkActive="active-link"
+            [routerLinkActiveOptions]="{exact: true}"
+            (click)="onClickThreeDotMenu()">
+            <button mat-button menu-look class="menu button-background">
+                <mat-icon style="vertical-align: baseline;" svgIcon="more_vert"></mat-icon>
+            </button>
+            <ng-container>
+                <div *appLet="isDraft">
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.Download)"
+                        [isSidebarMenu]="false"
+                        (click)="viewDCF()">
+                        <a i18n="@@viewDCF">View DCF</a>
+                    </app-menu-item>
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.Download)"
+                        [disabled]="!(state?.attachments | isAttachmentTypeAvailable:attachmentType.SIGNED_DCF)"
+                        [isSidebarMenu]="false"
+                        (click)="viewAttachmentsSignedCopy()">
+                        <a i18n="@@viewSignedDcfCopy">View signed copy of DCF</a>
+                    </app-menu-item>
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.Download)"
+                        [disabled]="!(state?.attachments | isAttachmentTypeAvailable:attachmentType.NOTIFICATION)"
+                        [isSidebarMenu]="false"
+                        (click)="viewAttachmentsNotification()">
+                        <a i18n="@@viewSignedNotification">View signed notification</a>
+                    </app-menu-item>
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.Download)"
+                        [disabled]="!(state?.attachments | isAttachmentTypeAvailable:attachmentType.ATHLETE_PHOTO)"
+                        [isSidebarMenu]="false"
+                        (click)="viewAttachmentsAthletePhoto()">
+                        <a i18n="@@viewAthletePhoto">View photo of the athlete at testing time</a>
+                    </app-menu-item>
+                    <app-menu-item
+                        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.Download)"
+                        [disabled]="!(state?.attachments | isAttachmentTypeAvailable:attachmentType.CHAIN_OF_CUSTODY)"
+                        [isSidebarMenu]="false"
+                        (click)="viewAttachmentsChainOfCustody()">
+                        <a i18n="@@viewChainOfCustody">View Chain of Custody</a>
+                    </app-menu-item>
+                    <app-menu-item
+                        *ngIf="(isUserCorrector$ | async) && (state?.security?.actions | isActionAvailable:actionRight.Delete)"
+                        [disabled]="!isCancelled"
+                        [isDeletable]="isCancelled"
+                        [isTooltip]="!isCancelled"
+                        (click)="openDeleteDcf()">
+                        <a i18n="@@deleteDcf">Delete DCF</a>
+                        <span tooltip i18n="@@dcfCancelBeforeDeleteInfo">The Doping Control Form should be cancelled before it can be deleted.</span>
+                    </app-menu-item>
+                </div>
+            </ng-container>
+        </app-generic-menu>
+        
+        <br>
+        
+        <app-header
+            [athlete]="state.athlete"
+            [isCancellable]="isCancellable && (state?.security?.actions | isActionAvailable:actionRight.Cancel)"
+            [isUserAnonymous]="state.isUserAnonymous"
+            [status]="status$ | async"
+            (cancelDcf)="cancelDcf($event)">
+        </app-header>
+    </div>
+
+    <div *ngIf="!state.dcfHasBeenDeleted && !(isDCFDecommissioned$ | async)" class="float-btn-right">
+        <app-button
+            appOpenObjectInClassic
+            i18n="@@viewDcfInClassic_uppercase"
+            type="secondary"
+            [dcfId]="dcfId$ | async"
+            [newTab]="false"
+            [objectId]="athleteId$ | async"
+            [targetObject]="'Dcf'">
+            VIEW DCF IN CLASSIC
+        </app-button>
+    </div>
+    
+    <app-loading-frame [error]="error$ | async" [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async" [loading]="loading$ | async">
+        <app-notification *ngIf="state.isUserAnonymous" type="informative">
+            <span i18n="@@anonymousViewWarning">You are viewing the anonymous version of this DCF.</span>
+        </app-notification>
+
+        <app-notification *ngIf="state.wasSampleValidityUpdated !== null && !state.wasSampleValidityUpdated" type="error">
+            <span i18n="@@sampleValidityUpdateError">The sample validity could not be updated.</span>
+        </app-notification>
+
+        <app-notification *ngIf="state.wasSampleValidityUpdated" type="success">
+            <span i18n="@@sampleValidityUpdateSuccess">The sample validity was updated successfully.</span>
+        </app-notification>
+        
+        <app-notification *ngIf="showCancelledConfirmation && isCancelled" id="notificationsDCF" type="success">
+            <ng-container *ngIf="arrivalDate$ | async; else defaultMessage">
+                <span i18n="@@dcfForXDatedXHasBeenCancelled">Doping Control Form for {{ state.athlete?.lastName }} , {{ state.athlete?.firstName }} dated {{ arrivalDate$ | async | formatDate :'-0000' : 'DD-MMM-YYYY' }} has been set to cancelled.</span>
+            </ng-container>
+            <ng-template #defaultMessage>
+                <span i18n="@@dcfForXHasBeenCancelled">Doping Control Form for {{ state.athlete?.lastName }} , {{ state.athlete?.firstName }} has been set to cancelled.</span>
+            </ng-template>
+        </app-notification>
+
+        <app-notification *ngIf="(showSampleMatchingResultConfirmedMessage$ | async) === true" id="notificationsDCF" type="success">
+            <span i18n="@@matchForSampleXConfirmedByUser">The match for {{ translations$ | getSampleType:(sample$ | async)?.sampleTypeSpecificCode | async }} {{ (sample$ | async)?.sampleCode }} was confirmed by the user.</span>
+        </app-notification>
+        
+        <app-notification *ngIf="(showSampleMatchingResultRejectedMessage$ | async) === true" id="notificationsDCF" type="informative">
+            <span i18n="@@matchForSampleXRejectedByUser">The match for {{ translations$ | getSampleType:(sample$ | async)?.sampleTypeSpecificCode | async }} {{ (sample$ | async)?.sampleCode }} was rejected by the user.</span>
+        </app-notification>
+        
+        <app-notification *ngIf="(hasBeenSaved$ | async) && !(showCancelledConfirmation && isCancelled)" id="notificationsDCF" type="success">
+            <ng-container *ngIf="isDraft">
+                <span i18n="@@dopingControlFormNumberXsavedasStatusX">Doping Control Form number {{ dcfId$ | async }} has been saved as {{ status }}.</span>
+                <ng-container *ngIf="isFirstSaveAsDraft">
+                    <span class="first-save-message">
+                        <span class="first-save-message-header" i18n="@@whatsNext">What's next?</span>
+                        <span class="first-save-message-content" i18n="@@whatsNextAdditionalSampleInfo">• Sample will only be included in the passport when DCF is completed and saved</span>
+                    </span>
+                </ng-container>
+            </ng-container>
+            <ng-container *ngIf="isComplete">
+                <ng-container *ngIf="isFirstSaveAsComplete; else isNotFirstSaveAsComplete">
+                    <span i18n="@@dopingControlFormNumberXSaved">Doping Control Form number {{ dcfId$ | async }} has been saved.</span>
+                </ng-container>
+                <ng-template #isNotFirstSaveAsComplete>
+                    <span i18n="@@dopingControlFormNumberXUpdated">Doping Control Form number {{ dcfId$ | async }} has been updated.</span>
+                </ng-template>
+            </ng-container>
+        </app-notification>
+        <app-notification *ngIf="hasDiluteSamples$ | async" type="warning">
+            <span i18n="@@oneOrMoreSampleIsDilutedWarning">One or more Urine Sample(s) have a Specific Gravity that is outside the expected range. These samples are considered as dilute.</span>
+        </app-notification>
+
+        <app-notification *ngIf="arrivalDate !== null && arrivalDate !== undefined && dcfToBeDeleted()" type="warning">
+            <span i18n="@@warningsDCFToBeDeleted">The arrival date for this DCF is older than {{ dcfRetentionPeriod }} months. Please note that unmatched DCFs older than {{ dcfRetentionPeriod }} months will be deleted.</span>
+        </app-notification>
+
+        <app-notification
+            *ngIf=" (state?.security?.actions | isActionAvailable:actionRight.Edit) &&
+                    !isCancelled &&
+                    !state?.dcfHasBeenDeleted &&
+                    (
+                        showAuthorizationErrors ||
+                        showNotificationErrors ||
+                        showAthleteInformationErrors ||
+                        sampleInformationErrors.hasMissingFields ||
+                        showProceduralInformationErrors
+                    )"
+            id="notifications"
+            type="warning">
+            <span i18n="@@followingStepsMissingMandatoryValues">The following steps are missing some mandatory values in order to complete this Doping Control Form.</span>
+            <ul links class="error-link-list">
+                <li *ngIf="showAthleteInformationErrors || showAuthorizationErrors || showNotificationErrors">
+                    <a i18n="@@step1ADAMSNotifications" href="{{ route$ | async }}#adamsNotifications">Step 1 - ADAMS Notifications</a>
+                </li>
+                <li *ngIf="sampleInformationErrors.hasMissingFields">
+                    <a i18n="@@step2SampleCollection" href="{{ route$ | async }}#sample-information">Step 2 - Sample Collection</a>
+                </li>
+                <li *ngIf="showProceduralInformationErrors">
+                    <a i18n="@@step3ProceduralInformation" href="{{ route$ | async }}#procedural-information">Step 3 - Procedural Information</a>
+                </li>
+            </ul>
+        </app-notification>
+
+        <app-notification *ngIf="testingOrderHasChanged$ | async" type="success">
+            <span i18n="@@testingOrderHasBeenUpdated">Testing Order has been updated.</span>
+        </app-notification>
+
+        <app-view-content [className]="!showAuthorizationErrors ? 'margin-content' : 'no-margin-content'">
+            <!-- STEP 1 -->
+            <app-view-section [isLoading]="false">
+                <app-view-section-title
+                    sectionNumber=1
+                    sectionTitle="ADAMS Notifications"
+                    [canWrite]="(state?.security?.actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                    [link]="['/', 'dcf', 'edit', dcfId, 'step', 1]"
+                    [numberErrors]="missingFieldsCountStep1()">
+                </app-view-section-title>
+
+                <app-view-section-content appHideControl [permissions]="state?.security?.fields">
+                    <h3 i18n="@@authorization">Authorization</h3>
+                    <app-dcf-authorization
+                        id="authorization"
+                        [actions]="state?.security?.actions"
+                        [authorization]="authorization$ | async"
+                        [dcfId]="dcfId$ | async"
+                        [isCancelled]="isCancelled"
+                        [isUserCorrector]="isUserCorrector$ | async"
+                        [testingOrders$]="testingOrders$"
+                        [whiteList]="state?.security?.fields"
+                        (changeTestingOrderEmitter)="bindDCFToTestingOrder($event)"
+                        (updateMissingFieldsCount)="setMissingFieldsCountAuthorization($event)">
+                    </app-dcf-authorization>
+
+                    <h3 i18n="@@notification">Notification</h3>
+                    <app-dcf-notification
+                        id="notification"
+                        [actions]="state?.security?.actions"
+                        [dcfId]="dcfId$ | async"
+                        [isCancelled]="isCancelled"
+                        [notification]="dcfNotification$ | async"
+                        [timeSlot]="inTimeSlot$ | async"
+                        [whiteList]="state?.security?.fields"
+                        (showNotificationErrors)="showNotificationErrors = $event"
+                        (updateMissingFieldsCount)="setMissingFieldsCountNotification($event)">
+                    </app-dcf-notification>
+
+                    <h3 i18n="@@athleteInformation">Athlete Information</h3>
+                    <app-athlete-information
+                        id="athlete-information"
+                        [abpAccess]="abpAccess$ | async"
+                        [actions]="state?.security?.actions"
+                        [arrivalDate]="arrivalDate$ | async"
+                        [athlete]="dcfAthlete$ | async"
+                        [dcfId]="dcfId$ | async"
+                        [isCancelled]="isCancelled"
+                        [isUserAnonymous]="isUserAnonymous$ | async"
+                        [notificationDate]="notificationDate$ | async"
+                        [testGender]="testGender$ | async"
+                        [whiteList]="state?.security?.fields"
+                        (showAthleteInformationErrors)="showAthleteInformationErrors = $event"
+                        (updateMissingFieldsCount)="setMissingFieldsCountAthleteInformation($event)">
+                    </app-athlete-information>
+                </app-view-section-content>
+            </app-view-section>
+            
+            <!-- STEP 2 -->
+            <app-sample-information
+                id="sample-information"
+                [abpAccess]="abpAccess$ | async"
+                [actions]="state?.security?.actions"
+                [athleteId]="athleteId$ | async"
+                [dcfId]="dcfId$ | async"
+                [dcfRetentionPeriod]="dcfRetentionPeriod"
+                [dcfToBeDeleted]="dcfToBeDeleted()"
+                [hasSampleManagementReader]="hasSampleManagementReader"
+                [isBplrReaderOrWriter]="isBplrReaderOrWriter$ | async"
+                [isCancelled]="isCancelled"
+                [isLastMatchedSample]="isLastMatchedSample()"
+                [isLrReaderOrWriter]="isLrReaderOrWriter$ | async"
+                [isUserCorrector]="isUserCorrector$ | async"
+                [sampleInformation]="dcfSampleInformation$ | async"
+                [sampleManagementTestInformation]="sampleManagementTestInformation$ | async"
+                [sampleTypes]="sampleTypes$ | async"
+                [urineSampleBoundaries]="urineSampleBoundaries$ | async"
+                [whiteList]="state?.security?.fields"
+                (changeSampleEmitter)="changeSample($event)"
+                (errors)="sampleInformationErrors = $event">
+            </app-sample-information>
+            
+            <!-- STEP 3 -->
+            <app-procedural-information
+                id="procedural-information"
+                [actions]="state?.security?.actions"
+                [dcfId]="dcfId$ | async"
+                [isCancelled]="isCancelled"
+                [proceduralInformation]="dcfProceduralInformation$ | async"
+                [whiteList]="state?.security?.fields"
+                (showProceduralInformationErrors)="showProceduralInformationErrors = $event">
+            </app-procedural-information>
+        </app-view-content>
+    </app-loading-frame>
+</app-dcf-page>
+
+<app-footer
+    [creationInfo]="creationInfo$ | async"
+    [updateInfo]="updateInfo$ | async">
+</app-footer>
+
+<div *ngIf="isTestActivityReaderOrWriter$ | async" class="activity-table__wrapper">
+    <app-activity-table
+        [athleteId]="athleteId$ | async"
+        [dataSource]="dataSource"
+        [error]="activitiesError$ | async"
+        [loading]="loading$ | async" 
+        [ownerId]="testId"
+        [targetObject]="'CreateDCFActivity'"
+        [userHasCreateRoles]="isTestActivityWriter$ | async">
+    </app-activity-table>
+</div>
+
+<app-delete-modal
+    [name]="(fullName$ | async)"
+    [shortName]="objectTargetEnum.DcfShortName"
+    [targetObject]="objectTargetEnum.DCF"
+    (deleteObject)="deleteDcf($event)">
+</app-delete-modal>
+
+<app-modal
+    *ngIf="showAttachmentsAthletePhoto"
+    [centralizeButtons]="true"
+    [minHeight]="'350px'"
+    [minWidth]="'680px'"
+    [removeMargin]="true"
+    [resizeModal]="true"
+    [scrollable]="true"
+    (modalClose)="closeAttachmentsAthletePhoto()">
+    <div modal-header>
+        <span i18n="@@athletePhotoTestingTime_uppercase">PHOTO OF THE ATHLETE AT TESTING TIME</span>
+    </div>
+    <div modal-body class="modal__body modal__photo">
+        <app-loading-frame
+            [error]="error$ | async"
+            [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+            [loading]="loading$ | async">
+            <img alt="athelete's photo" [src]="attachmentsAthletePhoto?.url">
+            <div class="right-buttons-modal">
+                <div>
+                    <strong i18n="@@lastNameXfirstNameXonDateXFileSizeX">{{attachmentsAthletePhoto?.meta?.athleteLastName}}, {{attachmentsAthletePhoto?.meta?.athleteFirstName}}</strong> on <strong>{{attachmentsAthletePhoto?.meta?.lastModifiedDate | date: 'mediumDate'}}</strong> - ({{formatFileSize(attachmentsAthletePhoto?.meta?.fileSize)}})
+                </div>
+                <ng-container>
+                    <app-button
+                        class="button"
+                        i18n="@@close_uppercase"
+                        type="primary"
+                        (click)="closeAttachmentsAthletePhoto()">CLOSE</app-button>
+                </ng-container>
+            </div>
+        </app-loading-frame>
+    </div>
+</app-modal>
+
+<app-modal
+    *ngIf="showAttachmentsNotificationPhoto"
+    [centralizeButtons]="true"
+    [minHeight]="'350px'"
+    [minWidth]="'680px'"
+    [removeMargin]="true"
+    [resizeModal]="true"
+    [scrollable]="true"
+    (modalClose)="closeAttachmentsNotificationPhoto()">
+    <div modal-header>
+        <span i18n="@@signedDcfNotification_uppercase">SIGNED DCF NOTIFICATION</span>
+    </div>
+    <div modal-body class="modal__body modal__photo">
+        <app-loading-frame
+            [error]="error$ | async"
+            [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+            [loading]="loading$ | async">
+            <img alt="signed notification" [src]="attachmentsNotification?.url">
+            <div class="right-buttons-modal">
+                <div>
+                    <span *ngIf="attachmentsAthletePhoto?.meta?.lastModifiedDate">
+                        <strong>{{attachmentsAthletePhoto?.meta?.lastModifiedDate | date: 'mediumDate'}}</strong>
+                    </span>
+                    <span *ngIf="attachmentsAthletePhoto?.meta?.fileSize">
+                        - ({{formatFileSize(attachmentsAthletePhoto?.meta?.fileSize)}})
+                    </span>
+                </div>
+                <ng-container>
+                    <app-button
+                    class="button"
+                    i18n="@@close_uppercase"
+                    type="primary"
+                    (click)="closeAttachmentsNotificationPhoto()">CLOSE</app-button>
+                </ng-container>
+            </div>
+        </app-loading-frame>
+    </div>
+</app-modal>

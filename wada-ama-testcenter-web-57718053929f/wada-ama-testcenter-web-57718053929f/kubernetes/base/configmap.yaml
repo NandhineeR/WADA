@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: testcenter-web-configmap
+  namespace: default
+data:
+  PORT: "4200"
+  SUPPORTED_LANGUAGES: "am,ar,az,bg,cs,de,en,es,et,fa_IR,fi,fr,hu,it,ja,ko,lv,nl_BE,nl,om,pl,pt_BR,pt,ro,ru,sk,sr,sw,ti,tr,uk_UA,zh,zh_TW"
+  LOCALE_COOKIE_EXPIRATION_IN_DAYS: "100"
+  ASSETS_TYPES: "js,css,ico,jpg,png,gif,bmp,svg,woff2,htm"
+  CAPI_BASE_URL: "https://localhost:9443/ng/testcenter-api"
+  ADAMS_URL: "https://localhost:8080/adams"
+  SAMPLE_MANAGEMENT_URL: "https://localhost:9443/sm"
+  SAMPLE_MANAGEMENT_LINK: "http://localhost:8086/link"
+  APM_SERVER_URL: "https://10.100.80.11:9500"
+  ELASTIC_APM_VERIFY_SERVER_CERT: "false"
+  ENABLE_APM_AGENT: "false"

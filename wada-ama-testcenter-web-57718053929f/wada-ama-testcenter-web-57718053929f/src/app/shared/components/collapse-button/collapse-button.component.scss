@@ -1,0 +1,48 @@
+$background: #3f8532;
+$disabled: #E4E4E4;
+$text-disabled: #A1A1A1;
+
+:host {
+    display: inline-block;
+}
+
+.wrapper {
+    cursor: pointer;
+    display: table;
+
+    &.disabled {
+        cursor: default;
+
+        div:first-child {
+            background: $disabled;
+            color: $text-disabled;
+        }
+    }
+
+    .side-content {
+        display: table-cell;
+        padding: 0 10px;
+    }
+
+    .collapse-button {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: $background;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        border-radius: 5px;
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: bold;
+
+        &.collapsed:after {
+            content: '+';
+        }
+
+        &.expanded:after {
+            content: '-';
+        }
+    }
+}

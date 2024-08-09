@@ -1,0 +1,50 @@
+@import '~sass/mixins';
+
+$fontColor: #414042;
+
+.legend {
+    @include ltr {
+        text-align: left;
+    }
+    @include rtl {
+        text-align: right;
+    }
+
+    &__title {
+        font-weight: bold;
+        font-size: 14px;
+        color: $fontColor;
+        margin: 0;
+
+        @include rtl {
+            padding-right: 10px;
+        }
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: row;
+        font-size: 11px;
+        font-weight: normal;
+        color: $fontColor;
+
+        @include ltr {
+            padding: 10px 0 0 30px;
+        }
+        @include rtl {
+            padding: 10px 30px 0 0;
+        }
+
+        &-desc {
+            font-size: 11px;
+            height: 25px;
+
+            @include ltr {
+                padding-left: 10px;
+            }
+            @include rtl {
+                padding-right: 10px;
+            }
+        }
+    }
+}

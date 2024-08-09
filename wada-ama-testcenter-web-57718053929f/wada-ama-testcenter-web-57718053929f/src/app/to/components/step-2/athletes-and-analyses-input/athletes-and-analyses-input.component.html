@@ -1,0 +1,355 @@
+<div *appLet="(inCreation$ | async) as inCreation" class="athletes-and-analyses-table__wrapper">
+    <app-notification *ngIf="areAthleteSportsEmpty" id="notifications" type="error">
+        <span i18n="@@athletesMissingSportDiscipline">One or many athletes are missing a sport/discipline. Please add a sport/discipline to all athletes.</span>
+    </app-notification>
+    <app-notification *ngIf="!isStepValid && arePlaceholderSportsEmpty" id="notifications" type="error">
+        <span i18n="@@placeholdersMissingSportDiscipline">One or many placeholders are missing a sport/discipline. Please add a sport/discipline to all placeholders.</span>
+    </app-notification>
+
+    <app-data-table
+      #table
+      [columnDefs]="columns"
+      [dataSource]="dataSource"
+      [modifyState]="true"
+      [showColumnMenu]="testRows && testRows.length > 0"
+      [showDrag]="true"
+      [showOrder]="true"
+      [showPaginator]="true"
+      [showRemove]="(actions | isActionAvailable:actionRight.EditTests) || inCreation"
+      [showSelect]="true"
+      (deletedRow)="deleteRow($event)"
+      (selections)="updateSelections($event)">
+        <ng-container *columnCell="'name'; let e; let i=index">
+            <input
+                *ngIf="e.name === '' && (e.placeholder || e.placeholder !== '' || e.athleteId == ''); else name"
+                class="table-input input-athlete-name"
+                [appDisable]="controls.TEST_INFORMATION | isInputDisabled:fieldsSecurity:!inCreation"
+                [attr.data-qa]="'athletePlaceholderName'"
+                [attr.data-qa-precision]="i"
+                [(ngModel)]="e.placeholder"
+                (click)="$event.stopPropagation()">
+            <ng-template #name>
+                <span *ngIf="e.athleteAccessible">
+                    <a
+                        appOpenObjectInClassic
+                        href=""
+                        [attr.data-qa]="'athleteName'"
+                        [attr.data-qa-precision]="i"
+                        [objectId]="e.athleteId" 
+                        [targetObject]="'Athlete'">
+                        {{ e.name }}
+                        <span *ngIf="e.isPlaceholder"> - {{ e.placeholder }}</span>
+                    </a>
+                </span>
+                <span *ngIf="!e.athleteAccessible"
+                    [attr.data-qa]="'athleteName'"
+                    [attr.data-qa-precision]="i">
+                    {{ e.name }}
+                    <span *ngIf="e.isPlaceholder"> - {{ e.placeholder }}</span>
+                </span>
+            </ng-template>
+        </ng-container>
+
+        <ng-container *columnCell="'sportDiscipline'; let e; let i = index">
+            <app-typeahead
+                class="table-input"
+                dataQA="sportDisciplineTypeahead"
+                suggestionField="displayDescriptionName"
+                [dataQAIndex]="i"
+                [isDisabled]="controls.TEST_INFORMATION | isInputDisabled:fieldsSecurity:!inCreation"
+                [suggestions]="sportDisciplineSuggestions"
+                [(ngModel)]="e.sportDiscipline"
+                (click)="$event.stopPropagation()"
+                (selected)="sportEmpty()">
+            </app-typeahead>
+        </ng-container>
+
+        <ng-container *columnCell="'team'; let e">
+            <app-dropdown
+                dataQA="teamDropdown"
+                defaultValue="true"
+                i18n-placeholder="@@team"
+                id="team"
+                property="id"
+                type="text"
+                [appDisable]="controls.TEST_INFORMATION | isInputDisabled:fieldsSecurity:!inCreation"
+                [isDisabled]="controls.TEST_INFORMATION | isInputDisabled:fieldsSecurity:!inCreation"
+                [minWidth]="150"
+                [useMinWidth]="true"
+                [(ngModel)]="e.team">
+                <ng-container *ngFor="let item of e.teams; let i = index">
+                    <div
+                        class="dropdown-item"
+                        data-qa="teamDropdownOption"
+                        [appDropdownElement]="item"
+                        [attr.data-qa-precision]="i">
+                        {{ item.name }}
+                    </div>
+                </ng-container>
+                <div class="dropdown-item"[appDropdownElement]="">
+                    <span i18n="@@notApplicable">Not Applicable</span>
+                </div>
+            </app-dropdown>
+        </ng-container>
+
+        <ng-container *columnCell="'athleteLevel'; let e; let i = index">
+            <app-dropdown
+                dataQA="athleteLevelDropdown"
+                defaultValue="true"
+                i18n-placeholder="@@athleteLevel"
+                id="athleteLevel"
+                type="text"
+                [appDisable]="controls.TEST_INFORMATION | isInputDisabled:fieldsSecurity:!inCreation"
+                [dataQAIndex]="i"
+                [isDisabled]="controls.TEST_INFORMATION | isInputDisabled:fieldsSecurity:!inCreation"
+                [minWidth]="150"
+                [useMinWidth]="true"
+                [(ngModel)]="e.athleteLevel">
+                <ng-container *ngFor="let item of ATHLETE_LEVEL_LIST; let indexDropdown = index">
+                    <div
+                        class="dropdown-item"
+                        data-qa="athleteLevelDropdownOption"
+                        [appDropdownElement]="item"
+                        [attr.data-qa-precision]="indexDropdown">
+                        {{ translations$ | getAthleteLevel:item | async }}
+                    </div>
+                </ng-container>
+            </app-dropdown>
+        </ng-container>
+
+        <ng-template #analyses let-column="column" let-element="element">
+            <div
+                #root="appLinkRowHeights"
+                [appLinkRowHeights]="element.order"
+                [ngClass]="{'no-pointer-events': !((actions | isActionAvailable:actionRight.EditAnalyses) || inCreation)}"
+                (resized)="root.resizeRows()">
+                <div *ngFor="let el of column.cell(element); let idx = index" class="fake-link" (click)="editAnalyses(element?.tempId)">
+                    <span *ngIf="el.name === sampleTypeEnum.Urine" class="bold underline" data-qa="urineSample" i18n="@@urine">Urine</span>
+                    <span *ngIf="el.name === sampleTypeEnum.Blood" class="bold underline" data-qa="bloodSample" i18n="@@blood">Blood</span>
+                    <span *ngIf="el.name === sampleTypeEnum.BloodPassport" class="bold underline" data-qa="blood_passportSample" i18n="@@bloodPassport">Blood Passport</span>
+                    <span *ngIf="el.name === sampleTypeEnum.DriedBloodSpot" class="bold underline" data-qa="dried_blood_spotSample" i18n="@@driedBloodSpot">Dried Blood Spot</span>
+                    <span [attr.data-qa]="el.name + 'Attribute'"> {{ el.attribute | removeParenthesis }}</span>
+                </div>
+                <div *ngIf="column.cell(element).length === 0">
+                    <div class="fake-link" (click)="editAnalyses(element?.tempId)">
+                        <span class="bold underline" i18n="@@none">None</span>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #laboratories let-column="column" let-element="element">
+            <div [appLinkRowHeights]="element.order">
+                <div *ngFor="let el of column.cell(element); let idx = index">
+                    <span>
+                        {{ el | removeParenthesis }}
+                    </span>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #athleteHeader>
+            <div
+                appTooltip
+                i18n="@@athleteName"
+                i18n-tooltipContent="@@AthleteLastNameFirstName"
+                tooltipContent="Athlete (Last Name, First Name)"
+                tooltipPlacement="top">Athlete Name</div>
+        </ng-template>
+
+        <ng-template #athleteIdHeader>
+            <div
+                appTooltip
+                i18n="@@athleteId_titlecase"
+                i18n-tooltipContent="@@athleteId_titlecase"
+                tooltipContent="Athlete ID"
+                tooltipPlacement="top">Athlete ID</div>
+        </ng-template>
+
+        <ng-template #genderHeader>
+            <div
+                appTooltip
+                i18n="@@sportGender"
+                i18n-tooltipContent="@@athleteGender"
+                tooltipContent="Athlete Gender"
+                tooltipPlacement="top">Sport Gender</div>
+        </ng-template>
+
+        <ng-template #sportNationalityHeader>
+            <div
+                appTooltip
+                i18n="@@sportNationality"
+                i18n-tooltipContent="@@athleteSportNationality"
+                tooltipContent="Athlete Sport Nationality"
+                tooltipPlacement="top">Sport Nationality</div>
+        </ng-template>
+
+        <ng-template #sportDisciplineHeader>
+            <div
+                appTooltip
+                i18n="@@sportDiscipline"
+                i18n-tooltipContent="@@athleteSportDiscipline_slash"
+                tooltipContent="Athlete Sport / Discipline"
+                tooltipPlacement="top">Sport Discipline</div>
+        </ng-template>
+
+        <ng-template #dateOfBirthHeader>
+            <div
+                appTooltip
+                tooltipPlacement="top"
+                tooltipContent="Athlete Date of Birth"
+                i18n-tooltipContent="@@athleteDateOfBirth"
+                i18n="@@dateOfBirth">Date of Birth</div>
+        </ng-template>
+
+        <ng-template #ageHeader>
+            <div
+                appTooltip
+                i18n="@@age"
+                i18n-tooltipContent="@@athleteAge"
+                tooltipContent="Athlete Age"
+                tooltipPlacement="top">Age</div>
+        </ng-template>
+
+        <ng-template #disabilitiesHeader>
+            <div
+                appTooltip
+                i18n="@@disabilities"
+                i18n-tooltipContent="@@disabilitiesAthleteProfile"
+                tooltipContent="Disabilities in Athlete's Profile"
+                tooltipPlacement="top">Disabilities</div>
+        </ng-template>
+
+        <ng-template #athleteLevelHeader>
+            <div
+                appTooltip
+                i18n="@@athleteLevel"
+                i18n-tooltipContent="@@athleteLevelHeaderTooltip"
+                tooltipContent="Athlete level is optional in Testing Order but must be provided in Doping Control Form"
+                tooltipPlacement="top">Athlete Level</div>
+        </ng-template>
+
+        <ng-template #laboratoriesHeader>
+            <div
+                appTooltip
+                i18n="@@laboratories"
+                i18n-tooltipContent="@@selectedLaboratoriesForAnalyses"
+                tooltipContent="Selected Laboratories for Analyses"
+                tooltipPlacement="top">Laboratories</div>
+        </ng-template>
+
+        <ng-template #analysesHeader>
+            <div
+                appTooltip
+                i18n="@@analyses"
+                i18n-tooltipContent="@@selectedAnalyses"
+                tooltipContent="Selected Analyses"
+                tooltipPlacement="top">Analyses</div>
+        </ng-template>
+
+        <ng-template #teamHeader>
+            <div
+                appTooltip
+                i18n="@@team"
+                i18n-tooltipContent="@@whereaboutsTeamOfAthlete"
+                tooltipContent="Whereabouts Team of Athlete"
+                tooltipPlacement="top">Team</div>
+        </ng-template>
+
+        <ng-template #gender let-column="column" let-element="element">
+            <app-gender-selector [gender]="column.cell(element)"></app-gender-selector>
+        </ng-template>
+
+        <div *columnCell="'y'; let e">
+            <div *ngFor="let row of e.y">{{ row }}</div>
+        </div>
+
+        <ng-template #totalSamples let-column="column">
+            <span i18n="@@total_colon">Total:</span>
+            <ng-container [ngSwitch]="column.total()">
+                <span *ngSwitchCase="1"><span>&nbsp;1&nbsp;</span><span i18n="@@sample">Sample</span></span>
+                <span *ngSwitchDefault><span>&nbsp;{{column.total()}}&nbsp;</span><span i18n="@@samples">Samples</span></span>
+            </ng-container>
+        </ng-template>
+
+        <app-data-table-selected-count-label>
+            <strong>{{ selectedRowCount }} </strong>
+            <span  class="selected-athlete"> {{ translations$ | getAthleteSelected:selectedRowCount | async }}</span>
+        </app-data-table-selected-count-label>
+
+        <ng-container header>
+            <app-generic-menu
+                dataQA="addTestMenuOption"
+                [disabled]="!(actions | isActionAvailable:actionRight.EditTests) && !inCreation"
+                (click)="cleanDataTableSelection()">
+                <span menu-name i18n="@@addTest">Add Test</span>
+                <ng-container>
+                    <app-menu-item dataQA="openSearchAthlete" (click)="openSearchAthlete()">
+                        <a i18n="@@searchAthlete">Search Athlete</a>
+                    </app-menu-item>
+                    <app-menu-item dataQA="openAddFromGroup" (click)="openAddFromGroup()">
+                        <a i18n="@@addFromGroup">Add From Group</a>
+                </app-menu-item>
+                    <app-menu-item dataQA="openAddPlaceholder" (click)="openAddPlaceholder()">
+                        <a i18n="@@addPlaceholder">Add Placeholder</a>
+                    </app-menu-item>
+                </ng-container>
+            </app-generic-menu>
+            <app-generic-menu
+                class="left-spacing"
+                dataQA="otherOptionsMenu"
+                [disabled]="!(actions | isActionAvailable:actionRight.EditAnalyses) && !inCreation">
+                <span menu-name i18n="@@otherOptions">Other Options</span>
+                <ng-container>
+                    <app-menu-item
+                        dataQA=addAnalysesToAthletesButton
+                        [disabled]="selectedRowCount === 0"
+                        (click)="addAnalysesToAthlete()">
+                        <a i18n="@@addAnalysesToTests">Add Analyses to Tests</a>
+                    </app-menu-item>
+                    <app-menu-item
+                        dataQA="checkWhereaboutsButton"
+                        [disabled]="inCreation || selectedRowCount === 0"
+                        (click)="showErrorModal()">
+                        <a
+                            appOpenObjectInClassic
+                            i18n="@@checkWhereaboutsDetails"
+                            [enabled]="noPlaceholders"
+                            [objectId]="athleteIds"
+                            [targetObject]="'WhereaboutsArea'"
+                            [toEndDate]="toEndDate$ | async"
+                            [toId]="missionOrderId$ | async"
+                            [toStartDate]="toStartDate$ | async">Check Whereabouts Details</a>
+                    </app-menu-item>
+                </ng-container>
+            </app-generic-menu>
+            <app-button
+                appOpenObjectInClassic
+                *ngIf="(
+                    (inCreation || (actions | isActionAvailable:actionRight.CreateAthlete)) &&
+                    (isAthleteDemographicWriter$ | async) &&
+                    !isDTPWithNoSelectedThirdPartyContract(dtps$ | async, realOrganization$ | async, sourceOrganization$ | async)
+                )"
+                class="left-spacing"
+                dataQA="createAthleteButton"
+                type="secondary"
+                [enabled]="noPlaceholders"
+                [objectId]="athleteIds"
+                [targetObject]="'CreateAthlete'"
+                [toId]="missionOrderId$ | async"
+                (click)="showErrorModal()">
+                <span i18n="@@createAthlete">Create Athlete</span>
+            </app-button>
+
+            <app-error-modal #errorModalRef>
+                <span modal-title i18n="@@placeholerSelection_uppercase">PLACEHOLDER SELECTION</span>
+                <span modal-close i18n="@@close">Close</span>
+                <div secondary-message>
+                    <app-notification id="notifications" type="error">
+                        <span i18n="@@cannotCheckWhereaboutsForPlaceholders">You can't check whereabouts details for placeholders. Either unselects placeholders or bind athletes to selected placeholders prior to check whereabouts</span>
+                    </app-notification>
+                </div>
+            </app-error-modal>
+        </ng-container>
+    </app-data-table>
+</div>

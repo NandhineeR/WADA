@@ -1,0 +1,81 @@
+<div class="selection-section">
+    <div *ngIf="isUrine">
+        <div class="input-line">
+            <div class="checkbox-field" (click)="basicUrineChanges(isBasicUrine)">
+                <input type="checkbox"
+                        [checked]="isBasicUrine"
+                        data-qa="basicUrineSampleCheckbox">
+                <label></label>
+            </div>
+            <label (click)="basicUrineChanges(isBasicUrine)" i18n="@@basicUrineMenu">Basic Urine Menu</label>
+        </div>
+        
+    </div>
+
+    <div *ngIf="isBloodPassport">
+        <div class="input-line">
+            <div class="checkbox-field" (click)="bloodPassportChanges(isBloodPassportSelected)">
+                <input type="checkbox" [checked]="isBloodPassportSelected"
+                data-qa="bloodPassportSampleCheckbox">
+                <label></label>
+            </div>
+            <label (click)="bloodPassportChanges(isBloodPassportSelected)" i18n="@@bloodPassport">Blood Passport</label>
+        </div>
+    </div>
+
+    <div *ngIf="isDriedBloodSpot">
+        <div class="input-line">
+            <div class="checkbox-field" (click)="driedBloodSpotChanges(isDriedBloodSpotSelected)">
+                <input type="checkbox" [checked]="isDriedBloodSpotSelected"
+                data-qa="dbsSampleCheckbox">
+                <label></label>
+            </div>
+            <label i18n="@@driedBloodSpot" (click)="driedBloodSpotChanges(isDriedBloodSpotSelected)">Dried Blood Spot</label>
+        </div>
+
+        <app-modal-field [@fadeInOut] *ngIf="isDriedBloodSpotSelected">
+            <label i18n="@@dbsAnalysisTypeDetails">DBS analysis type details</label>
+            <textarea class="free-form-text"
+                field-input
+                maxlength="4000"
+                (blur)="propagateAnalysisChanges()"
+                [(ngModel)] ="currentAnalysis.dbsAnalysisTypeDetails"
+                rows="5"
+                data-qa="dbsAnalysisTypeDetails">
+            </textarea>
+        </app-modal-field>
+    </div>
+
+    <ng-template [ngTemplateOutlet]="dynamicCheckboxes"></ng-template>
+    <ng-template [ngTemplateOutlet]="laboratoryTemplate"></ng-template>
+</div>
+
+<ng-template #dynamicCheckboxes>
+    <div class="input-line" *ngFor="let analyseAttribute of currentAnalysis?.sampleAnalysisAttributes; let i = index">
+        <div class="checkbox-field" (click)="attributeChanges(analyseAttribute.selected, analyseAttribute.analysisDescription.id)">
+            <input type="checkbox"
+                    class="min-width"
+                    [checked]="analyseAttribute.selected"
+                    [attr.data-qa]="analyseAttribute.analysisDescription.description + sampleType?.specificCode">
+            <label></label>
+        </div>
+        <label (click)="attributeChanges(analyseAttribute.selected, analyseAttribute.analysisDescription.id)"> {{analyseAttribute?.analysisDescription?.description}} </label>
+    </div>
+</ng-template>
+
+<ng-template #laboratoryTemplate >
+    <app-modal-field [@fadeInOut] *ngIf="showLaboratory" [hasAsterisk]="true" [hasError]="laboratoryError && isLabEmpty">
+        <label i18n="@@laboratory">Laboratory</label>
+        <app-typeahead appRandomizeInput
+                        field-input
+                        fieldId="lab{{currentAnalysis.tempId}}"
+                        suggestionField="displayDescriptionName"
+                        value="defaultLab"
+                        (inputBlur)="detectInputBlur()"
+                        [class.error]="laboratoryError"
+                        [hasError]="laboratoryError && isLabEmpty"
+                        [suggestions]="laboratorySuggestions"
+                        dataQA="laboratory{{sampleType?.specificCode}}Typeahead">
+        </app-typeahead>
+    </app-modal-field>
+</ng-template>

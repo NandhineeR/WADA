@@ -1,0 +1,400 @@
+<div class="athletes-and-analyses-table__wrapper">
+    <div class="notification">
+        <ng-container *ngFor="let name of closedAnalysisWarning?.names" >
+            <app-notification type="success">
+                <span data-qa="successfullyClosedAnalysisNotification" i18n="@@sampleTypeWasMarkedAsClosed">{{ name }} analysis sample was successfully marked as Closed</span>
+            </app-notification>
+        </ng-container>
+
+        <ng-container *ngFor="let name of closedTestsWarning?.names" >
+            <app-notification type="success">
+                <span data-qa="successfullyClosedNotification" i18n="@@sampleXWasMarkedAsClosed">{{ name }} was successfully marked as Closed Sample Not Collected</span>
+            </app-notification>
+        </ng-container>
+        
+        <ng-container *ngFor="let name of cancelledTestsWarning?.names" >
+            <app-notification type="success">
+                <span data-qa="successfullyCancelledNotification" i18n="@@sampleXWasMarkedAsCancelled">{{ name }} was successfully marked as Cancelled</span>
+            </app-notification>
+        </ng-container>
+    </div>
+
+    <app-data-table
+        #table
+        [columnDefs]="columns"
+        [dataSource]="dataSource"
+        [modifyState]="true"
+        [showColumnMenu]="testRows?.length > 0"
+        [showDrag]="false"
+        [showOrder]="true"
+        [showPaginator]="true"
+        [showRemove]="false"
+        [showSelect]="true"
+        (selections)="updateSelections($event)">
+        <ng-container *columnCell="'name'; let e; let i=index">
+            <span *ngIf="e.name === '' && e.isPlaceholder && e.unlinkedTest; else name" class="table-input">{{ e.placeholder }}</span>
+            <ng-template #name>
+                <span *ngIf="e.athleteAccessible">
+                    <a
+                        appOpenObjectInClassic
+                        href=""
+                        [attr.data-qa]="'athleteName'"
+                        [attr.data-qa-precision]="i"
+                        [objectId]="e.athleteId"
+                        [targetObject]="'Athlete'">{{ e.name }}
+                        <span *ngIf="e.isPlaceholder"> - {{ e.placeholder }}</span>
+                    </a>
+                </span>
+                <span *ngIf="!e.athleteAccessible">{{ e.name }}
+                    <span *ngIf="e.isPlaceholder"> - {{ e.placeholder }}</span>
+                </span>
+            </ng-template>
+        </ng-container>
+
+        <ng-template #analyses let-column="column" let-element="element">
+            <div [appLinkRowHeights]="element.order" style="overflow-x: auto;">
+                <table class="table-analysis">
+                    <tbody *ngFor="let el of column.cell(element)">
+                        <tr>
+                            <td class="col-text">
+                                <span>
+                                    <span *ngIf="el.name === sampleTypeEnum.Urine" class="bold underline" i18n="@@urine">Urine</span>
+                                    <span *ngIf="el.name === sampleTypeEnum.Blood" class="bold underline" i18n="@@blood">Blood</span>
+                                    <span *ngIf="el.name === sampleTypeEnum.BloodPassport" class="bold underline" i18n="@@bloodPassport">Blood Passport</span>
+                                    <span *ngIf="el.name === sampleTypeEnum.DriedBloodSpot" class="bold underline" i18n="@@driedBloodSpot">Dried Blood Spot</span>
+                                    <span>&nbsp;{{ el.status }}&nbsp;</span>
+                                </span>
+                            </td>
+                            <td class="col-button">
+                                <span *ngIf="el.status.includes(specificCodeStatus.Pending)">
+                                    <button
+                                        class="button-background"
+                                        matTooltipClass="set-analysis-as-closed-tooltip"
+                                        matTooltipPosition="above"
+                                        [matTooltip]="setAnalysisAsClosedTooltip?.innerText"
+                                        (click)="showCloseAnalysisModal(el)">
+                                        <mat-icon>settings_backup_restore</mat-icon>
+                                    </button>
+                                    <span #setAnalysisAsClosedTooltip i18n="@@setSampleNotCollectedTooltip" style="display: none">Set Analysis as Closed</span>
+                                </span>
+                            </td>
+                            <td class="col-text padding-left max-width">
+                                <span>
+                                    <span>{{ el.attribute }}</span>
+                                </span>
+                            </td>
+                            <td class="col-button">
+                                <span *ngIf="(actions | isActionAvailable:actionRight.DownloadLaboratoryRequestForm)">
+                                    <button
+                                        class="button-background"
+                                        matTooltipClass="analysis-form-request-tooltip"
+                                        matTooltipPosition="above"
+                                        [matTooltip]="analysisRequestFormTooltip?.innerText"
+                                        (click)="viewLabAnalysisRequestFormByAnalysis(el.id)">
+                                        <mat-icon>open_in_new</mat-icon>
+                                    </button>
+                                    <span #analysisRequestFormTooltip i18n="@@analysisRequestFormTooltip" style="display: none">View {{ el.lab }} Analysis Request Form</span>
+                                </span>
+                            </td>
+                            <td class="col-text padding-left max-width">
+                                <div *appLet="getAnalysisSample(el) | async as analysisSample">
+                                    <div
+                                        *ngIf="analysisSample?.ltsRequest"
+                                        class="section-long-term-storage">
+                                        <span matTooltipClass="long-term-storage-tootltip"
+                                                matTooltipPosition="above"
+                                                [appTooltip]="longTermStorageFormTooltip" >LTS
+                                            <ng-template #longTermStorageFormTooltip i18n="@@longTermStorageFormTooltip" style="display: none">
+                                                <app-view-long-term-storage [ltsRequest]="analysisSample?.ltsRequest || null"></app-view-long-term-storage>
+                                            </ng-template>
+                                        </span>
+                                    </div>
+                                    <div
+                                        *ngIf="analysisSample?.qtaRequest"
+                                        class="section-quick-turn-around">
+                                        <span matTooltipClass="quick-turn-around-tooltip"
+                                            matTooltipPosition="above"
+                                            [appTooltip]="quickTurnAroundFormTooltip">QTA
+                                            <ng-template #quickTurnAroundFormTooltip i18n="@@quickTurnAroundFormTooltip" style="display: none">
+                                                <app-view-quick-turn-around [qtaRequest]="analysisSample?.qtaRequest || null"></app-view-quick-turn-around>
+                                            </ng-template>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody *ngIf="column.cell(element).length === 0">
+                        <tr>
+                            <td>
+                                <span class="bold underline" i18n="@@none">None</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-template>
+
+        <ng-template #laboratories let-column="column" let-element="element">
+            <div [appLinkRowHeights]="element.order">
+                <div *ngFor="let el of column.cell(element); let idx = index">
+                    <span>
+                        {{ el | removeParenthesis }}
+                    </span>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #gender let-column="column" let-element="element">
+            <app-gender-selector [gender]="column.cell(element)"></app-gender-selector>
+        </ng-template>
+
+        <ng-template #athleteLevel let-column="column" let-element="element">
+            <span *ngIf="column.cell(element)">{{ translations$ | getAthleteLevel:column.cell(element) | async }} </span>
+        </ng-template>
+
+        <div *columnCell="'y'; let e" [appLinkRowHeights]="e.name">
+            <div *ngFor="let row of e.y">{{ row }}</div>
+        </div>
+
+        <ng-template #totalSamples let-column="column">
+            <span i18n="@@total_colon">Total:</span>
+            <ng-container [ngSwitch]="column.total()">
+                <span *ngSwitchCase="1"><span>&nbsp;1&nbsp;</span><span i18n="@@sample">Sample</span></span>
+                <span *ngSwitchDefault><span>&nbsp;{{column.total()}}&nbsp;</span><span i18n="@@samples">Samples</span></span>
+            </ng-container>
+        </ng-template>
+
+
+        <div *columnCell="'results'; let e">
+            <div *ngFor="let analysis of e.analysisResults">
+                <a
+                    appOpenObjectInClassic
+                    href=""
+                    [ngClass]="{'no-link': !isLabResultAccessible(analysis)}"
+                    [targetObject]="'LabResult'"
+                    [type]="analysis.sampleType" [objectId]="analysis.labResultId">
+                    <span>{{ analysis.sampleType }}&nbsp;<span i18n="@@x_parentheses">({{ analysis.jarCode }})</span>&nbsp;<span i18n="@@on_lowercase">on</span>&nbsp;{{ analysis.matchingDate | formatDate :'-0000' : 'DD-MMM-YYYY' }}<span i18n="@@colon">:</span>&nbsp;</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.AAF" i18n="@@aaf_uppercase">AAF</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.ATF" i18n="@@atf_uppercase">ATF</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.Created" i18n="@@aftCreated">ATF (Created)</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.Cancel" i18n="@@aftCancelled">ATF (Cancelled)</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.Negative" i18n="@@negative">Negative</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.CompleteAAF" i18n="@@atfCompleteInvestigationAaf"><br>ATF (Complete - Investigation AAF)</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.CompleteNegative" i18n="@@atfCompleteInvestigationNegative"><br>ATF (Complete - Investigation Negative)</span>
+                    <span *ngIf="analysis.testResult === labResultStatusEnum.Pending" i18n="@@atfInProgress">ATF (In progress)</span>
+                </a>
+            </div>
+        </div>
+
+        <div *columnCell="'status'; let testRow">
+            <span *ngIf="testRow.isCancelled()" data-qa="testCancelledStatus" i18n="@@testCancelled">Test Cancelled</span>
+            
+            <!-- When test is "Closed Sample not Collected" -->
+            <div *ngIf="testRow.isClosed()">
+                <!--open modal-->
+                <span
+                    class="fake-link"
+                    data-qa="testClosedStatus"
+                    i18n="@@closedSampleNotCollected"
+                    (click)="showCloseTestsModal(testRow, true)">Closed - Sample Not Collected</span><span>&nbsp;({{ testRow.subStatus?.description }})</span>
+            </div>
+
+            <!-- When a test is "In Creation" or "Planned", no DCF has been created yet and user has the right to create DCFs -->
+            <div
+                *ngIf="testRow.isDCFCreatable() && (actions | isActionAvailable:actionRight.CreateDCF)"
+                class="padding">
+                <a [queryParams]="{ from: 'to', testId: testRow.id }" [routerLink]="['/','dcf', 'new']">
+                    <app-button dataQA="createDcfButton">
+                        <span i18n="@@createDcf">Create DCF</span>
+                    </app-button>
+                </a>
+            </div>
+
+            <!-- When DCF could potentially be created for a test, but the user doesn't have the right to -->
+            <div *ngIf="!testRow.isTestPlaceholder() && testRow.isDCFNotCreatable() || (testRow.isDCFCreatable() && !(actions | isActionAvailable:actionRight.CreateDCF))">
+                <span i18n="@@dcfNotCreated">DCF Not Created</span>
+            </div>
+
+            <!-- When a test has a placeholder not bound to an athlete and the user has the right to bind the test to an athlete -->
+            <div *ngIf="testRow.isTestPlaceholder() && (actions | isActionAvailable:actionRight.BindAthlete)" class="padding">
+                <app-button (click)="openBindToAthleteModal(testRow.id)">
+                    <span i18n="@@bindToAthlete">Bind to Athlete</span>
+                </app-button>
+            </div>
+
+            <!--When the DCF is "Draft" or "Completed" and the user has the right to view the DCF-->
+            <div *ngIf="testRow.isDCFReadable()">
+                <a [routerLink]="['/','dcf', 'view', testRow.dcfId]" [queryParams]="">
+                    <span *ngIf="isCompletedStatus(testRow.dcfStatus.specificCode)" i18n="dcfStatusCompleted">DCF Completed</span>
+                    <span *ngIf="isDraftStatus(testRow.dcfStatus.specificCode)" i18n="dcfStatusDraft">DCF Draft</span>
+                </a>
+            </div>
+
+            <!--When the DCF is "Draft" or "Completed" but the user doesn't have the right to view the DCF-->
+            <div *ngIf="testRow.isDCFNotReadable()">
+                <span *ngIf="isCompletedStatus(testRow.dcfStatus.specificCode)" i18n="dcfStatusCompleted">DCF Completed</span>
+                <span *ngIf="isDraftStatus(testRow.dcfStatus.specificCode)" i18n="dcfStatusDraft">DCF Draft</span>
+            </div>
+
+            <!--When at least one Athlete has an Unsuccessful Attempt attached to a test-->
+            <div *ngIf="testRow.uas?.length > 0 && (actions | isActionAvailable:actionRight.ViewUA)" class="padding">
+                <div *ngFor="let ua of testRow.uas">
+                    <a [queryParams]="{ id: ua.id }" [routerLink]="['/', 'to', 'ua', 'view']">
+                        <span><span i18n="@@unsuccessfulAttempt">Unsuccessful Attempt</span>&nbsp;{{ ua.attemptDate | formatDate :'-0000' : 'DD-MMM-YYYY' }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <app-data-table-selected-count-label>
+            <strong>{{ selectedRowCount }} </strong>
+            <span  class="selected-athlete"> {{ translations$ | getAthleteSelected:selectedRowCount | async }}</span>
+        </app-data-table-selected-count-label>
+
+        <ng-container header>
+            <div *appLet="testingOrder?.testingOrderStatus?.specificCode as toStatus" class="actions-menu">
+                <app-generic-menu class="generic-menu" dataQA="otherActionsButton" [disabled]="selectedRowCount === 0">
+                    
+                    <span menu-name i18n="@@otherActions_uppercase">OTHER ACTIONS</span>
+                    
+                    <app-menu-item *ngIf="actions | isActionAvailable:actionRight.CancelTest" dataQA="markAsCancelledButton" (click)="showCancelTestsModal()">
+                        <a menu-item i18n="@@markAsCancelled">Mark as Cancelled</a>
+                    </app-menu-item>
+                    
+                    <app-menu-item
+                        *ngIf="!allSelectedSamplesAreClosed && actions | isActionAvailable:actionRight.CloseTest"
+                        dataQA="markAsSampleNotCollectedButton"
+                        (click)="showCloseTestsModal(null, false)">
+                        <a menu-item i18n="@@markAsSampleNotCollected">Mark as Sample Not Collected</a>
+                    </app-menu-item>
+                    
+                    <div *ngIf="!areSelectedTestsUnlinked()">
+                        <app-menu-item *ngIf="actions | isActionAvailable:actionRight.CreateUA" dataQA="addUaButton" (click)="createUA()">
+                            <a menu-item i18n="@@addUnsuccessfulAttempt">Add Unsuccessful Attempt</a>
+                        </app-menu-item>
+                        
+                        <app-menu-item
+                            appOpenObjectInClassic
+                            *ngIf="actions | isActionAvailable:actionRight.CheckWhereabouts"
+                            [objectId]="athleteIds"
+                            [toEndDate]="toEndDate"
+                            [toId]="missionOrderId"
+                            [toStartDate]="toStartDate"
+                            [targetObject]="'WhereaboutsArea'">
+                            <a menu-item dataQA="checkWhereaboutsButton" i18n="@@checkWhereaboutsDetails">Check Whereabouts Details</a>
+                        </app-menu-item>
+                        
+                        <app-menu-item
+                            *ngIf="toStatus === specificCodeStatus.Pending && (actions | isActionAvailable:actionRight.CreateDCF)"
+                            dataQA="createMultipleDcfs"
+                            (click)="showCreateMultipleDCFModal()">
+                            <a menu-item i18n="@@createMultipleDopingControlForms">Create Multiple Doping Control Forms</a>
+                        </app-menu-item>
+                        
+                        <app-menu-item
+                            *ngIf=" toStatus !== specificCodeStatus.Cancelled &&
+                                    toStatus !== specificCodeStatus.Complete &&
+                                    (actions | isActionAvailable:actionRight.MoveAthlete)"
+                            dataQA="moveAthleteButton"
+                            (click)="showMoveToAnotherTOModal()">
+                            <a menu-item i18n="@@moveAthleteToOtherTestingOrder">Move Athlete to other Testing Order</a>
+                        </app-menu-item>
+                    </div>
+                </app-generic-menu>
+                
+                <app-generic-menu
+                    class="generic-menu btn-left-margin"
+                    dataQA="viewAnalysesButton"
+                    [disabled]="laboratoriesFromSelectedTests.size === 0">
+                    <span menu-name i18n="@@viewAnalyses_uppercase">PRINT ANALYSES</span>
+                    
+                    <ng-container *ngFor="let laboratory of laboratoriesFromSelectedTests">
+                        <app-menu-item
+                            *ngIf="(actions | isActionAvailable:actionRight.DownloadLaboratoryRequestForm)"
+                            (click)="viewLabAnalysisRequestFormByLab(laboratory)">
+                            <a data-qa="viewAnalysisRequestFormButton" i18n="@@viewLabXAnalysisRequestForm">View {{ laboratory }} Analysis Request Form</a>
+                        </app-menu-item>
+                    </ng-container>
+                </app-generic-menu>
+
+                <app-button
+                    class="btn-left-margin"
+                    dataQA="refreshLTSQTAButton"
+                    matTooltipClass="refresh-lts-qta-tooltip"
+                    matTooltipPosition="above"
+                    type="secondary"
+                    [matTooltip]="refreshLTSQTATooltip?.innerText"
+                    (click)="retrieveAnalysisSamples()">
+                    <div class="align-center">
+                        <span menu-name i18n="@@refreshLTSQTA_uppercase">REFRESH LTS/QTA</span>
+                        <span class="margin-left">
+                            <mat-icon class="margin-top">refresh</mat-icon>
+                        </span>
+                    </div>
+                    <span #refreshLTSQTATooltip i18n="@@refreshLTSQTATooltip" style="display: none">Retrieve data from the Sample Management Platform.</span>
+                </app-button>
+
+                <app-button
+                    class="btn-left-margin"
+                    dataQA="requestLTSQTAButton"
+                    type="secondary"
+                    (click)="openTestingOrderInSampleManagement()">
+                    <div class="align-center">
+                        <span menu-name i18n="@@requestLTSQTA_uppercase">REQUEST LTS/QTA</span>
+                        <span class="margin-left">
+                            <mat-icon class="margin-top">open_in_new</mat-icon>
+                        </span>
+                    </div>
+                </app-button>
+            </div>
+        </ng-container>
+    </app-data-table>
+</div>
+
+<router-outlet deactivate="onDeactivateBindAthleteModal()" name="modal"></router-outlet>
+
+<app-close-analysis-modal
+    #closeAnalysisModalRef
+    [closedAnalysis]="closedAnalysis"
+    [statusUpdateError]="statusUpdateError"
+    (analysisToCloseEmitter)="closeAnalysis($event)"
+    (displayClosedAnalysisWarning)="displayClosedAnalysisWarning($event)">
+</app-close-analysis-modal>
+
+<app-close-test-modal
+    #closeTestModalRef
+    [closedTests]="closedTests"
+    [statusUpdateError]="statusUpdateError"
+    [testStatuses]="testStatuses"
+    (displayClosedTestsWarning)="displayClosedTestsWarning($event)"
+    (testsToCloseEmitter)="closeTests($event)">
+</app-close-test-modal>
+
+<app-cancel-test-modal
+    #cancelTestModalRef
+    [cancelledTests]="cancelledTests"
+    [statusUpdateError]="statusUpdateError"
+    [testStatuses]="testStatuses"
+    (displayCancelledTestsWarning)="displayCancelledTestsWarning($event)"
+    (testsToCancelEmitter)="cancelTests($event)">
+</app-cancel-test-modal>
+
+<app-create-multiple-dcf-modal
+    #createMultipleDCFModalRef
+    [country]="testingOrder?.country || null"
+    [resultManagementAuthority]="testingOrder?.resultManagementAuthority || null"
+    [sampleCollectionAuthority]="testingOrder?.sampleCollectionAuthority || null"
+    [testInWarnings]="testInWarnings"
+    [testType]="testingOrder?.testType || null"
+    [testingAuthority]="testingOrder?.testingAuthority || null"
+    [warningForAll]="warningForAllTest"
+    (confirm)="createMultipleDCF($event)">
+</app-create-multiple-dcf-modal>
+
+<app-move-athlete-modal
+    #moveToAnotherTOModalRef
+    [currentTestingOrderId]="testingOrder?.id"
+    [testsToMove]="testsToMove"
+    (moveToTOEmitter)="moveToTestingOrder($event)">
+</app-move-athlete-modal>

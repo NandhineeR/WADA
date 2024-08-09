@@ -1,0 +1,43 @@
+@import '~sass/mixins';
+
+@mixin view-entry($left, $right) {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.15rem;
+
+    .view-entry-name {
+        display: inline-block;
+        width: 40%;
+        min-width: 40%;
+        text-align: $right;
+        padding-#{$left}: 25px;
+    }
+
+    .view-entry-value {
+        display: inline-block;
+        text-align: $left;
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+    .view-entry-link {
+        display: inline-block;
+        text-align: $left;
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+}
+
+.space-between-instructions {
+    padding-top: 14px;
+}
+
+.view-entry {
+    @include ltr {
+        @include view-entry(left, right);
+    }
+    @include rtl {
+        @include view-entry(right, left);
+    }
+}

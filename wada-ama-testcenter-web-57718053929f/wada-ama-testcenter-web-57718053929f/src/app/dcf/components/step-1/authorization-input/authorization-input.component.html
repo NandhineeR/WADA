@@ -1,0 +1,159 @@
+<div
+    appInheritDir
+    appRandomizeInput
+    #root="appRandomizeInput"
+    *appLet="fieldsSecurity$ | async as security"
+    class="wrapper">
+    
+    <app-dcf-notifications
+        *ngIf="(
+            (form | formErrors:showErrors:dcfStatus) ||
+            (hasSaveConflict && hasOptimisticLockException) ||
+            (saveError && !(hasSaveConflict && hasOptimisticLockException))
+        )"
+        id="dcf-notifications"
+        type="error"
+        [conflictException]="conflictException"
+        [dcfId]="dcfId$ | async"
+        [saveError]="saveError">
+        <span *ngIf="!conflictException && !saveError" i18n="@@errorsDetectedInFollowingFields">Some error(s) were detected in the following fields:</span>
+        <ul links class="error-link-list">
+            <li *ngIf="testingAuthorityHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('testingAuthority') }}" i18n="@@testingAuthority">Testing Authority</a>
+            </li>
+            <li *ngIf="sampleCollectionAuthorityHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('sampleCollectionAuthority') }}" i18n="@@sampleCollectionAuthority">Sample Collection Authority</a>
+            </li>
+            <li *ngIf="resultManagementAuthorityHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('resultManagementAuthority') }}" i18n="@@resultManagementAuthority">Result Management Authority</a>
+            </li>
+        </ul>
+    </app-dcf-notifications>
+
+    <app-notification *ngIf="hasSampleCodeValidationError$ | async" type="warning">
+        <span i18n="@@testingAuthorityAffectedDampleValidation">The sample code validation detected some duplication using this testingAuthority. Go to step 2 for more details.</span>
+    </app-notification>
+
+    <form *appLet="dcfMode$ | async as dcfMode" [formGroup]="form">
+        <div
+            *appLet="{
+                isEditMode: (dcfMode === dcfModeType.Edit),
+                displayTestingOrder: (dcfMode === dcfModeType.CreateFromTO || (isBoundToTO$ | async))
+            } as applet">
+            <ng-container *ngIf="applet.displayTestingOrder">
+                <app-form-field>
+                    <label i18n="@@testingOrderNumber">Testing Order Number</label>
+                    <label field-input>{{ testingOrderNumber$ | async }}</label>
+                </app-form-field>
+            </ng-container>
+
+            <!-- Edit Testing Order Number -->
+            <div [hidden]="applet.displayTestingOrder">
+                <app-form-field>
+                    <label for="testingOrderNumber" i18n="@@testingOrderNumber">Testing Order Number</label>
+                    <div field-input>
+                        <app-to-typeahead
+                            *ngIf="dcfMode !== dcfModeType.CreateFromTO"
+                            appRestrictToPattern="^[0-9]*$"
+                            dataQA="testingOrderNumberTypeahead"
+                            fieldId="testingOrderNumber"
+                            formControlName="testingOrder"
+                            suggestionField="testingOrderNumber"
+                            [isDisabled]="isDCFCompleted() || (controls.TESTING_ORDER_ID | isInputDisabled:security:applet.isEditMode)"
+                            [isStartingFocus] = true
+                            [tos]="toItems$"
+                            (clearedSelection)="resetTO()"
+                            (click)="initializeTOs()"
+                            (selected)="selectTestingOrderNumber($event)">
+                        </app-to-typeahead>
+                        <span class="loading-animation" *ngIf="loadingTOs$ | async">
+                            <img class="loading-img" src="assets/loading.png" alt="Loading Icon" i18n-alt="@@loadingIcon">
+                        </span>
+                    </div>
+                </app-form-field>
+            </div>
+
+            <app-form-field>
+                <label for="adoReferenceNumber" i18n="@@adoReferenceNumber">ADO Reference Number</label>
+                <input
+                    #firstFormElement
+                    autofocus
+                    field-input
+                    data-qa="adoReferenceNumber"
+                    formControlName="adoReferenceNumber"
+                    id="adoReferenceNumber"
+                    type="text"
+                    [appDisable]="controls.ADO_REFERENCE_NUMBER | isInputDisabled:security:applet.isEditMode" 
+                    (blur)="submitForm()">
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="testingAuthorityHasErrors">
+                <label for="testingAuthority" i18n="@@testingAuthority">Testing Authority</label>
+                <app-typeahead
+                    field-input
+                    dataQA="testingAuthorityTypeahead"
+                    fieldId="testingAuthority"
+                    formControlName="testingAuthority"
+                    suggestionField="displayDescriptionName"
+                    [isDisabled]="(isMatchingResultType3or2or1$ | async) || (controls.TEST_AUTHORITY | isInputDisabled:security:applet.isEditMode)"
+                    [hasError]="testingAuthorityHasErrors"
+                    [suggestions]="testingAuthoritySuggestions"
+                    (selected)="dispatchSampleCodeValidation()">
+                </app-typeahead>
+                <div field-error *ngIf="testingAuthorityHasErrors">
+                    <span *ngIf="testingAuthority.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="sampleCollectionAuthorityHasErrors">
+                <label for="sampleCollectionAuthority" i18n="@@sampleCollectionAuthority">Sample Collection Authority</label>
+                <app-info-bubble i18n="@@sampleCollectionAuthorityTooltip">Name of the organization physically responsible for the collection of doping control samples.</app-info-bubble>
+                <app-typeahead
+                    field-input
+                    dataQA="sampleCollectionAuthorityTypeahead"
+                    fieldId="sampleCollectionAuthority"
+                    formControlName="sampleCollectionAuthority"
+                    suggestionField="displayDescriptionName"
+                    [hasError]="sampleCollectionAuthorityHasErrors"
+                    [isDisabled]="(isMatchingResultType1$ | async) || (controls.SAMPLE_COLLECTION_AUTHORITY | isInputDisabled:security:applet.isEditMode)"
+                    [suggestions]="sampleCollectionSuggestions"
+                    (selected)="triggerFormSubmission()">
+                </app-typeahead>
+                <div field-error *ngIf="sampleCollectionAuthorityHasErrors">
+                    <span *ngIf="sampleCollectionAuthority.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="resultManagementAuthorityHasErrors">
+                <label for="resultManagementAuthority" i18n="@@resultManagementAuthority">Result Management Authority</label>
+                <app-typeahead
+                    field-input
+                    dataQA="resultManagementAuthorityTypeahead"
+                    fieldId="resultManagementAuthority"
+                    formControlName="resultManagementAuthority"
+                    [suggestions]="resultManagementSuggestions"
+                    suggestionField="displayDescriptionName"
+                    [isDisabled]="controls.RESULT_MANAGEMENT_AUTHORITY | isInputDisabled:security:applet.isEditMode"
+                    [hasError]="resultManagementAuthorityHasErrors"
+                    (selected)="triggerFormSubmission()">
+                </app-typeahead>
+                <div field-error *ngIf="resultManagementAuthorityHasErrors">
+                    <span *ngIf="resultManagementAuthority.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+            <app-form-field>
+                <label for="testCoordinator" i18n="@@testCoordinator">Test Coordinator</label>
+                <app-typeahead 
+                    field-input
+                    dataQA="testCoordinatorTypeahead"
+                    fieldId="testCoordinator"
+                    formControlName="testCoordinator"
+                    suggestionField="displayDescriptionName"
+                    [isDisabled]="controls.TEST_COORDINATOR | isInputDisabled:security:applet.isEditMode"
+                    [suggestions]="testCoordinatorSuggestions"
+                    (selected)="triggerFormSubmission()">
+                </app-typeahead>
+            </app-form-field>
+        </div>
+    </form>
+</div>

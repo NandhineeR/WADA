@@ -1,0 +1,105 @@
+@import '~sass/variables';
+
+$text-color: #414042;
+$arrow-size: 20px;
+$border-width: 2px;
+$popup-background: white;
+$popover-offset: 5px;
+
+.popover__wrapper {
+    position: relative;
+    display: inline-block;
+
+    .popover__target {
+        display: inline-block;
+    }
+
+    // The popover styles
+    .popover__content {
+        position: absolute;
+        z-index: 10000;
+        border-radius: 5px;
+        font-size: 13px;
+        font-weight: normal;
+        min-width: 300px;
+        color: $text-color;
+        background: $popup-background;
+        border: $border-width solid $primary-background;
+
+        .popover__header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            background: $primary-background;
+            padding: 10px;
+            padding-left:20px;
+
+            .popover__title {
+                white-space: nowrap;
+                color: white;
+                font-size: 20px;
+                font-weight: 500;
+                text-transform: uppercase;
+                padding-right: 20px;
+            }
+
+            .popover__close {
+                height: 30px;
+                width: 30px;
+                border-radius: 30px;
+                background: white;
+                color: $primary-background;
+                font-size: 40px;
+                line-height: 30px;
+                text-align: center;
+                vertical-align: middle;
+                cursor: pointer;
+            }
+        }
+
+        // popover arrow: https://css-tricks.com/snippets/css/css-triangle/
+        // External green arrow
+        .popover__arrow {
+            content: " ";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-width: $arrow-size;
+            border-style: solid;
+        }
+
+        // Center the popover and arrow horizontally for top/bottom popovers
+        &.popover__top,
+        &.popover__bottom {
+            left: 50%;
+            transform: translateX(-50%);
+
+            .popover__arrow {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        // Center top popover and arrow vertically
+        &.popover__top {
+            bottom: calc(100% + #{$arrow-size} + #{$popover-offset});
+
+            .popover__arrow {
+                border-color: transparent;
+                border-top-color: $primary-background;
+                top: 100%;
+            }
+        }
+
+        // Center bottom popover and arrow vertically
+        &.popover__bottom {
+            top: calc(100% + #{$arrow-size} + #{$popover-offset});
+
+            .popover__arrow {
+                border-color: transparent;
+                border-bottom-color: $primary-background;
+                bottom: 100%;
+            }
+        }
+    }
+}

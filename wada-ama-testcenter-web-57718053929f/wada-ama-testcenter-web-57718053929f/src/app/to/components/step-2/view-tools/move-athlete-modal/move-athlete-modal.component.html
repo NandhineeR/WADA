@@ -1,0 +1,67 @@
+<div
+    appInheritDir
+    appTabFocus
+    *ngIf="showModal"
+    class="modal__wrapper">
+    <div class="modal__header">
+        <div *appLet="testsToMove.testIds.length as ids" class="modal__title">
+            <ng-container [ngSwitch]="ids">
+                <span *ngSwitchCase="1" data-qa="moveAthleteModal" i18n="@@moveAthleteToOtherTestingOrder_uppercase">MOVE ATHLETE TO OTHER TESTING ORDER</span>
+                <span *ngSwitchDefault data-qa="moveAthletesModal" i18n="@@moveAthletesToOtherTestingOrder_uppercase">MOVE ATHLETES TO OTHER TESTING ORDER</span>
+            </ng-container>
+        </div>
+        <div class="modal__close" (click)="onClose()">&times;</div>
+    </div>
+
+    <div
+        *ngIf="(loadingTOs$ | async) === false; else loading"
+        class="modal__body">
+        <app-notification *ngIf="testHasDCFWarning.hasWarning()" type="warning">
+            <ng-container [ngSwitch]="testHasDCFWarning.names.length">
+                <span *ngSwitchCase="1" i18n="@@followingTestHasDcfAssociated">The following test has a DCF associated:</span>
+                <span *ngSwitchDefault i18n="@@followingTestsHaveDcfAssociated">The following tests have DCFs associated:</span>
+            </ng-container>
+            <ul>
+                <li *ngFor="let name of testHasDCFWarning.names">
+                    <span>{{name}}</span>
+                </li>
+            </ul>
+        </app-notification>
+
+        <label *ngIf="testsToMove.testIds.length == 1" i18n="@@athleteName">Athlete Name</label>
+        <label *ngIf="testsToMove.testIds.length > 1" i18n="@@athletes">Athletes</label>
+        <ng-container *ngFor="let athleteName of testsToMove.names">
+            <div>{{ athleteName }}</div>
+        </ng-container>
+        <br>
+        <app-modal-field [hasAsterisk]="true">
+            <label class="to-label" for="testingOrder" i18n="@@testingOrderNumber">Testing Order Number</label>
+            <app-to-typeahead
+                field-input
+                appRestrictToPattern="[0-9]"
+                dataQA="testingOrderNumberTypeahead"
+                suggestionField="testingOrderNumber"
+                [isStartingFocus] = true
+                [showTestingOrderNumberOnly]="true"
+                [tos]="toItems$"
+                (selected)="selectTestingOrderNumber($event)">
+            </app-to-typeahead>
+        </app-modal-field>
+
+        <div class="modal__buttons">
+            <app-button focus="true" i18n="@@cancel_uppercase" type="secondary" (click)="onClose()">CANCEL</app-button>
+            <app-button
+                dataQA="confirmMoveToTestingOrder"
+                i18n="@@to_changeToNumberField_save"
+                type="primary"
+                [class.disabled]="testHasDCFWarning.hasWarning()"
+                [disabled]="testHasDCFWarning.hasWarning()"
+                (click)="moveToTestingOrder($event)">SAVE</app-button>
+        </div>
+    </div>
+    <ng-template #loading>
+        <app-loading-animation [isTemplate]="true"></app-loading-animation>
+    </ng-template>
+</div>
+
+<div *ngIf="showModal" class="modal__overlay"></div>

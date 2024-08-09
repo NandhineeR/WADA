@@ -1,0 +1,129 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~app/shared/styles/radio';
+
+$green: #3F8532;
+$error-color: #AA1A1A;
+$border-color: #969090;
+$line-border-color: #414042;
+$frameColor: #3f8532;
+$arrow-size: 10px;
+$maxNumberOfSteps: 10;
+$stepWidth: 150px;
+$labelNotVisitedColor: #414042;
+$labelActiveColor: #3f8532;
+$labelCompletedColor: #414042;
+$background: #ffffff;
+
+.table-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-row-gap: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.button-menu {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.label {
+    margin-top: 5px;
+    font-size: 13px;
+    color: $labelNotVisitedColor;
+    text-align: center;
+
+    &.active {
+        color: $labelActiveColor;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+    &.completed {
+        color: $labelCompletedColor;
+    }
+}
+
+.table-header-title-1 {
+    grid-column-start: 2;
+}
+
+.table-header-title-2 {
+    grid-column-start: 3;
+}
+
+.table-column-1 {
+    text-align: right;
+    font-weight: bold;
+    padding-right: 20px;
+}
+
+@mixin step($left, $right) {
+    .form-frame {
+        border-radius: 5px;
+        border: 2px solid $frameColor;
+        background-color: $background;
+        width: 100%;
+        padding: 10px 0px 60px;
+        margin-top: $arrow-size;
+        margin-bottom: 50px;
+        position: relative;
+
+        div.field-label{
+            color: form-label-color;
+        }
+
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    .field-info {
+        font-size: 0.9rem;
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    input[type="text"] {
+        width: 60%;
+    }
+    app-typeahead, app-multi-typeahead, app-date-input {
+        width: 60%;
+        display: block;
+    }
+
+    textarea {
+        width:60%;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+        padding: 0 6px;
+        outline: 0;
+        min-height: 100px;
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}

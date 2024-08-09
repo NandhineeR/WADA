@@ -1,0 +1,76 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/radio';
+@import '~~app/shared/styles/fake-link';
+
+$error-color: #AA1A1A;
+$warning-color: #9A5713;
+$light-blue-shadow: #4ab6f5;
+$light-blue-border: #346fc9;
+
+@mixin highlightBorder {
+    border: 2px solid $warning-color;
+}
+
+@mixin step($left, $right) {
+    label {
+        margin-bottom: 0;
+    }
+
+    input[type="text"] {
+        &.error {
+            border: 2px solid $error-color;
+        }
+        &.warning {
+            @include highlightBorder();
+        }
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+
+    app-typeahead, app-to-typeahead {
+        width: 60%;
+    }
+
+    app-date-input {
+        width: 60%;
+        display:block
+    }
+
+    app-form-field, app-participant-input {
+        margin-bottom: 12px;
+
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    .topSpace {
+        margin-top: 20px;
+    }
+
+    .specificGravity {
+        margin-left: 6px;
+        width: 199px;
+    }
+
+    .sampleCode {
+        &.ng-invalid.ng-dirty {
+            @include highlightBorder();
+        }
+    }
+}
+
+@include fake-link(left, right);
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}

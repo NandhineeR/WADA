@@ -1,0 +1,10 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~~app/shared/styles/fake-link';
+
+@include fake-link(left, right);
+
+.footer {
+    padding-top: 10px;
+    font-size: 13px;
+}

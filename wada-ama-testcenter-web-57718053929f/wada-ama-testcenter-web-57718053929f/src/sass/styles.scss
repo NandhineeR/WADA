@@ -1,0 +1,189 @@
+@import './variables';
+@import './mixins';
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~@angular/cdk/overlay-prebuilt.css';
+@import '~ngx-toastr/toastr-bs4-alert';
+
+html, body {
+    margin: 0;
+    font-family: Montserrat, sans-serif;
+}
+
+@mixin checkbox($left, $right, $dir) {
+    input[type="checkbox"] {
+        float: $left;
+        margin-#{$right}: 3px;
+        appearance: none;
+        height: 14px;
+        width: 14px;
+        border-radius: 5px;
+        background-color: #fff;
+        border: 2px solid $unselected-enabled-checkbox-color;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"] + label {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        top: -4px;
+    }
+
+    input[type="checkbox"]:checked + label:after {
+        content: '';
+        position: absolute;
+        width: 8px;
+        height: 3px;
+        background: transparent;
+        top: 9px;
+        #{$left}: -14px;
+        border: 2px solid white;
+        border-top: none;
+        border-#{$right}: none;
+        transform: rotate($dir * -45deg);
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: $checkbox-color;
+        border-color: $checkbox-color;
+    }
+
+    input[type="checkbox"]:disabled {
+        background-color: $empty-background-checkbox-color;
+        border-color: $unselected-disabled-checkbox-color;
+    }
+
+    input:read-only {
+        background: $disabled-field-color;
+    }
+
+    input::placeholder {
+        color: $placeholder-font-color;
+    }
+}
+
+@include ltr {
+    @include checkbox(left, right, 1);
+}
+@include rtl {
+    @include checkbox(right, left, -1);
+}
+
+/*
+* https://wada-ama.atlassian.net/wiki/spaces/adams5/pages/340033555/V2.0+Style+Guidelines
+* Section "Fields"
+*/
+input[type="text"] {
+    border: 1px solid #757575;
+    color: $form-input-color;
+    border-radius: 5px;
+    padding: 0 6px;
+}
+
+input[type="radio"]:focus + span,
+input[type="radio"]:focus + span + span {
+    outline: 1px dotted #212121;
+    outline: 5px auto -webkit-focus-ring-color;
+}
+
+div.field-label {
+    label, span {
+        color: $form-label-color;
+    }
+}
+
+.narrow-field input[type="text"], input[type="text"].narrow-field {
+    width: 150px;
+}
+
+.standard-field, .standard-field input[type="text"] {
+    width: 300px;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.lowercase {
+    text-transform: lowercase;
+}
+
+.keep-text-style {
+    white-space:pre-wrap;
+}
+
+body {
+    text-align: inherit;
+}
+
+.dropdown-item {
+    color: $form-input-color;
+}
+
+.dropdown-item.selected, .dropdown-item.selected:hover {
+    background: $dropdown-link-hover-bg;
+    color: $dropdown-link-hover-color;
+}
+
+// workaround for file _hover.scss that overwrites these values if they are not specified.
+.dropdown-item:hover {
+    background: inherit;
+    color: inherit;
+}
+
+app-button ~ app-button {
+    margin-left: 20px;
+}
+
+.popover-body {
+    padding: 30px;
+}
+
+.error-toast-top-center {
+    top: 65px;
+    right: 0;
+    width: 100%;
+
+    .error-toastr {
+        border-radius: 5px;
+        position: relative;
+        margin-right:auto;
+        margin-left: 30%;
+        padding: 0.75rem 1.25rem 0.75rem 50px;
+        width: 55%;
+        background-position: 15px center;
+        background-repeat: no-repeat;
+        background-size: 24px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
+        pointer-events: auto;
+    }
+}
+
+button.text-button {
+    color: $link-color;
+    text-decoration: underline;
+    font-size: 13px;
+    margin-left: 2em;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+}
+
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+    z-index: 99999 !important;
+}
+
+span.radio-label, label.checkbox-label {
+    color: $form-input-color;
+}
+
+label {
+    display: inline;
+}
+
+h4 {
+    font-size: 16px;
+    font-family: Montserrat, sans-serif;
+    font-weight: 800;
+    color: $font-color;
+}

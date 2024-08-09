@@ -1,0 +1,5 @@
+<span class="keep-text-style" [attr.data-QA]="dataQA">{{ displayedText | trim }}</span>
+<span class="show-more-less" (click)="showAll()">
+    <span *ngIf="isTextShortened && isTextTooLong" i18n="@@showMore">Show More</span>
+    <span *ngIf="showMore" i18n="@@showLess">Show Less</span>
+</span>

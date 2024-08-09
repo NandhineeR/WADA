@@ -1,0 +1,229 @@
+<div 
+    *appLet="{security: fieldsSecurity$ | async, isEditMode: isEditMode$ | async} as state"
+    class="wrapper">
+    <app-notification type="informative">
+        <span i18n="@@onlySCACanFill">This section can only be filled by the Sample Collection Authority.</span>
+    </app-notification>
+
+    <app-notification *ngIf="dataSource.data.length === maximumNumberOfRows" id="notifications" type="warning">
+        <span i18n="@@maximumParticipantsReached">You have reached the maximum allowed number of participants ({{ maximumNumberOfRows }}).</span>
+    </app-notification>
+
+    <app-notification *ngIf="statusWarning" id="notifications" type="warning">
+        <span i18n="@@selectStatusForLeadDCOs">Please select a status for every Lead DCO.</span>
+    </app-notification>
+
+    <app-notification *ngIf="participantTypeErrors?.length > 0" id="notifications" type="warning">
+        <span i18n="@@enterValidParticipantType">Please select a type for each participant.</span>
+    </app-notification>
+
+    <app-notification
+        *ngIf="hasAccessToDCP && !(state?.security?.actions | isActionAvailable:actionRight.EditDopingControlPersonnel) && state?.isEditMode"
+        type="warning">
+        <span i18n="@@sampleCollectionAuthorityChahge">The Sample Collection Authority change made on step 1 will only take effect once the Testing Order is saved.</span>
+    </app-notification>
+
+    <app-notification *ngIf="statusError && !statusWarning" id="notifications" type="error">
+        <span i18n="@@leadDopingControlOfficerWarning">You cannot have more than one Lead Doping Control Officer with a "Proposed", "Requested" or "Confirmed" status. Delete or change the status of the current Lead Doping Control Officer if you want to change Lead Doping Control Officer.</span>
+    </app-notification>
+
+    <app-notification *ngIf="arrivalTimeErrors?.length > 0" id="notifications" type="error">
+        <span i18n="@@enterValidArrivalTime">Please enter a valid arrival time.</span>
+        <ul>
+            <ng-container *ngFor="let arrivalTimeError of arrivalTimeErrors">
+                <li>
+                    <a href="{{ url }}#{{ arrivalTimeError?.inputId }}" i18n="@@arrivalTime">Arrival Time</a>
+                </li>
+            </ng-container>
+        </ul>
+    </app-notification>
+    
+    <app-data-table
+        #table
+        [allowMultiSelect]="false"
+        [dataSource]="dataSource"
+        [deleteRowIcon]="true"
+        [isFirstRowSpecial]="true"
+        [marginTop]="'10px'"
+        [modifyState]="true"
+        [showDrag]="false"
+        [showOrder]="false"
+        [showPaginator]="false"
+        [showRemove]="hasAccessToDCP && ((state?.security?.actions | isActionAvailable:actionRight.EditDopingControlPersonnel) || !state?.isEditMode)"
+        [showSelect]="false"
+        [showTableFooter]="false"
+        [showTopHeader]="false"
+        [columnDefs]="columns"
+        (deletedRow)="deleteRow($event)">
+        <ng-container *columnCell="'type'; let e; let i = index">
+            <div *ngIf="i === 0; else dropdownType">
+                <span i18n="@@leadDopingControlOfficer">Lead Doping Control Officer</span>
+            </div>
+            <ng-template #dropdownType>
+                <app-dropdown
+                    dataQA="roleDropdown"
+                    i18n-placeholder="@@DCP_type"
+                    identifier="temp{{e.tempId}}"
+                    isStartingFocus="true"
+                    property="code"
+                    type="text"
+                    [appDisable]="!hasAccessToDCP || i === 0 || (controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode)"
+                    [dataQAIndex]="i"
+                    [disableMouseOver]="true"
+                    [hasError]="participantTypeHasError(e.tempId)"
+                    [isDisabled]="!hasAccessToDCP || i === 0 || (controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode)"
+                    [minWidth]="229"
+                    [useMinWidth]="true"
+                    [(ngModel)]="e.type"
+                    (click)="runValidations()"
+                    (selectedOnBlur)="validateParticipantSelected(e.tempId)">
+                    <div 
+                        *ngFor="let participantType of participantTypes; let indexDropdown = index"
+                        class="dropdown-item"
+                        data-qa="roleDropdownOption"
+                        [appDropdownElement]="participantType"
+                        [attr.data-qa-precision]="indexDropdown">
+                        {{ participantType.description }}
+                    </div>
+                </app-dropdown>
+            </ng-template>
+        </ng-container>
+
+        <ng-container *columnCell="'lastName'; let e; let i = index">
+            <app-typeahead
+                #typeahead
+                field-input
+                class="lastName"
+                dataQA="lastNameTypeahead"
+                fieldId="lastName{{e.tempId}}"
+                suggestionField="lastName"
+                [bindAsString]="true"
+                [dataQAIndex]="i"
+                [index]="i"
+                [isDCOParticipant]="true"
+                [isDisabled]="(controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode) || !hasAccessToDCP"
+                [itemTemplate]="personEntryTemplate"
+                [suggestions]="participantSuggestions"
+                [suggestionsLimit]="suggestionsLimit"
+                [(ngModel)]="e.lastName"
+                (selected)="participantSelected($event, e.tempId)">
+            </app-typeahead>
+            <ng-template #personEntryTemplate let-model="item" let-query="query">
+                <span [innerHtml]="(model.lastName + ', ' + model.firstName) | highlight:query"></span>
+                <span *ngIf="model.userAccount">
+                    &nbsp;
+                    <span i18n="@@userAccount_uppercase">(USER ACCOUNT)</span>
+                </span>
+            </ng-template>
+        </ng-container>
+
+        <ng-container *columnCell="'firstName'; let e; let i=index">
+            <input
+                #firstName
+                class="firstName"
+                data-qa="firstName"
+                id="firstName{{e.tempId}}"
+                type="text"
+                [appDisable]="(controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode) || !hasAccessToDCP"
+                [attr.data-qa-precision]="i"
+                [(ngModel)]="e.firstName"
+                (blur)="validateParticipantSelected(e.tempId)">
+        </ng-container>
+
+        <ng-container *columnCell="'arrivalTime'; let e; let i=index">
+            <input 
+                appTimeFormat
+                appRestrictToPattern="[0-9:]"
+                autocomplete="disabled"
+                class="marginTop"
+                data-qa="arrivalTime"
+                id="arrivalTime{{e.tempId}}"
+                maxlength=5
+                size="8"
+                type="text"
+                [appDisable]="(controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode) || !hasAccessToDCP"
+                [attr.data-qa-precision]="i"
+                [ngClass]="{'error': arrivalTimeHasError(e.tempId)}"
+                [ngModel]="e.arrivalTime"
+                [setTimeForString]="true"
+                (blur)="onLeaveArrivalTime($event.target.value, e.tempId, e.type)">
+            <span field-info class="field-info" i18n="@@timeFormat">hh:mm (24h)</span>
+        </ng-container>
+
+        <ng-container *columnCell="'status'; let e; let i = index">
+            <div [ngClass]="{'doubleMarginTop': e.lastStatusChange !== null}">
+                <app-dropdown
+                    dataQA="statusDropdown"
+                    i18n-placeholder="@@select"
+                    identifier="status{{e.tempId}}"
+                    placeholder="Select"
+                    property="description"
+                    type="text"
+                    [appDisable]="!hasAccessToDCP || (controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode)"
+                    [dataQAIndex]="i"
+                    [disableMouseOver]="true"
+                    [isDisabled]="!hasAccessToDCP || (controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode)"
+                    [minWidth]="110"
+                    [useMinWidth]="true"
+                    [(ngModel)]="e.status"
+                    (click)="runValidations()">
+                    <div
+                        *ngFor="let participantStatus of statuses; let indexDropdown = index"
+                        class="dropdown-item"
+                        data-qa="statusDropdownOption"
+                        [appDropdownElement]="participantStatus"
+                        [attr.data-qa-precision]="indexDropdown">
+                        {{ participantStatus.description }}
+                    </div>
+                </app-dropdown>
+                <span *ngIf="state?.security?.fields?.has(controls.TEST_PARTICIPANT_INFORMATION)">
+                    <div *ngIf="e.lastStatusChange">
+                        <span field-info class="field-info" i18n="@@lastStatusModification_colon">Last Status Modification:</span>
+                        <span>&nbsp;{{ e.lastStatusChange | formatDate: '-0000': 'DD-MMM-YYYY HH:mm' }} <span i18n="timezone@@gmt_uppercase">GMT</span></span>
+                    </div>
+                </span>
+            </div>
+        </ng-container>
+
+        <ng-container *columnCell="'comment'; let e; let i=index;">
+            <textarea
+                class="message"
+                cols="80"
+                data-qa="message"
+                maxlength="4000"
+                rows="2"
+                [appDisable]="(controls.TEST_PARTICIPANT_INFORMATION | isInputDisabled:state?.security:state?.isEditMode) || !hasAccessToDCP"
+                [attr.data-qa-precision]="i"
+                [(ngModel)]="e.comment">
+            </textarea>
+        </ng-container>
+
+        <ng-container footer>
+            <app-modal-button
+                *ngIf=" canAddRow &&
+                        hasAccessToDCP &&
+                        ((state?.security?.actions | isActionAvailable:actionRight.EditDopingControlPersonnel) ||
+                            !state?.isEditMode)"
+                class="modal-button"
+                dataQA="addDopingControlPersonnel"
+                type="secondary"
+                [setMargin]="true"
+                (click)="addDopingControlPersonnel()">
+                <span i18n="@@addDopingControlPersonnel_uppercase">ADD DOPING CONTROL PERSONNEL</span>
+            </app-modal-button>
+        </ng-container>
+    </app-data-table>
+
+    <app-instructions-box>
+        <label instructions-label class="labelInfo" i18n="@@instructionsAdditionalInformation">Instructions / Additional Information</label>
+        <textarea
+            instructions-textarea
+            data-qa="instructionAdditionalInformation"
+            maxlength="4000"
+            rows="5"
+            [appDisable]="(controls.DCP_INSTRUCTIONS | isInputDisabled:state?.security:state?.isEditMode)"
+            [(ngModel)]="instructions"
+            (change)="updateInstructions($event.target.value)">
+        </textarea>
+    </app-instructions-box>
+</div>

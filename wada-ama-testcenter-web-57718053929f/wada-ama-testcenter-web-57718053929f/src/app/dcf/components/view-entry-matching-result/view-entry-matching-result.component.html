@@ -1,0 +1,5 @@
+<div
+    class="table-container {{ header ? 'table-header':'' }}"
+    [ngClass]="hasError ? 'has-error':''">
+    <ng-content ></ng-content>
+</div>

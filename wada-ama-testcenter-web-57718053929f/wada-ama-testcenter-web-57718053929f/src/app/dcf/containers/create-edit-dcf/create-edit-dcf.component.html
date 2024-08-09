@@ -1,0 +1,157 @@
+<div
+    appInheritDir
+    *appLet="(inEdit$ | async) as inEdit"
+    class="wrapper">
+    <app-dcf-page
+        *appLet="{
+            isClickDisabled: isClickDisabled$ | async,
+            isSavingDisabled: disableSaving$ | async
+        } as state">
+        <span title *ngIf="inEdit === false" i18n="@@createDopingControlForm">Create Doping Control Form</span>
+        <span title *ngIf="inEdit" i18n="@@editDopingControlFormIdX">Edit Doping Control Form - {{ dcfId$ | async }}</span>
+
+        <app-header
+            [athlete]="athlete$ | async"
+            [isCancellable]="false"
+            [status]="status$ | async">
+        </app-header>
+
+        <div controls>
+            <app-button
+                i18n="@@cancelChanges"
+                type="secondary"
+                (click)="showCancelCreateModal()">Cancel Changes</app-button>
+            <app-button
+                *ngIf="saveAsDraftDCF$ | async; else saveTopTemplate"
+                dataQA="saveAsDraftButton"
+                i18n="@@saveAsDraft_uppercase"
+                type="secondary"
+                [disabled]="state.isSavingDisabled"
+                (click)="save(state.isSavingDisabled)">SAVE AS DRAFT</app-button>
+            <ng-template #saveTopTemplate>
+                <app-button
+                    dataQA="saveButton"
+                    i18n="@@save_uppercase"
+                    type="primary"
+                    [disabled]="state.isSavingDisabled"
+                    (click)="save(state.isSavingDisabled)">SAVE</app-button>
+            </ng-template>
+        </div>
+        <app-steps *appLet="route$ | async as route" numSteps="3" [activeStep]="activeStep">
+            <app-step
+                dataQA="stepADAMSNotifications"
+                i18n="@@adamsNotifications"
+                link="/dcf/{{ route }}/step/1"
+                step=1
+                [activeStep]="activeStep"
+                [isLinkDisabled]="state.isClickDisabled">ADAMS Notifications</app-step>
+            <app-step
+                dataQA="stepSampleInformation"
+                i18n="@@sampleCollection_withBreak"
+                link="/dcf/{{ route }}/step/2"
+                step=2
+                [activeStep]="activeStep"
+                [isLinkDisabled]="state.isClickDisabled">Sample<br/>Collection</app-step>
+            <app-step
+                dataQA="stepProceduralInformation"
+                i18n="@@proceduralInformation_withBreak"
+                link="/dcf/{{ route }}/step/3"
+                step=3
+                [activeStep]="activeStep"
+                [isLinkDisabled]="state.isClickDisabled">Procedural<br/>Information</app-step>
+        </app-steps>
+
+        <app-loading-frame
+            [error]="error$ | async"
+            [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+            [loading]="isStepLoading() |async"
+            [saveError]="saveError$ | async"
+            (resetErrors)="returnToFormAfterError()">
+            <div *appLet="(nextStep$ | async) as nextStep" class="form-frame">
+                <router-outlet></router-outlet>
+                
+                <div class="frame-arrow step-active-{{ activeStep }}"></div>
+                
+                <div class="next-button-container" *ngIf="nextStep > 0">
+                    <a
+                        *ngIf="!inEdit && testId === ''"
+                        tabindex="-1" [routerLink]="['step', nextStep]"
+                        [queryParams]="{athleteId: athleteId}"
+                        [ngClass]="{ 'disabled': state.isClickDisabled }">
+                        <app-button dataQA="nextButton" i18n="@@next_uppercase" type="primary">NEXT</app-button>
+                    </a>
+                    <a
+                        *ngIf="!inEdit && testId !== ''"
+                        tabindex="-1"
+                        [queryParams]="{from: 'to', testId: testId}"
+                        [ngClass]="{ 'disabled': state.isClickDisabled }"
+                        [routerLink]="['step', nextStep]">
+                        <app-button dataQA="nextButton" i18n="@@next_uppercase" type="primary">NEXT</app-button>
+                    </a>
+                    <a
+                        *ngIf="inEdit"
+                        tabindex="-1"
+                        [ngClass]="{ 'disabled': state.isClickDisabled }"
+                        [routerLink]="['step', nextStep]">
+                        <app-button dataQA="nextButton" i18n="@@next_uppercase" type="primary">NEXT</app-button>
+                    </a>
+                    <div class="message">
+                        <div i18n="@@goToStepX">Go to step {{ activeStep + 1 }}:</div>
+                        <div *ngIf="activeStep === 1" i18n="@@sampleCollection">Sample Collection</div>
+                        <div *ngIf="activeStep === 2" i18n="@@proceduralInformation">Procedural Information</div>
+                    </div>
+                </div>
+
+                <div *ngIf="nextStep <= 0" class="next-button-container">
+                    <app-button
+                        *ngIf="saveAsDraftDCF$ | async; else saveBottomTemplate"
+                        dataQA="saveAsDraftButton"
+                        i18n="@@saveAsDraft_uppercase"
+                        type="primary"
+                        [disabled]="state.isSavingDisabled"
+                        (click)="save(state.isSavingDisabled)">SAVE AS DRAFT</app-button>
+                    <ng-template #saveBottomTemplate>
+                        <app-button
+                            dataQA="saveButton"
+                            i18n="@@save_uppercase"
+                            type="primary"
+                            [disabled]="state.isSavingDisabled"
+                            (click)="save(state.isSavingDisabled)">SAVE</app-button>
+                    </ng-template>
+                    <div class="message" i18n="@@goToView">Go to View</div>
+                </div>
+            </div>
+        </app-loading-frame>
+    </app-dcf-page>
+
+    <app-footer
+        *ngIf="inEdit"
+        [creationInfo]="creationInfo$ | async"
+        [updateInfo]="updateInfo$ | async">
+    </app-footer>
+
+    <app-confirm-leave #cancelCreateModalRef (confirm)="redirectOnConfirm($event)">
+        <div primary-message>
+            <span *ngIf="!inEdit" i18n="@@cancelCreationDopingControlFormConfirmation">Are you sure you want to cancel creation of this Doping Control Form?</span>
+            <span *ngIf="inEdit" i18n="@@cancelYourChangesConfirmation">Are you sure you want to cancel your changes?</span>
+        </div>
+        <div secondary-message>
+            <span *ngIf="!inEdit" i18n="@@allDataEnteredWillBeLost">All data you have entered will be lost.</span>
+            <span *ngIf="inEdit" i18n="@@dcfWillRevertBack">The DCF will revert back to its last saved form.</span>
+        </div>
+    </app-confirm-leave>
+
+    <app-confirm-leave #confirmLeaveModalRef>
+        <div primary-message>
+            <span i18n="@@youAreAboutToLeave">You are about to leave this page.</span>
+            <span>&nbsp;</span>
+            <span *ngIf="!inEdit" i18n="@@cancelCreationDopingControlFormConfirmation">Are you sure you want to cancel creation of this Doping Control Form?</span>
+            <span *ngIf="inEdit" i18n="@@cancelYourChangesConfirmation">Are you sure you want to cancel your changes?</span>
+
+        </div>
+        <div secondary-message>
+            <span *ngIf="!inEdit" i18n="@@allDataEnteredWillBeLost">All data you have entered will be lost.</span>
+            <span *ngIf="inEdit" i18n="@@dcfWillRevertBack">The DCF will revert back to its last saved form.</span>
+        </div>
+    </app-confirm-leave>
+</div>

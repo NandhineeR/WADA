@@ -1,0 +1,67 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+
+$expandTextColor: #414042;
+$filterBorder: #c0c0c0;
+$filterBackground: #efefef;
+$filterBackground2: #ececec;
+
+@mixin tdssaFilter($left, $right) {
+    padding: 5px 20px 5px 20px;
+    
+    &.expanded {
+        padding-bottom: 15px;
+        overflow-y: hidden;
+    }
+
+    .expand-text {
+        font-weight: bold;
+        color: $expandTextColor;
+        font-size: 14px;
+    }
+
+    .table-row {
+        margin-#{$left}: 5px;
+    }
+
+    .minimal-info {
+        font-weight: bold;
+        color: $expandTextColor;
+        font-size: 11px;
+
+        &-label {
+            font-weight: normal;
+        }
+    }
+
+    .filter-group {
+        float: $left;
+        padding-#{$right}: 20px;
+
+        &.checkbox-group {
+            width: auto;
+        }
+    
+        .form-control {
+            width: auto;
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            border: 1px solid transparent;
+        
+            &.is-invalid {
+                border: 1px solid red;
+            }
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include tdssaFilter(left, right);
+    }
+    @include rtl {
+        @include tdssaFilter(right, left);
+    }
+}
+

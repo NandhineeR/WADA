@@ -1,0 +1,25 @@
+$checkbox-color: #3F8532;
+$error-color: #AA1A1A;
+
+app-typeahead {
+    width: 60%;
+    display: block;
+}
+
+app-form-field{
+    margin-bottom: 12px;
+}
+
+input[type="text"] {
+    width: 60%;
+}
+
+input.error  {
+    border: 2px solid $error-color;
+}
+
+.checkbox-field {
+    color: $checkbox-color;
+    margin-top: 5px;
+    margin-bottom: -5px;
+}

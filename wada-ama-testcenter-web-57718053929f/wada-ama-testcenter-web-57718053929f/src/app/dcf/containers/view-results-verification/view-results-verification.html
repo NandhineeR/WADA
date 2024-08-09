@@ -1,0 +1,145 @@
+<div
+    appInheritDir
+    *appLet="{
+        actions: actions$ | async,
+        athlete: athlete$ | async,
+        dcf: dcf$ | async,
+        fieldsMismatches: fieldsMismatches$ | async,
+        labResult: labResult$ | async,
+        matchingResultStatus: matchingResultStatus$ | async,
+        sample: sample$ | async
+    } as applet"
+    class="wrapper">
+    <app-dcf-page>
+        <span title i18n="@@resultVerification">Result Verification</span>
+        <app-header
+            [athlete]="applet.athlete"
+            [isCancellable]="false"
+            [isDCFMode]="false"
+            [matchType]="(matchingResultStatus$ | async)?.description"
+            [removeDecoration]="true">
+        </app-header>
+
+        <app-notification *ngIf="isLastMatchedSample() && dcfToBeDeleted()" type="warning">
+            <span i18n="@@warningsDCFToBeDeleted">The arrival date for this DCF is older than {{ dcfRetentionPeriod }} months. Please note that unmatched DCFs older than {{ dcfRetentionPeriod }} months will be deleted.</span>
+        </app-notification>
+
+        <div class="form-frame">
+            <router-outlet></router-outlet>
+            <div class="table-container">
+                <app-view-entry-matching-result header="true">
+                    <span class="table-header-title-1" i18n="@@dopingControlForm">Doping Control Form</span>
+                    <span class="table-header-title-2" i18n="@@labResults">Lab Results</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('sampleCode')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sampleCode" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('sampleCode')">Sample Code</app-view-entry-name>
+                    <span>{{ applet.sample?.sampleCode }}</span>
+                    <span>{{ applet.labResult?.sampleCode }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('sampleType')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sampleType" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('sampleType')">Sample Type</app-view-entry-name>
+                    <span>{{ translations$ | getSampleType:applet.sample?.sampleTypeSpecificCode | async }}</span>
+                    <span>{{ translations$ | getSampleType:applet.labResult?.sampleType?.specificCode | async }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('sport')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sport" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('sport')">Sport</app-view-entry-name>
+                    <span>{{ applet.dcf.athlete?.sportDiscipline?.sportDescription }}</span>
+                    <span>{{ applet.labResult?.sport?.sportDescription }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('sportDiscipline')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sportDiscipline" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('sportDiscipline')">Sport Discipline</app-view-entry-name>
+                    <span>{{ applet.dcf.athlete?.sportDiscipline?.disciplineDescription }}</span>
+                    <span>{{ applet.labResult?.sport?.disciplineDescription }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('collectionDate')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sampleCollectionDate" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('collectionDate')">Sample Collection Date</app-view-entry-name>
+                    <span>{{ formattedCollectionDate | date:'dd-MMM-yyyy' | uppercase }}</span>
+                    <span>{{ applet.labResult?.arrivalDate | date:'dd-MMM-yyyy' | uppercase }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('testAuthority')">
+                    <app-view-entry-name class="table-column-1" i18n="@@testingAuthority" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('testAuthority')">Testing Authority</app-view-entry-name>
+                    <span>{{ applet.dcf.authorization?.testingAuthority?.displayDescriptionName }}</span>
+                    <span>{{ applet.labResult?.testAuthority?.description }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('sampleCollectionAuthority')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sampleCollectionAuthority" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('sampleCollectionAuthority')">Sample Collection Authority</app-view-entry-name>
+                    <span>{{ applet.dcf.authorization?.sampleCollectionAuthority?.displayDescriptionName }}</span>
+                    <span>{{ applet.labResult?.sampleCollectionAuthority?.description }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('resultManagementAuthority')">
+                    <app-view-entry-name class="table-column-1" i18n="@@resultManagementAuthority" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('resultManagementAuthority')">Result Management Authority</app-view-entry-name>
+                    <span>{{ applet.dcf.authorization?.resultManagementAuthority?.displayDescriptionName }}</span>
+                    <span>{{ applet.labResult?.resultManagementAuthority?.description }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('laboratory')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sentToLaboratory" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('laboratory')">Sent to Laboratory</app-view-entry-name>
+                    <span>{{ applet.sample?.laboratory?.description }}</span>
+                    <span>{{ applet.labResult?.laboratory?.displayDescriptionName }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('inCompetition')">
+                    <app-view-entry-name class="table-column-1" i18n="@@testType" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('inCompetition')">Test Type</app-view-entry-name>
+                    <span>
+                        <span *ngIf="applet.dcf.sampleInformation?.testType === true" i18n="@@inCompetition">In Competition</span>
+                        <span *ngIf="applet.dcf.sampleInformation?.testType === false" i18n="@@outOfCompetition">Out of Competition</span>
+                    </span>
+                    <span>
+                        <span *ngIf="applet.labResult?.inCompetition === true" i18n="@@inCompetition">In Competition</span>
+                        <span *ngIf="applet.labResult?.inCompetition === false" i18n="@@outOfCompetition">Out of Competition</span>
+                    </span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('country')">
+                    <app-view-entry-name class="table-column-1" i18n="@@country" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('country')">Country</app-view-entry-name>
+                    <span>{{ applet.dcf.notification?.country?.name }}</span>
+                    <span>{{ applet.labResult?.country?.name }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('state')">
+                    <app-view-entry-name class="table-column-1" i18n="@@region" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('state')">Region</app-view-entry-name>
+                    <span>{{ applet.dcf.notification?.region?.name }}</span>
+                    <span>{{ applet.labResult?.state?.name }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('city')">
+                    <app-view-entry-name class="table-column-1" i18n="@@city" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('city')">City</app-view-entry-name>
+                    <span>{{ applet.dcf.notification?.city }}</span>
+                    <span>{{ applet.labResult?.city }}</span>
+                </app-view-entry-matching-result>
+
+                <app-view-entry-matching-result [hasError]="applet.fieldsMismatches.includes('gender')">
+                    <app-view-entry-name class="table-column-1" i18n="@@sportGender" [hasCheck]="true" [hasError]="applet.fieldsMismatches.includes('gender')">Sport Gender</app-view-entry-name>
+                    <span>
+                        <app-gender-selector [gender]="applet.athlete?.sex"></app-gender-selector>
+                    </span>
+                    <span>
+                        <app-gender-selector [gender]="applet.labResult?.gender"></app-gender-selector>
+                    </span>
+                </app-view-entry-matching-result>
+            </div>
+
+            <div class="button-menu">
+                <ng-container *ngIf="applet.matchingResultStatus?.specificCode !== status.ConfirmedByUser && (applet.actions | isActionAvailable:actionRight.EditMatchingResult)">
+                    <app-button i18n="@@rejectMatch" type="secondary" (click)="showRejectOrConfirmModal(true)">Reject Match</app-button>
+                    <app-button i18n="@@confirmMatch" type="secondary" (click)="showRejectOrConfirmModal(false)">Confirm Match</app-button>
+                </ng-container>
+                <app-button i18n="@@goBackToDcf" type="primary" [routerLink]="['/','dcf', 'view', applet.dcf.id]">Go back to DCF</app-button>
+            </div>
+        </div>
+    </app-dcf-page>
+
+    <app-reject-confirm-modal #rejectConfirmModalRef (rejectMatchEmitter)="rejectMatch()" (confirmMatchEmitter)="confirmMatch()" [isRejectMatch]="isRejectMatch">
+        <div primary-message>
+            <span i18n="@@rejectConfirmModalMessage">Are you sure you want to {{ isRejectMatch ? 'reject' : 'confirm' }} the match?</span>
+        </div>
+    </app-reject-confirm-modal>
+</div>

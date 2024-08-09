@@ -1,0 +1,59 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+@mixin tdpmMonitoring($left, $right) {
+    padding: 20px;
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .title {
+            font-size: 34px;
+            color: $font-color;
+            font-weight: bold;
+        }
+    }
+
+    .content  {
+        padding: 20px;
+        border: 2px solid $primary-background;
+        border-radius: 5px;
+        background: #FFFFFF;
+
+        .section  {
+            margin-top: 20px
+        }
+
+        .export-button {
+            margin-bottom: 5px;
+            float: #{$right};
+
+            .export-button-content {
+                display: flex;
+                flex-direction: row;
+                align-content: center;
+                align-items: center;
+
+                .export-button-icon {
+                    width: 15px;
+                    height: 15px;
+                    display: inline-block;
+                    background-image: url('../../../../assets/saved.svg');
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include tdpmMonitoring(left, right);
+    }
+    @include rtl {
+        @include tdpmMonitoring(right, left);
+    }
+}

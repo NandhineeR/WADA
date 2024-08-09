@@ -1,0 +1,118 @@
+<app-to-page appInheritDir *appLet="(inEdit$ | async) as inEdit">
+    <div title *ngIf="!inEdit">
+        <ng-container [ngSwitch]="ids.length">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" data-qa="addUnsuccessfulAttemptSpan" i18n="@@addUnsuccessfulAttempt">Add Unsuccessful Attempt</span>
+            <span *ngSwitchDefault data-qa="addUnsuccessfulAttemptsSpan" i18n="@@addUnsuccessfulAttempts">Add Unsuccessful Attempts</span>
+        </ng-container>
+    </div>
+    <div title *ngIf="inEdit">
+        <ng-container [ngSwitch]="ids.length">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" data-qa="editUnsuccessfulAttemptSpan" i18n="@@editUnsuccessfulAttempt">Edit Unsuccessful Attempt</span>
+            <span *ngSwitchDefault data-qa="editUnsuccessfulAttemptsSpan" i18n="@@editUnsuccessfulAttempts">Edit Unsuccessful Attempts</span>
+        </ng-container>
+    </div>
+    <div controls>
+        <app-button
+            *ngIf="viewModels?.length > 0"
+            dataQA="cancelUaButton"
+            i18n="@@cancel_uppercase"
+            type="secondary"
+            [disabled]="(loading$ | async) || (error$ | async)"
+            (click)="cancel()">CANCEL</app-button>
+        <app-button
+            *ngIf="viewModels?.length === 1"
+            dataQA="saveUaButton"
+            type="primary"
+            i18n="@@saveAndReview_uppercase"
+            [disabled]="(loading$ | async) || (error$ | async)"
+            (click)="saveAndReviewAll()">SAVE AND REVIEW</app-button>
+        <app-button
+            *ngIf="viewModels?.length > 1"
+            dataQA="saveAthletesUAButton"
+            i18n="@@saveAndReviewAllAthletes_uppercase"
+            type="primary"
+            [disabled]="(loading$ | async) || (error$ | async)"
+            (click)="saveAndReviewAll()">SAVE AND REVIEW ALL ATHLETES</app-button>
+    </div>
+    <app-loading-frame
+        [error]="error$ | async"
+        [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+        [loading]="loading$ | async"
+        [saveError]="saveError$ | async"
+        (resetErrors)="returnToFormAfterError()">
+        <accordion [closeOthers]="true">
+            <accordion-group
+                #group
+                *ngFor="let model of viewModels; let mIndex=index; let last=last"
+                class="margin"
+                closeOthers="true"
+                [@fadeOut]
+                [isOpen]="model.active">
+                <div accordion-heading (click)="toggleAccordion(model, !last, false)">
+                    <app-view-section-title
+                        dataQA="deleteIcon"
+                        [arrowDirection]="model.active ? 'up' : 'down'"
+                        [formatErrors]="model.errorsPerCategory?.Format"
+                        [hasBeenSaved]="displaySaved$ | async"
+                        [inEdit]="inEdit$ | async"
+                        [isActive]="model.active"
+                        [numberErrors]="model.errorsPerCategory?.Mandatory + model.errorsPerCategory?.MandatoryDraft"
+                        [rightControls]="true"
+                        [rightInfo]="translations$ | getUnsuccessfulAttemptStatus:model.status | async"
+                        [rightInfoIcon]="model.errors?.length <= 0 && model.status === 1"
+                        [sectionNumber]="mIndex+1"
+                        [sectionTitle]="model.title"
+                        [singleForm]="viewModels.length === 1"
+                        [theme]="model.active ? 'accordion-title-active' : 'accordion-title-inactive'"
+                        (delete)="deleteUA($event, model)">
+                        <span
+                            deleteSectionConfirmationMessage
+                            data-qa="removeUaConfirmationSpan"
+                            i18n="@@deleteCreationUnsuccessfulAttemptForXConfirmation">Do you want to delete the creation of the Unsuccessful Attempt for {{ model.title }}? All data will be lost.</span>
+                    </app-view-section-title>
+                </div>
+                
+                <app-ua-form
+                    [attemptMethods]="attemptMethods$ | async"
+                    [countries]="countries$ | async"
+                    [dopingControlOfficers]="dopingControlOfficers$ | async"
+                    [fieldsSecurity]="model.security"
+                    [form]="model.form"
+                    [isEditMode]="isEditMode"
+                    [locale]="locale$ | async"
+                    [resultManagementAuthorities]="resultManagementAuthorities$ | async"
+                    [showErrors]="showErrors"
+                    [ua]="model.data">
+                </app-ua-form>
+            </accordion-group>
+        </accordion>
+    </app-loading-frame>
+
+    <app-confirm-leave #cancelCreateModalRef (confirm)="redirectOnConfirm($event)">
+        <div primary-message>
+            <span *ngIf="!inEdit" i18n="@@cancelCreationUnsuccessfulAttemptConfirmation">Are you sure you want to cancel creation of this Unsuccessful Attempt?</span>
+            <span *ngIf="inEdit" i18n="@@cancelYourChangesConfirmation">Are you sure you want to cancel your changes?</span>
+        </div>
+        <div secondary-message>
+            <span *ngIf="!inEdit" i18n="@@allDataEnteredWillBeLost">All data you have entered will be lost.</span>
+            <span *ngIf="inEdit" i18n="@@unsuccessfulAttemptWillRevertBack">The Unsuccessful Attempt will revert back to its last saved form.</span>
+        </div>
+    </app-confirm-leave>
+
+    <app-confirm-leave #confirmLeaveModalRef>
+        <div primary-message>
+            <span i18n="@@youAreAboutToLeave">You are about to leave this page.</span>
+            <span>&nbsp;</span>
+            <span *ngIf="!inEdit" i18n="@@cancelCreationUnsuccessfulAttemptConfirmation">Are you sure you want to cancel creation of this Unsuccessful Attempt?</span>
+            <span *ngIf="inEdit" i18n="@@cancelYourChangesConfirmation">Are you sure you want to cancel your changes?</span>
+        </div>
+        <div secondary-message>
+            <span *ngIf="!inEdit" i18n="@@allDataEnteredWillBeLost">All data you have entered will be lost.</span>
+            <span *ngIf="inEdit" i18n="@@unsuccessfulAttemptWillRevertBack">The Unsuccessful Attempt will revert back to its last saved form.</span>
+        </div>
+    </app-confirm-leave>
+</app-to-page>
+
+<div class="footer"></div>

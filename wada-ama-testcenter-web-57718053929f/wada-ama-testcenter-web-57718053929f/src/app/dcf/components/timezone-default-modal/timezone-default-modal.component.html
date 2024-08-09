@@ -1,0 +1,42 @@
+<app-modal
+    *ngIf="showModal" 
+    [isClosable]="isModalClosable" 
+    [removeMargin]="true" 
+    [scrollable]="true"
+    (modalClose)="setShowModal(false)">
+    <div modal-header>
+        <span i18n="@@setDefaultTimezoneDCF">Set default time zone for the DCF</span>
+    </div>
+
+    <div modal-body class="modal__body">
+        <div class="wrapper">
+            <div class="modal__messages">
+                <div class="primary__message">
+                    <ng-container>
+                        <span i18n="@@followingTimezonesWillBeReplaced">The following time zone fields will be replaced:</span>
+                    </ng-container>
+                </div>
+                <div class="secondary__message">
+                    <ul>
+                        <li *ngFor="let filledTimezone of filledTimezones">
+                            <span>{{ filledTimezone?.dateTimeField }} : {{ filledTimezone?.timezone?.shortName }}</span>
+                        </li>
+                    </ul>
+                    <span i18n="@@overwrittenTimezonesInformationWarning">Upon saving the form, these fields will be overwritten, yet they will remain editable.</span>
+                </div>
+            </div>
+
+            <div class="center-modal-buttons bottom-button-padding">
+                <ng-container>
+                    <app-button dataQA="cancelDefaultTimezoneButton" type="secondary" (click)="onCloseModal()">
+                        <span i18n="@@doNotOverwrite" >Do not overwrite</span>
+                    </app-button>
+
+                    <app-button dataQA="confirmDefaultTimezoneButton" type="primary" (click)="onConfirm()">
+                        <span i18n="@@overwriteTimezoneFields">Overwrite time zone fields</span>
+                    </app-button>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</app-modal>

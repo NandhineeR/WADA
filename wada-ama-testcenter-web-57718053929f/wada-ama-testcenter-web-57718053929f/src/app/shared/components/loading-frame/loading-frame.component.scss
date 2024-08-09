@@ -1,0 +1,29 @@
+@import '~sass/variables';
+
+.bottom-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid $filter-border;
+    border-radius: 5px;
+    height: 300px;
+    width: 100%;
+    background-color: rgba(215, 215, 215, 0.9);
+    
+    .loading-error {
+        font-size: 36px;
+        color: $font-color;
+    }
+
+    .loading-error-secondary-message {
+        font-size: 20px;
+        color: $font-color;
+        text-align: center;
+        margin: 0px 60px 15px 60px;
+    }
+
+    .first-button {
+        margin-bottom: 10px;
+    }
+}

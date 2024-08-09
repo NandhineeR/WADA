@@ -1,0 +1,455 @@
+<div appInheritDir class="wrapper">
+    <table appSticky aria-label="tdp-table">
+        <thead>
+            <tr>
+                <th class="headerTitle no-bottom-border" colspan="2" rowspan="2" scope="colgroup">
+                    <div
+                        appTooltip
+                        i18n="@@sportDiscipline_slash"
+                        i18n-tooltipContent="@@sportDiscipline_slash"
+                        tooltipContent="Sport / Discipline"
+                        tooltipPlacement="top">Sport / Discipline</div>
+                </th>
+                <th class="headerTitle" rowspan="2" scope="row">
+                    <div i18n="@@totalSamples" tooltipPlacement="top" [appTooltip]="totalTooltip">Total Samples</div>
+                    <ng-template #totalTooltip>
+                        <span i18n="@@totalSamplesTooltip">Total Samples (Urine, Blood, Blood Passport and Dried Blood Spot)<br>IC: In Competition<br>OOC: Out of Competition</span>
+                    </ng-template>
+                </th>
+                <th
+                    *ngIf="tdpSheetInfo.tdpTotals.samples.length"
+                    class="headerTitle no-left-border"
+                    scope="col"
+                    [attr.colspan]="tdpSheetInfo.tdpTotals.samples.length * 2">
+                    <span i18n="@@sampleTypes">Sample Types</span>
+                </th>
+                <th
+                    *ngIf="tdpSheetInfo.tdpTotals.analyses.length"
+                    class="headerTitle"
+                    scope="col"
+                    [attr.colspan]="tdpSheetInfo.tdpTotals.analyses.length * 2">
+                    <span i18n="@@analyses">Analyses</span>
+                </th>
+                <th
+                    *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                    class="headerTitle"
+                    rowspan="3"
+                    scope="col">
+                    <div
+                        appTooltip
+                        i18n="@@remove"
+                        i18n-tooltipContent="@@removeSportDisciplineTooltip"
+                        tooltipContent="Remove a Sport / Discipline from your Test Distribution Plan."
+                        tooltipPlacement="top">Remove</div>
+                </th>
+            </tr>
+            <tr>
+                <ng-container *ngFor="let sample of tdpSheetInfo.tdpTotals.samples; trackBy:customTrackBy">
+                    <th class="headerSubTitle" colspan="2" scope="colgroup">
+                        <div
+                            tooltipPlacement="top"
+                            [appTooltip]="sampleTooltip"
+                            [tooltipContext]="{ sample: sample }">
+                            {{ translations$ | getSampleType:sample.sampleType | async }}
+                        </div>
+                        <ng-template #sampleTooltip>
+                            <span i18n="@@samplesTooltip">{{ translations$ | getSampleType:sample.sampleType | async }} Samples<br>IC: In Competition<br>OOC: Out of Competition</span>
+                        </ng-template>
+                    </th>
+                </ng-container>
+                
+                <ng-container *ngFor="let analysis of tdpSheetInfo.tdpTotals.analyses; trackBy:customTrackBy; index as i">
+                    <th
+                        class="headerSubTitle"
+                        colspan="2"
+                        scope="colgroup"
+                        [class.not-last]="tdpSheetInfo.year >= currentYear && !readonly">
+                        <div
+                            tooltipPlacement="top"
+                            [appTooltip]="analysisTooltip"
+                            [tooltipContext]="{ analysis: analysis }">
+                            {{ translations$ | getAnalysisCategory:analysis.analysisCategory | async }}
+                        </div>
+                        <ng-template #analysisTooltip>
+                            <span i18n="@@analysisTooltip">{{ translations$ | getExtendedAnalysisCategory:analysis.analysisCategory | async }} ({{ translations$ | getAnalysisCategory:analysis.analysisCategory | async }}) Analyses<br>IC: In Competition <br>OOC: Out of Competition</span>
+                        </ng-template>
+                    </th>
+                </ng-container>
+            </tr>
+            <tr>
+                <th class="collapse-button" scope="col">
+                    <app-collapse-button
+                        dataQA="showAllAppCollapseButton"
+                        [collapsed]="true"
+                        [disabled]="!anyCollapsed"
+                        (click)="showAll(true)">
+                        <span
+                            class="collapse-label"
+                            i18n="@@showAll"
+                            [class.collapse-label-disabled]="!anyCollapsed">Show All</span>
+                    </app-collapse-button>
+                </th>
+                <th class="collapse-button no-left-border" scope="col">
+                    <app-collapse-button
+                        dataQA="hideAllAppCollapseButton"
+                        [collapsed]="false"
+                        [disabled]="!anyExpanded"
+                        (click)="showAll(false)">
+                        <span
+                            class="collapse-label"
+                            i18n="@@hideAll"
+                            [class.collapse-label-disabled]="!anyExpanded">Hide All</span>
+                    </app-collapse-button>
+                </th>
+                <th class="headerSubTitle" scope="row">
+                    <span i18n="IC=in competition, OOC=out of competition@@icAndOoc">IC and OOC</span>
+                </th>
+                
+                <ng-container *ngFor="let analysis of tdpSheetInfo.tdpTotals.samples; trackBy:customTrackBy">
+                    <th class="headerSubTitle input-col" scope="col">
+                        <span i18n="IC=in competition@@ic_uppercase">IC</span>
+                    </th>
+                    <th class="headerSubTitle input-col" scope="col">
+                        <span i18n="OOC=out of competition@@ooc_uppercase">OOC</span>
+                    </th>
+                </ng-container>
+                
+                <ng-container *ngFor="let analysis of tdpSheetInfo.tdpTotals.analyses; trackBy:customTrackBy; index as i">
+                    <th class="headerSubTitle input-col" scope="col">
+                        <span i18n="IC=in competition@@ic_uppercase">IC</span>
+                    </th>
+                    <th
+                        class="headerSubTitle input-col"
+                        scope="col"
+                        [class.not-last]="tdpSheetInfo.year >= currentYear && !readonly">
+                        <span i18n="OOC=out of competition@@ooc_uppercase">OOC</span>
+                    </th>
+                </ng-container>
+            </tr>
+            
+            <tr class="totalRow">
+                <th
+                    class="grandTotalHeader"
+                    colspan="2"
+                    scope="row">
+                    <span class="grandTotalHeader" i18n="@@grandTotal">Grand Total</span>
+                </th>
+                <th class="alignRight" scope="col">
+                    <span *ngIf="tdpSheetInfo.year < currentYear">{{ (tdpSheetInfo.rows | hasOnlyDisabledRows) ? '' : tdpSheetInfo.tdpTotals.sampleTotal }}</span>
+                    <span *ngIf="tdpSheetInfo.year >= currentYear">{{ tdpSheetInfo.tdpTotals.sampleTotal }}</span>
+                </th>
+                <ng-template #GrandTotalType let-type="type">
+                    <ng-container *ngFor="let sampleAnalyses of type; trackBy:customTrackBy">
+                        <th class="alignRight" scope="col">
+                            <span *ngIf="tdpSheetInfo.year < currentYear">
+                                {{ (tdpSheetInfo.rows | hasOnlyDisabledRows) ? '' : sampleAnalyses.inCompetitionCell.value }}
+                            </span>
+                            <span *ngIf="tdpSheetInfo.year >= currentYear">
+                                {{ sampleAnalyses.inCompetitionCell.value }}
+                            </span>
+                        </th>
+                        <th class="alignRight" scope="col">
+                            <span *ngIf="tdpSheetInfo.year < currentYear">
+                                {{ (tdpSheetInfo.rows | hasOnlyDisabledRows) ? '' : sampleAnalyses.outOfCompetitionCell.value }}
+                            </span>
+                            <span *ngIf="tdpSheetInfo.year >= currentYear">
+                                {{ sampleAnalyses.outOfCompetitionCell.value }}
+                            </span>
+                        </th>
+                    </ng-container>
+                </ng-template>
+                
+                <ng-container *ngTemplateOutlet="GrandTotalType; context:{type : tdpSheetInfo.tdpTotals.samples}"></ng-container>
+                
+                <ng-container *ngTemplateOutlet="GrandTotalType; context:{type : tdpSheetInfo.tdpTotals.analyses}"></ng-container>
+                
+                <th
+                    *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                    class="alignRight"
+                    scope="col"></th>
+            </tr>
+        </thead>
+        
+        <tbody *ngIf="tdpSheetInfo">
+            <ng-container *ngFor="let sport of (tdpSheetInfo | sportsNotDeleted); trackBy: customTrackBy">
+                <tr class="sportRow">
+                    <td class="sportHeader" colspan="2">
+                        <app-collapse-button
+                            class="sportHeader"
+                            [collapsed]="!visibilityMap[sport.sportId]"
+                            [dataQA]="sport.sportName + 'AppCollapseButton'"
+                            (click)="toggleVisibility(sport.sportId)">
+                            <div>{{ sport.sportName }}</div>
+                        </app-collapse-button>
+                    </td>
+                    <td class="alignRight">
+                        <span>
+                            {{ sport.tdpTotals.sampleTotal }}
+                        </span>
+                    </td>
+
+                    <ng-template #zeroTotal>
+                        <td class="alignRight">
+                            <span>0</span>
+                        </td>
+                        <td class="alignRight">
+                            <span>0</span>
+                        </td>
+                    </ng-template>
+
+                    <ng-container *ngFor="let sampleValue of tdpSheetInfo.tdpTotals.samples; trackBy: customTrackBy">
+                        <ng-container *ngIf="(sport.tdpTotals.samples | getBySampleType : sampleValue).length > 0; else zeroTotal">
+                            <ng-container *ngFor="let sample of (sport.tdpTotals.samples | getBySampleType : sampleValue); trackBy: customTrackBy">
+                                <td class="alignRight">
+                                    <span>{{ sample.inCompetitionCell.value }}</span>
+                                </td>
+                                <td class="alignRight">
+                                    <span>{{ sample.outOfCompetitionCell.value }}</span>
+                                </td>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    
+                    <ng-container *ngFor="let analysisValue of tdpSheetInfo.tdpTotals.analyses; trackBy: customTrackBy">
+                        <ng-container *ngIf="(sport.tdpTotals.analyses | getByAnalysisCategory : analysisValue).length > 0; else zeroTotal">
+                            <ng-container *ngFor="let analysis of (sport.tdpTotals.analyses | getByAnalysisCategory : analysisValue); trackBy: customTrackBy">
+                                <td class="alignRight">
+                                    <span>{{ analysis.inCompetitionCell.value }}</span>
+                                </td>
+                                <td class="alignRight">
+                                    <span>{{ analysis.outOfCompetitionCell.value }}</span>
+                                </td>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    
+                    <td
+                        *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                        class="alignRight"></td>
+                </tr>
+                
+                <ng-container *ngFor="let disc of (sport | disciplinesNotDeleted); trackBy: customTrackBy">
+                    <ng-template #tooltipRef>
+                        <ng-container *appLet="(tdpSheetInfo | getPeriod | getDisablingPeriod:disc.disciplineId:sport.sportId:tdpSheet) as disablingPeriod">
+                            <ng-container *ngIf="disablingPeriod | isParentPeriod:tdpSheetInfo; else childPeriod">
+                                <span *ngIf="(disablingPeriod | getQuarter) === 'none'; else parentPeriodWithQuarter">
+                                    <app-period-selector
+                                        [capitalize]="true"
+                                        [period]="disablingPeriod">
+                                    </app-period-selector>
+                                    <span i18n="@@existsForSportNameXDisciplineNameXinYearX"> exist for {{ sport.sportName }} - {{ disc.disciplineName }} in {{ tdpSheetInfo.year }}</span>.
+                                    <br>
+                                    <span i18n="@@ifYouWishToEnter">If you wish to enter</span>&nbsp;<app-period-selector [period]="tdpSheetInfo"></app-period-selector><span i18n="@@comma">,</span>
+                                    <span i18n="@@pleaseRemoveAll_lowercase">please remove all</span>&nbsp;<app-period-selector [period]="disablingPeriod"></app-period-selector>.
+                                </span>
+                                
+                                <ng-template #parentPeriodWithQuarter>
+                                    <app-period-selector
+                                        [capitalize]="true"
+                                        [period]="disablingPeriod">
+                                    </app-period-selector>
+                                    <span i18n="@@existsForSportNameXDisciplineNameXinYearX"> exist for {{ sport.sportName }} - {{ disc.disciplineName }} in {{ tdpSheetInfo.year }}</span><app-quarter-selector [period]="disablingPeriod"></app-quarter-selector>.
+                                    <br>
+                                    <span i18n="@@ifYouWishToEnter">If you wish to enter</span>&nbsp;<app-period-selector [period]="tdpSheetInfo"></app-period-selector><span i18n="@@comma">,</span>
+                                    <span i18n="@@pleaseRemoveAll_lowercase">please remove all</span>&nbsp;<app-period-selector [period]="disablingPeriod"></app-period-selector>.
+                                </ng-template>
+                            </ng-container>
+                            
+                            <ng-template #childPeriod>
+                                <span *ngIf="(tdpSheetInfo | getPeriod | getQuarter) === 'none'; else childPeriodWithQuarter">
+                                    <span i18n="@@sumOfAllValuesForSportNameXDisciplineNameXinYearX">This is the sum of all values for {{ sport.sportName }} - {{ disc.disciplineName }} in {{ tdpSheetInfo.year }}</span>.
+                                    <br>
+                                    <span i18n="@@ifYouWishToEnter">If you wish to enter</span>&nbsp;<app-period-selector [period]="tdpSheetInfo"></app-period-selector><span i18n="@@comma">,</span>
+                                    <span i18n="@@pleaseRemoveAll_lowercase">please remove all</span>&nbsp;<app-period-selector [period]="disablingPeriod"></app-period-selector>.
+                                </span>
+                                
+                                <ng-template #childPeriodWithQuarter>
+                                    <span i18n="@@sumOfAllValuesForSportNameXDisciplineNameXinYearX">This is the sum of all values for {{ sport.sportName }} - {{ disc.disciplineName }} in {{ tdpSheetInfo.year }}</span>&nbsp;<app-quarter-selector [period]="tdpSheetInfo"></app-quarter-selector>.
+                                    <br>
+                                    <span i18n="@@ifYouWishToEnter">If you wish to enter</span>&nbsp;<app-period-selector [period]="tdpSheetInfo"></app-period-selector><span i18n="@@comma">,</span>
+                                    <span i18n="@@pleaseRemoveAll_lowercase">please remove all</span>&nbsp;<app-period-selector [period]="disablingPeriod"></app-period-selector>.
+                                </ng-template>
+                            </ng-template>
+                        </ng-container>
+                    </ng-template>
+                    
+                    <tr
+                        *ngIf="visibilityMap[sport.sportId]"
+                        class="disciplineRow"
+                        tooltipPlacement="top"
+                        tooltipSize="400"
+                        [appTooltip]="tooltipRef"
+                        [class.highlighted]="highlightedDisciplineId === disc.disciplineId"
+                        [id]="'row' + disc.disciplineId"
+                        [openOnMouseX]="true"
+                        [showTooltip]="tdpSheetInfo.year >= currentYear && disc.isDisabled && !readonly"
+                        [tooltipContext]="{ disc: disc, sport: sport, tdpSheetInfo: tdpSheetInfo }">
+                        
+                        <td colspan="2">
+                            <div class="sport-discipline-padding">{{ sport.sportName }} - {{ disc.disciplineName }}</div>
+                        </td>
+                        
+                        <td class="alignRight">
+                            <span *ngIf="tdpSheetInfo.year < currentYear">
+                                {{ !disc.isDisabled ? disc.tdpTotals.sampleTotal : disc.tdpTotals.sampleTotal | replaceZeroWithBlank }}
+                            </span>
+                            <span *ngIf="(!disc.isDisabled || (disc.tdpTotals | tdpTotalsAreNotZero)) && tdpSheetInfo.year >= currentYear">
+                                {{ disc.tdpTotals.sampleTotal }}
+                            </span>
+                        </td>
+
+                        <ng-template #unavailableValues>
+                            <td class="alignRight input-padding input-col">
+                                <input
+                                    readonly
+                                    class="number-input unavailable-value"
+                                    type="text"
+                                    [appTooltip]="unavailableValueTooltip"/>
+                            </td>
+                            <td class="alignRight input-padding input-col">
+                                <input
+                                    readonly
+                                    class="number-input unavailable-value"
+                                    type="text"
+                                    [appTooltip]="unavailableValueTooltip"/>
+                            </td>
+                        </ng-template>
+
+                        <ng-template #unavailableValue>
+                            <input
+                                readonly
+                                class="number-input unavailable-value"
+                                type="text"
+                                [appTooltip]="unavailableValueTooltip"/>
+                        </ng-template>
+
+                        <ng-template #unavailableValueTooltip>
+                            <span i18n="@@unexpectedMissingValueInTDP">A value is unexpectedly missing from this TDP. Please contact WADA support to fix this issue or you could also try to delete the row and add it again if you need it.</span>
+                        </ng-template>
+
+                        <!-- For each sample types: ['Urine', 'Blood', 'Blood Passport', 'Dried Blood Spot'] -->
+                        <ng-container *ngFor="let sampleValue of tdpSheetInfo.tdpTotals.samples; trackBy: customTrackBy">
+                            <ng-container *ngIf="(disc.tdpTotals.samples | getBySampleType : sampleValue).length > 0; else unavailableValues">
+                                <ng-container *ngFor="let sample of (disc.tdpTotals.samples | getBySampleType : sampleValue); trackBy: customTrackBy">
+                                    
+                                    <td class="alignRight input-padding input-col">
+                                        <ng-container *ngIf="sample.inCompetitionCell.id != null; else unavailableValue">
+                                            <span *ngIf="tdpSheetInfo.year < currentYear || readonly">
+                                                {{ !disc.isDisabled ? sample.inCompetitionCell.value : (disc.tdpTotals.sampleTotal ? sample.inCompetitionCell.value : '') }}
+                                            </span>
+                                            <input
+                                                appNoZero
+                                                *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                                                appRestrictToPattern="\d"
+                                                class="number-input"
+                                                maxlength=6
+                                                type="text"
+                                                [attr.data-qa]="sample.sampleType + 'IC'"
+                                                [attr.data-qa-precision]="sport.sportName + '_' + disc.disciplineName"
+                                                [disabled]="disc.isDisabled"
+                                                [value]="sample.inCompetitionCell.value | replaceZeroWithBlank"
+                                                (change)="onChange(sample.inCompetitionCell, sport.sportId, disc.disciplineId)"
+                                                (input)="onInput($event.target.value, sample.inCompetitionCell, sport.sportId, disc.disciplineId)" />
+                                        </ng-container>
+                                    </td>
+                                    
+                                    <td class="alignRight input-padding input-col">
+                                        <ng-container *ngIf="sample.outOfCompetitionCell.id != null; else unavailableValue">
+                                            <span *ngIf="tdpSheetInfo.year < currentYear || readonly">
+                                                {{ !disc.isDisabled ? sample.outOfCompetitionCell.value : (disc.tdpTotals.sampleTotal ? sample.outOfCompetitionCell.value : '' ) }}
+                                            </span>
+                                            <input
+                                                appNoZero
+                                                *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                                                appRestrictToPattern="\d"
+                                                class="number-input"
+                                                maxlength=6
+                                                type="text"
+                                                [attr.data-qa]="sample.sampleType + 'OOC'"
+                                                [attr.data-qa-precision]="sport.sportName + '_' + disc.disciplineName"
+                                                [disabled]="disc.isDisabled"
+                                                [value]="sample.outOfCompetitionCell.value | replaceZeroWithBlank"
+                                                (change)="onChange(sample.outOfCompetitionCell, sport.sportId, disc.disciplineId)"
+                                                (input)="onInput($event.target.value, sample.outOfCompetitionCell, sport.sportId, disc.disciplineId)" />
+                                        </ng-container>
+                                    </td>
+                                
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+                        
+                        <ng-container *ngFor="let analysisValue of tdpSheetInfo.tdpTotals.analyses; trackBy: customTrackBy">
+                            <ng-container *ngIf="(disc.tdpTotals.analyses | getByAnalysisCategory : analysisValue).length > 0; else unavailableValues">
+                                <ng-container *ngFor="let analysis of disc.tdpTotals.analyses | getByAnalysisCategory : analysisValue; trackBy: customTrackBy">
+                                    
+                                    <td class="alignRight input-padding input-col">
+                                        <ng-container *ngIf="analysis.inCompetitionCell.id != null; else unavailableValue">
+                                            <span *ngIf="tdpSheetInfo.year < currentYear || readonly">
+                                                {{ !disc.isDisabled ? analysis.inCompetitionCell.value : (disc.tdpTotals.sampleTotal ? analysis.inCompetitionCell.value : '' ) }}
+                                            </span>
+                                            <input
+                                                appNoZero
+                                                *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                                                appRestrictToPattern="\d"
+                                                class="number-input"
+                                                maxlength=6
+                                                type="text"
+                                                [attr.data-qa]="analysis.analysisCategory + 'IC'"
+                                                [attr.data-qa-precision]="sport.sportName + '_' + disc.disciplineName"
+                                                [disabled]="disc.isDisabled"
+                                                [value]="analysis.inCompetitionCell.value | replaceZeroWithBlank"
+                                                (change)="onChange(analysis.inCompetitionCell, sport.sportId, disc.disciplineId)"
+                                                (input)="onInput($event.target.value, analysis.inCompetitionCell, sport.sportId, disc.disciplineId)" />
+                                        </ng-container>
+                                    </td>
+                                    
+                                    <td class="alignRight input-padding input-col">
+                                        <ng-container *ngIf="analysis.outOfCompetitionCell.id != null; else unavailableValue">
+                                            <span *ngIf="tdpSheetInfo.year < currentYear || readonly">
+                                                {{ !disc.isDisabled ? analysis.outOfCompetitionCell.value : (disc.tdpTotals.sampleTotal ? analysis.outOfCompetitionCell.value : '' ) }}
+                                            </span>
+                                            <input
+                                                appNoZero
+                                                *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                                                appRestrictToPattern="\d"
+                                                class="number-input"
+                                                maxlength=6
+                                                type="text"
+                                                [attr.data-qa]="analysis.analysisCategory + 'OOC'"
+                                                [attr.data-qa-precision]="sport.sportName + '_' + disc.disciplineName"
+                                                [disabled]="disc.isDisabled"
+                                                [value]="analysis.outOfCompetitionCell.value | replaceZeroWithBlank"
+                                                (change)="onChange(analysis.outOfCompetitionCell, sport.sportId, disc.disciplineId)"
+                                                (input)="onInput($event.target.value, analysis.outOfCompetitionCell, sport.sportId, disc.disciplineId)" />
+                                        </ng-container>
+                                    </td>
+                                
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+
+                        <td
+                            *ngIf="tdpSheetInfo.year >= currentYear && !readonly"
+                            class="text-center">
+                            <ng-template #tooltipDisabledButtonRef>
+                                <span i18n="@@unableToRemoveLastDiscipline">The last discipline cannot be removed. Please add another Sport/Discipline first.</span>
+                            </ng-template>
+                            <app-delete-sport-discipline
+                                [appTooltip]="tooltipDisabledButtonRef"
+                                [confirmDeletion]="(tdpSheet | yearlyTotalForDiscipline:disc.disciplineId) > 0"
+                                [disabled]="disableDeleteButton"
+                                [disciplineId]="disc.disciplineId"
+                                [disciplineName]="disc.disciplineName"
+                                [hideAllTooltips]="!disableDeleteButton"
+                                [sportId]="sport.sportId"
+                                [sportName]="sport.sportName"
+                                (delete)="onDeleteSportDiscipline($event)">
+                            </app-delete-sport-discipline>
+                        </td>
+                    
+                    </tr>
+                </ng-container>
+            </ng-container>
+        </tbody>
+    </table>
+</div>

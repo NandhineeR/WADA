@@ -1,0 +1,303 @@
+<div
+    appInheritDir
+    appRandomizeInput
+    *ngIf="autoCompletes$ | async as autoCompletes"
+    #root="appRandomizeInput"
+    class="wrapper">
+    <app-dcf-notifications 
+        *ngIf="(
+            (form | formErrors:showErrors:dcfStatus) ||
+            (hasSaveConflict && hasOptimisticLockException) ||
+            (saveError && !(hasSaveConflict && hasOptimisticLockException))
+        )"
+        id="dcf-notifications"
+        type="error"
+        [conflictException]="conflictException"
+        [dcfId]="dcfId$ | async"
+        [saveError]="saveError">
+        <div *ngIf="!conflictException && !saveError">
+            <span i18n="@@errorsDetectedInFollowingFields">Some error(s) were detected in the following fields:</span>
+            <ul links class="error-link-list">
+                <li *ngIf="advanceNoticeHasErrors">
+                    <a href="{{ route$ | async }}#advanceNoticeRadioNo" i18n="@@advanceNotice">Advance Notice</a>
+                </li>
+                <li *ngIf="advanceNoticeReasonHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('advanceNoticeReason') }}" i18n="@@advanceNoticeReason">Advance Notice Reason</a>
+                </li>
+                <li *ngIf="notificationDateHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('notificationDate') }}" i18n="@@notificationDate">Notification Date</a>
+                </li>
+                <li *ngIf="timezoneHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('timezone') }}" i18n="@@dcf_timezone">Timezone</a>
+                </li>
+                <li *ngIf="countryHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('country') }}" i18n="@@country">Country</a>
+                </li>
+                <li *ngIf="cityHasErrors">
+                    <a href="{{ route$ | async }}#{{ root.getId('city') }}" i18n="@@city">City</a>
+                </li>
+                <li *ngIf="notifyingChaperoneHasErrors && notifyingChaperone.errors.lastNameRequired">
+                    <a href="{{ route$ | async }}#{{ root.getId('lastName') }}" i18n="@@notifyingChaperoneLastName">Notifying Chaperone Last Name</a>
+                </li>
+                <li *ngIf="notifyingChaperoneHasErrors && notifyingChaperone.errors.firstNameRequired">
+                    <a href="{{ route$ | async }}#{{ root.getId('firstName') }}" i18n="@@notifyingChaperoneFirstName">Notifying Chaperone First Name</a>
+                </li>
+            </ul>
+        </div>
+    </app-dcf-notifications>
+
+    <form
+        *appLet="{
+            security: fieldsSecurity$ | async,
+            isEditMode: isEditMode$ | async
+        } as state"
+        [formGroup]="form">
+        <app-form-field [hasAsterisk]="true" [hasError]="advanceNoticeHasErrors">
+            <label i18n="@@advanceNotice">Advance Notice</label>
+            <div field-input>
+                <label class="radio-container">
+                    <input
+                        #yes
+                        appAutofocus
+                        appRadioOnFocus
+                        data-qa="advanceNoticeYes"
+                        formControlName="advanceNotice"
+                        name="advanceNotice"
+                        type="radio"
+                        [appDisable]="controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode"
+                        [value]="true"
+                        (click)="setAdvanceNoticeReason(true)">
+                    <span class="checkmark"></span>
+                    <span i18n="@@yes" class="radio-label">Yes</span>
+                </label>
+                <label class="radio-container">
+                    <input
+                        appRadioOnFocus
+                        data-qa="advanceNoticeNo"
+                        formControlName="advanceNotice"
+                        id="advanceNoticeRadioNo"
+                        name="advanceNotice"
+                        type="radio"
+                        [appDisable]="controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode"
+                        [value]="false"
+                        (click)="setAdvanceNoticeReason(false)">
+                    <span class="checkmark"></span>
+                    <span i18n="@@no" class="radio-label">No</span>
+                </label>
+            </div>
+        </app-form-field>
+
+        <app-form-field *ngIf="yes.checked" [@fadeInOut] [hasAsterisk]="true" [hasError]="advanceNoticeReasonHasErrors">
+            <label for="advanceNoticeReason" i18n="@@advanceNoticeReason">Advance Notice Reason</label>
+            <input
+                field-input
+                formControlName="advanceNoticeReason"
+                id="advanceNoticeReason"
+                type="text"
+                [appDisable]="controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode"
+                [class.error]="advanceNoticeReasonHasErrors">
+            <div field-error *ngIf="advanceNoticeReasonHasErrors">
+                <span *ngIf="advanceNoticeReason.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-participant-input
+            #notifyingChaperoneParticipantInput
+            field-input
+            dataQALastName="notifyingChaperoneLastName"
+            dataQAFirstName="notifyingChaperoneFirstName"
+            firstNameId="firstName"
+            formControlName="notifyingChaperone"
+            id="notifyingChaperone"
+            lastNameId="lastName"
+            [appDisable]="controls.NOTIFYING_CHAPERONE | isInputDisabled:state?.security:state?.isEditMode"
+            [hasAsterisk]="true"
+            [hasError]="notifyingChaperoneHasErrors"
+            [hasFirstNameError]="notifyingChaperoneHasFirstNameErrors"
+            [hasLastNameError]="notifyingChaperoneHasLastNameErrors"
+            [participants]="chaperones$ | async">
+            <label i18n="@@notifyingChaperone">Notifying Chaperone</label>
+            <span last-name-errors data-qa="notifyingChaperoneLastName" *ngIf="notifyingChaperoneHasErrors && notifyingChaperone.errors?.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <span first-name-errors data-qa="notifyingChaperoneFirstName" *ngIf="notifyingChaperoneHasErrors && notifyingChaperone.errors?.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </app-participant-input>
+
+        <app-form-field
+            *ngIf="!isMultipleDCF"
+            class="wrapper"
+            columns="30% 30% 30% 30%"    
+            [hasAsterisk]="true"
+            [hasError]="notificationDateHasErrors"
+            [ngClass]="{ 'topSpace': isMultipleDCF }">
+            <label for="notificationDate" i18n="@@notificationDate">Notification Date</label>
+            <span field-top-label i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h)</span>
+            <app-datetime-picker 
+                field-input
+                dataQA="notificationDate"
+                fieldId="notificationDate"
+                formControlName="notificationDate"
+                [appDisable]="(isMatchingResultType3or2or1$ | async) || (controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode)"
+                [disabled]="(isMatchingResultType3or2or1$ | async) || (controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode)"
+                [hasError]="notificationDateHasErrors"
+                [locale]="locale$ | async">
+            </app-datetime-picker>
+            <div field-info *ngIf="notificationDateHasErrors" class="error-message">
+                <span *ngIf="notificationDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span *ngIf="notificationDate.errors.validateDateFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                <span *ngIf="notificationDate.errors.dateIsRemoved?.error?.invalid" i18n="@@notificationDateCantBeRemoved">The notification date can be updated but cannot be removed.</span>
+            </div>
+
+            <div field-top-label-2>
+                <span id="notificationTimezone" i18n="@@timeZone">Time Zone</span>
+                <span *ngIf="!(isDCFCompleted() || (controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode))">
+                    <button
+                        class="btn-link-timezone"
+                        matTooltipClass="help-timezone-tooltip"
+                        matTooltipPosition="above"
+                        [matTooltip]="helpTimezoneFormTooltip?.innerText"
+                        (click)="openLinkTimezone()">
+                        <mat-icon>help_outline</mat-icon>
+                    </button>
+                    <span #helpTimezoneFormTooltip i18n="@@helpTimezoneFormTooltip" style="display: none">Gather information about time zones</span>
+                </span>
+            </div>
+            <app-dropdown
+                field-input-2
+                dataQA="timeZoneDropdownNotificationDate"
+                formControlName="timezone"
+                i18n-placeholder="@@timezone"
+                id="timezone"
+                placeholder="Time Zone"
+                property="id"
+                style="width: 100%"
+                type="text"
+                [appDisable]="(isMatchingResultType3or2or1$ | async) || (controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode)"
+                [hasError]="timezoneHasErrors"
+                [isDisabled]="(isMatchingResultType3or2or1$ | async) || (controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode)">
+                <ng-container *ngFor="let item of timezones$ | async; let i = index">
+                    <div [appDropdownElement]="item" (click)="showSetTimezoneDefaultModal(item)" class="dropdown-item" data-qa="timeZoneDropdownOptionNotificationDate" [attr.data-qa-precision]="i">{{ item.shortName }}</div>
+                </ng-container>
+            </app-dropdown>
+            <div field-info-2 class="error-message" *ngIf="timezoneHasErrors">
+                <span *ngIf="timezone.errors.validateEmptyTimezone?.error?.invalid"
+                    i18n="@@provideTimezoneWithNotificationDate">The time zone must be provided when the notification date is set.</span>
+                <span *ngIf="timezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field *ngIf="!isTimeSlotNull && notificationDate.value && accessible$ | async">
+            <label i18n="@@dcf_timeSlot">60-minutes time slot</label>
+            <label field-input>
+                <div *ngIf="inTimeSlot$ | async; else noTemplate" i18n="@@yes">Yes</div>
+                <ng-template #noTemplate i18n="@@no">No</ng-template>
+            </label>
+        </app-form-field>
+
+        <app-form-field [hasError]="countryHasErrors">
+            <label for="country" i18n="@@country">Country</label>
+            <app-typeahead
+                field-input
+                dataQA="countryTypeahead"
+                fieldId="country"
+                formControlName="country"
+                suggestionField="name"
+                [hasError]="countryHasErrors"
+                [isDisabled]="(isMatchingResultType1$ | async) || (controls.COUNTRY | isInputDisabled:state?.security:state?.isEditMode)"
+                [suggestions]="countrySuggestions"
+                (selected)="selectCountry($event)">
+            </app-typeahead>
+            <div field-error *ngIf="countryHasErrors">
+                <span *ngIf="country.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field>
+            <label for="region" i18n="@@region">Region</label>
+            <app-typeahead
+                field-input
+                dataQA="regionTypeahead"
+                fieldId="region"
+                formControlName="region"
+                suggestionField="name"
+                [isDisabled]="(!((selectedCountryId$ | async) !== '')) || (controls.STATE | isInputDisabled:state?.security:state?.isEditMode)"
+                [suggestions]="regionSuggestions">
+            </app-typeahead>
+        </app-form-field>
+
+        <app-form-field [hasError]="cityHasErrors">
+            <label for="city" i18n="@@city">City</label>
+            <input
+                field-input
+                autocomplete="disabled"
+                data-qa="city"
+                formControlName="city"
+                id="city"
+                type="text"
+                [appDisable]="(isMatchingResultType1$ | async) || (controls.CITY | isInputDisabled:state?.security:state?.isEditMode)"   
+                [class.error]="cityHasErrors">
+            <div field-error *ngIf="cityHasErrors">
+                <span *ngIf="city.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field>
+            <label for="identificationDocument" i18n="@@identificationDocument">Identification Document</label>
+            <app-dropdown
+                field-input
+                dataQA="identificationDocumentDropdown"
+                formControlName="identificationDocument"
+                i18n-placeholder="@@identificationDocument"
+                id="identificationDocument"
+                placeholder="Identification Document"
+                property="id"
+                type="text"
+                [appDisable]="controls.IDENTIFICATION_DOCUMENT | isInputDisabled:state?.security:state?.isEditMode"
+                [isDisabled]="controls.IDENTIFICATION_DOCUMENT | isInputDisabled:state?.security:state?.isEditMode"
+                (selectedItem)="resetIdentificationDocumentType()">
+                <ng-container *ngFor="let item of autoCompletes.identificationDocuments; let i = index">
+                    <div [appDropdownElement]="item" class="dropdown-item" data-qa="identificationDocumentDropdownOption" [attr.data-qa-precision]="i">{{ item.description }}</div>
+                </ng-container>
+            </app-dropdown>
+        </app-form-field>
+
+        <app-form-field *ngIf="identificationDocument.value?.specificCode === 'OTHER'">
+            <label for="identificationDocumentType" i18n="@@documentType">Document Type</label>
+            <input
+                field-input
+                autocomplete="disabled"
+                data-qa="identificationDocumentType"
+                formControlName="identificationDocumentType"
+                id="identificationDocumentType"
+                type="text"
+                [appDisable]="controls.IDENTIFICATION_DOCUMENT_TYPE | isInputDisabled:state?.security:state?.isEditMode">
+        </app-form-field>
+
+        <app-form-field>
+            <label for="selectionCriteria" i18n="@@selectionCriteria">Selection Criteria</label>
+            <app-dropdown
+                field-input
+                dataQA="selectionCriteriaDropdown"
+                formControlName="selectionCriteria"
+                id="selectionCriteria"
+                i18n-placeholder="@@selectionCriteria"
+                placeholder="Selection Criteria"
+                property="id"
+                type="text"
+                [appDisable]="controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode"
+                [isDisabled]="controls.TEST_NOTIFICATION | isInputDisabled:state?.security:state?.isEditMode">
+                <ng-container *ngFor="let item of autoCompletes.selectionCriteria; let i = index">
+                    <div
+                        class="dropdown-item"
+                        data-qa="selectionCriteriaDropdownOption"
+                        [appDropdownElement]="item"
+                        [attr.data-qa-precision]="i">{{ item.description }}
+                    </div>
+                </ng-container>
+            </app-dropdown>
+        </app-form-field>
+    </form>
+</div>
+
+<app-set-timezone-default-modal #setTimezoneDefaultModalRef
+    [filledTimezones]="filledTimezones$ | async"
+    (overwriteTimezonesEmitter)="setTimezoneDefault($event)">
+</app-set-timezone-default-modal>

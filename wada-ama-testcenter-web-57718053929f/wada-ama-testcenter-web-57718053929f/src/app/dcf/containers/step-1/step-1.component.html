@@ -1,0 +1,94 @@
+<div class="wrapper">
+    <app-loading-frame>
+        <app-notification *ngIf="!isStepValid" type="warning">
+            <span i18n="@@stepNavigationDisabledWarning">Step navigation is disabled until all mandatory fields are filled.</span>
+        </app-notification>
+
+        <app-notification *ngIf="(isMatchingResultType1$ | async)" type="warning">
+            <span i18n="@@disableFieldMatchingResultInfo">Some fields are disabled due to an existing match. To edit these fields, use the “REJECT MATCH” button.</span>
+        </app-notification>
+
+        <accordion [closeOthers]="false">
+            <!-- Authorization Input -->
+            <accordion-group
+                #group
+                [isOpen]="false">
+                <div accordion-heading (click)="toggleAccordionAuthorization()">
+                    <app-view-section-title
+                        [arrowDirection]="isModelActiveAuthorization ? 'up' : 'down'"
+                        [businessErrors]="getBusinessErrors(sectionAuthorizationErrors$ | async)"
+                        [formatErrors]="getFormatErrors(sectionAuthorizationErrors$ | async)"
+                        [hasBeenSaved]="false"
+                        [inCreation]="inCreation"
+                        [inEdit]="!inCreation"
+                        [isActive]="isModelActiveAuthorization"
+                        [isDelete]="false"
+                        [numberErrors]="getNumberErrors(sectionAuthorizationErrors$ | async)"
+                        [rightControls]="true"
+                        [rightInfo]=""
+                        [rightInfoIcon]="true"
+                        [sectionNumber]="-1"
+                        [singleForm]="false"
+                        [theme]="'accordion-title-active'">
+                        <span class="step-title" i18n="@@authorization">Authorization</span>
+                    </app-view-section-title>
+                </div>
+                <app-authorization-input></app-authorization-input>
+            </accordion-group>
+
+            <!-- Notification Input -->
+            <accordion-group
+                #group
+                [isOpen]="true">
+                <div accordion-heading (click)="toggleAccordionNotification()">
+                    <app-view-section-title
+                        [arrowDirection]="isModelActiveNotification ? 'up' : 'down'"
+                        [businessErrors]="getBusinessErrors(sectionNotificationErrors$ | async)"
+                        [formatErrors]="getFormatErrors(sectionNotificationErrors$ | async)"
+                        [hasBeenSaved]="false"
+                        [inCreation]="inCreation"
+                        [inEdit]="!inCreation"
+                        [isActive]="isModelActiveNotification"
+                        [isDelete]="false"
+                        [numberErrors]="getNumberErrors(sectionNotificationErrors$ | async)"
+                        [rightControls]="true"
+                        [rightInfo]=""
+                        [rightInfoIcon]="true"
+                        [sectionNumber]="-1"
+                        [singleForm]="false"
+                        [theme]="'accordion-title-active'">
+                        <span class="step-title" i18n="notification">Notification</span>
+                    </app-view-section-title>
+                </div>
+                <app-notification-input></app-notification-input>
+            </accordion-group>
+            
+            <!-- Athlete Information Input -->
+            <accordion-group
+                #group
+                [isOpen]="false">
+                <div accordion-heading (click)="toggleAccordionAthleteInformation()">
+                    <app-view-section-title
+                        [arrowDirection]="isModelActiveAthleteInformation ? 'up' : 'down'"
+                        [businessErrors]="getBusinessErrors(sectionAthleteErrors$ | async)"
+                        [formatErrors]="getFormatErrors(sectionAthleteErrors$ | async)"
+                        [hasBeenSaved]="false"
+                        [inCreation]="inCreation"
+                        [inEdit]="!inCreation"
+                        [isActive]="isModelActiveAthleteInformation"
+                        [isDelete]="false"
+                        [numberErrors]="getNumberErrors(sectionAthleteErrors$ | async)"
+                        [rightControls]="true"
+                        [rightInfo]=""
+                        [rightInfoIcon]="true"
+                        [sectionNumber]="-1"
+                        [singleForm]="false"
+                        [theme]="'accordion-title-active'">
+                        <span class="step-title" i18n="athleteInformation">Athlete Information</span>
+                    </app-view-section-title>
+                </div>
+                <app-athlete-information-input></app-athlete-information-input>
+            </accordion-group>
+        </accordion>
+    </app-loading-frame>
+</div>

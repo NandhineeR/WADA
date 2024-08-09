@@ -1,0 +1,71 @@
+<div appInheritDir class="field" [style.grid-template-columns]="columns">
+
+    <!-- First row -->
+    <div class="field-top-message-1">
+        <div class="field-warning field-message">
+            <ng-content select="[field-warning]"></ng-content>
+        </div>
+        <div class="field-error field-message">
+            <ng-content select="[field-error]"></ng-content>
+        </div>
+        <div class="field-top-label field-message">
+            <ng-content select="[field-top-label]"></ng-content>
+        </div>
+    </div>
+
+    <div class="field-top-message-2">
+        <div class="field-warning field-message">
+            <ng-content select="[field-warning-2]"></ng-content>
+        </div>
+        <div class="field-error field-message">
+            <ng-content select="[field-error-2]"></ng-content>
+        </div>
+        <div class="field-top-label field-message">
+            <ng-content select="[field-top-label-2]"></ng-content>
+        </div>
+    </div>
+
+    <div *ngIf="hasFieldInput3" class="field-top-message-3">
+        <div class="field-warning field-message">
+            <ng-content select="[field-warning-3]"></ng-content>
+        </div>
+        <div class="field-error field-message">
+            <ng-content select="[field-error-3]"></ng-content>
+        </div>
+        <div class="field-top-label field-message">
+            <ng-content select="[field-top-label-3]"></ng-content>
+        </div>
+    </div>
+
+    <!-- Second row -->
+    <div class="field-label" [ngClass]="{'label-align': labelAlign}">
+        <ng-content></ng-content>
+        <span class="field-asterisk" [class.error]="hasError" *ngIf="hasAsterisk">*</span>
+        <ng-content select="app-info-bubble"></ng-content>
+    </div>
+
+    <div class="field-input-1">
+        <ng-content select="[field-input]"></ng-content>
+    </div>
+
+    <div class="field-input-2">
+        <ng-content select="[field-input-2]"></ng-content>
+    </div>
+
+    <div *ngIf="hasFieldInput3" class="field-input-3">
+        <ng-content select="[field-input-3]"></ng-content>
+    </div>
+
+    <!-- Third row -->
+    <div class="field-bottom-message-1">
+        <ng-content select="[field-info]"></ng-content>
+    </div>
+
+    <div class="field-bottom-message-2">
+        <ng-content select="[field-info-2]"></ng-content>
+    </div>
+
+    <div *ngIf="hasFieldInput3" class="field-bottom-message-3">
+        <ng-content select="[field-info-3]"></ng-content>
+    </div>
+</div>

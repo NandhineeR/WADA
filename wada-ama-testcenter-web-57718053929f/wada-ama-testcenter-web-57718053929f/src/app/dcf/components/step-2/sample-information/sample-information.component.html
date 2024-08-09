@@ -1,0 +1,150 @@
+<app-view-section [isLoading]="!sampleInformation">
+    <app-view-section-title
+        sectionNumber=2
+        sectionTitle="Sample Collection"
+        [canWrite]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+        [link]="['/', 'dcf', 'edit', dcfId, 'step', 2]"
+        [numberErrors]="missingFieldsCount">
+    </app-view-section-title>
+
+    <app-view-section-content appHideControl *ngIf="sampleInformation" [permissions]="whiteList">
+        <router-outlet></router-outlet>
+        <app-multiple-field-row-view
+            dataQA="arrivalDate"
+            id="arrivalDate"
+            [items]="[sampleInformation.timezone?.shortName]"
+            [mainItem]="sampleInformation.arrivalDate | formatDatetime | uppercase">
+            <app-view-entry-name
+                i18n="@@arrivalDate"
+                role="mainField"
+                [invalid]="missingFields | setHas:fields.ArrivalDate"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Arrival Date</app-view-entry-name>
+            <app-view-entry-name
+                i18n="@@timeZone"
+                role="field-0"
+                [invalid]="missingFields | setHas:fields.arrivalTimezone"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Time Zone</app-view-entry-name>
+        </app-multiple-field-row-view>
+
+        <app-view-entry id="inCompetition">
+            <app-view-entry-name
+                i18n="@@testType"
+                [invalid]="missingFields | setHas:fields.TestType"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Test Type</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="sampleInformation.testType" i18n="@@inCompetition">In Competition</span>
+                <span *ngIf="!sampleInformation.testType" i18n="@@outOfCompetition">Out of Competition</span>
+            </app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry *ngIf="sampleInformation.testType" id="majorGameEvent">
+            <app-view-entry-name i18n="@@majorEvent" [invalid]="missingFields | setHas:fields.MajorEvent">Major Event</app-view-entry-name>
+            <app-view-entry-value>{{ sampleInformation.majorEvent?.description }}</app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry *ngIf="sampleInformation.testType" id="competitionName">
+            <app-view-entry-name i18n="@@competitionName" [invalid]="missingFields | setHas:fields.CompetitionName">Competition Name</app-view-entry-name>
+            <app-view-entry-value>{{ sampleInformation.competitionName }}</app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry id="feeForService">
+            <app-view-entry-name
+                i18n="@@feeForServiceTest"
+                [invalid]="missingFields | setHas:fields.FeeForService"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Fee for Service Test</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="sampleInformation.feeForService" i18n="@@yes">Yes</span>
+                <span *ngIf="!sampleInformation.feeForService" i18n="@@no">No</span>
+            </app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-subsection *ngFor="let sample of urineSamples; index as i">
+            <app-view-subsection-title i18n="@@sampleXUrineX">Sample {{ getSampleIndex(sample, i) }} - Urine {{ sample.sampleCode }}</app-view-subsection-title>
+            <app-urine-sample-view
+                [abpAccess]="abpAccess"
+                [actions] ="actions"
+                [athleteId]="athleteId"
+                [dcfId]="dcfId"
+                [dcfRetentionPeriod]="dcfRetentionPeriod"
+                [dcfToBeDeleted]="dcfToBeDeleted"
+                [hasSampleManagementReader]="hasSampleManagementReader"
+                [isLastMatchedSample]="isLastMatchedSample"
+                [isLrReaderOrWriter]="isLrReaderOrWriter"
+                [isUserCorrector]="isUserCorrector"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                [sample]="sample"
+                [sampleManagementSamplesInfo]="sample.sampleManagementInfo"
+                [sampleTypes]="sampleTypes"
+                [urineSampleBoundaries]="urineSampleBoundaries"
+                [whiteList]="whiteList"
+                (changeSampleEmitter)="changeSample($event)">
+            </app-urine-sample-view>
+        </app-view-subsection>
+
+        <app-view-subsection *ngFor="let sample of bloodSamples; index as i">
+            <app-view-subsection-title i18n="@@sampleXBloodX">Sample {{ getSampleIndex(sample, i) }} - Blood {{ sample.sampleCode }}</app-view-subsection-title>
+            <app-blood-sample-view 
+                [abpAccess]="abpAccess"
+                [actions] ="actions"
+                [athleteId]="athleteId"
+                [dcfId]="dcfId"
+                [dcfRetentionPeriod]="dcfRetentionPeriod"
+                [dcfToBeDeleted]="dcfToBeDeleted"
+                [hasSampleManagementReader]="hasSampleManagementReader"
+                [isLastMatchedSample]="isLastMatchedSample"
+                [isLrReaderOrWriter]="isLrReaderOrWriter"
+                [isUserCorrector]="isUserCorrector"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                [sample]="sample"
+                [sampleManagementSamplesInfo]="sample.sampleManagementInfo"
+                [sampleTypes]="sampleTypes"
+                [whiteList]="whiteList"
+                (changeSampleEmitter)="changeSample($event)"
+                (viewLabResult)="openViewLabResult($event)">
+            </app-blood-sample-view>
+        </app-view-subsection>
+
+        <app-view-subsection *ngFor="let sample of bloodPassportSamples; index as i">
+            <app-view-subsection-title i18n="@@sampleXBloodPassportX">Sample {{ getSampleIndex(sample, i) }} - Blood Passport {{ sample.sampleCode }}</app-view-subsection-title>
+            <app-blood-passport-sample-view
+                [abpAccess]="abpAccess"
+                [actions] ="actions"
+                [athleteId]="athleteId"
+                [dcfId]="dcfId"
+                [dcfRetentionPeriod]="dcfRetentionPeriod"
+                [dcfToBeDeleted]="dcfToBeDeleted"
+                [hasSampleManagementReader]="hasSampleManagementReader"
+                [isBplrReaderOrWriter]="isBplrReaderOrWriter"
+                [isLastMatchedSample]="isLastMatchedSample"
+                [isUserCorrector]="isUserCorrector"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                [sample]="sample"
+                [sampleManagementSamplesInfo]="sample.sampleManagementInfo"
+                [sampleTypes]="sampleTypes"
+                [whiteList]="whiteList"
+                (changeSampleEmitter)="changeSample($event)">
+        </app-blood-passport-sample-view>
+        </app-view-subsection>
+
+        <app-view-subsection *ngFor="let sample of driedBloodSpotSamples; index as i">
+            <app-view-subsection-title i18n="@@dcf_sampleXDriedBloodSpotX">Sample {{ getSampleIndex(sample, i) }} - Dried Blood Spot {{ sample.sampleCode }}</app-view-subsection-title>
+            <app-dried-blood-spot-sample-view
+                [abpAccess]="abpAccess"
+                [actions] ="actions"
+                [dcfId]="dcfId"
+                [dcfRetentionPeriod]="dcfRetentionPeriod"
+                [dcfToBeDeleted]="dcfToBeDeleted"
+                [hasSampleManagementReader]="hasSampleManagementReader"
+                [isLastMatchedSample]="isLastMatchedSample"
+                [isLrReaderOrWriter]="isLrReaderOrWriter"
+                [isUserCorrector]="isUserCorrector"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                [sample]="sample"
+                [sampleManagementSamplesInfo]="sample.sampleManagementInfo"
+                [sampleTypes]="sampleTypes"
+                [whiteList]="whiteList"
+                (changeSampleEmitter)="changeSample($event)">
+            </app-dried-blood-spot-sample-view>
+        </app-view-subsection>
+    </app-view-section-content>
+</app-view-section>

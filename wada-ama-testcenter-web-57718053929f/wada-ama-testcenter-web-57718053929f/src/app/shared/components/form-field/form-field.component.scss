@@ -1,0 +1,96 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/styles/field-asterisk';
+
+:host {
+    display: block;
+}
+
+@mixin fieldStyle($left, $right) {
+    display: grid;
+    grid-column-gap: 20px;
+    grid-row-gap: 0px;
+
+    .label-align{
+        text-align: $right;
+    }
+
+    .field-label {
+        grid-row-start: 2;
+        grid-column-start: 1;
+        font-weight: bold;
+
+        @include field-asterisk();
+
+    }
+
+    .field-top-message {
+        &-1 {
+            grid-column-start: 2;
+        }
+        
+        &-2 {
+            grid-column-start: 3;
+        }
+        
+        &-3 {
+            grid-column-start: 4;
+        }
+        
+        &-1, &-2, &-3 {
+            grid-row-start: 1;
+
+            .field-error {
+                color: $error-color;
+            }
+
+            .field-top-label {
+                color: $field-top-label-color;
+            }
+
+            .field-warning {
+                color: $warning-color;
+            }
+        }
+    }
+
+    .field-input {
+        &-1 {
+            grid-column-start: 2;
+        }
+        &-2 {
+            grid-column-start: 3;
+        }
+        &-3 {
+            grid-column-start: 4;
+        }
+        &-1, &-2, &-3 {
+            grid-row-start: 2;
+        }
+    }
+
+    .field-bottom-message {
+        &-1 {
+            grid-column-start: 2;
+        }
+        &-2 {
+            grid-column-start: 3;
+        }
+        &-3 {
+            grid-column-start: 4;
+        }
+        &-1, &-2, &-3 {
+            grid-row-start: 3;
+            color: $field-bottom-message-color;
+        }
+    }
+}
+
+.field {
+    @include ltr {
+        @include fieldStyle(left, right);
+    }
+    @include rtl {
+        @include fieldStyle(right, left);
+    }
+}

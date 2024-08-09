@@ -1,0 +1,72 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+
+:host {
+    display: block;
+}
+
+input.error  {
+    border: 2px solid $error-color;
+}
+
+@mixin fieldLabel($left, $right) {
+    grid-row-start: 2;
+    grid-column-start: 1;
+    font-weight: bold;
+
+    .field-asterisk {
+        padding-left: 4px;
+        color: $asterisk-color;
+        font-weight: bold;
+
+        &.error {
+            color: $error-color;
+        }
+    }
+}
+
+@mixin fieldStyle($left, $right) {
+    display: grid;
+    grid-column-gap: 20px;
+    grid-row-gap: 0px;
+
+    .field-label {
+        @include fieldLabel(left, right);
+
+    }
+
+    .field-top-message {
+        &-1 {
+            grid-column-start: 1;
+            grid-row-start: 1;
+
+            .field-error {
+                color: $error-color;
+            }
+
+            .field-warning {
+                color: $warning-color;
+            }
+
+            .field-top-label {
+                color: $field-top-label-color;
+            }
+        }
+    }
+
+    .field-input {
+        &-1 {
+            grid-column-start: 1;
+            grid-row-start: 3;
+        }
+    }
+}
+
+.field {
+    @include ltr {
+        @include fieldStyle(left, right);
+    }
+    @include rtl {
+        @include fieldStyle(right, left);
+    }
+}

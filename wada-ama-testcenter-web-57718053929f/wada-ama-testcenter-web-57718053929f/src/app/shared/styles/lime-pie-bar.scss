@@ -1,0 +1,17 @@
+@import '~sass/variables';
+
+@mixin bar($left, $right) {
+    font-size: 20px;
+    font-weight: 600;
+    background-image: linear-gradient($gradient-one, $gradient-two);
+    stroke: $stroke-color;
+    stroke-width: 1px;
+    height: 40px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    justify-content: space-between;
+    margin-bottom: 0px!important;
+}

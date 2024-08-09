@@ -1,0 +1,11 @@
+<div class="app-container" [appDir]="writingDirection" appTabFocus>
+    <app-header (toggleSidebar)="sidebar.toggleSidebar()"></app-header>
+    <app-sidebar #sidebar></app-sidebar>
+    <div class="content-container" appInheritDir>
+        <router-outlet></router-outlet>
+    </div>
+</div>
+<app-tooltip-container></app-tooltip-container>
+<app-translations></app-translations>
+<app-invalid-contract-overlay [showOverlay]="showOverlay"></app-invalid-contract-overlay>
+<app-loading-overlay [loading]="(getContractLoading$ | async) || (getPreferencesLoading$ | async)"></app-loading-overlay>

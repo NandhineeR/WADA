@@ -1,0 +1,68 @@
+@import '~sass/mixins';
+
+$error-line: #AA1A1A;
+$background-error: #F4E6E6;
+$success-line: #0E6D07;
+$background-success: #E2F4E1;
+$warning-line: #9A5713;
+$background-warning: #F6E6D0;
+$informative-line: #165872;
+$background-informative: #D9EDF7;
+$bullet-color: #333333;
+
+@mixin notification($left, $right) {
+    display: flex;
+    flex-direction: row;
+    font-size: 16px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+
+    &.error {
+        background-color: $background-error;
+        border-color: $error-line;
+        color: $error-line;
+    }
+    
+    &.success {
+        background-color: $background-success;
+        border-color: $success-line;
+        color: $success-line;
+    }
+    
+    &.warning {
+        background-color: $background-warning;
+        border-color: $warning-line;
+        color: $warning-line;
+    }
+    
+    &.informative {
+        background-color: $background-informative;
+        border-color: $informative-line;
+        color: $informative-line;
+    }
+
+    .icon {
+        height: 25px;
+        width: 25px;
+    }
+
+    .padding {
+        width: 10px;
+    }
+
+    .content {
+        flex: 1;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include notification(left, right);
+    }
+    @include rtl {
+        @include notification(right, left);
+    }
+}

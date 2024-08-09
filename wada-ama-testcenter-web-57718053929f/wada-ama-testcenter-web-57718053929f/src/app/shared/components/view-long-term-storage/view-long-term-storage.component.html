@@ -1,0 +1,56 @@
+<div *ngIf="ltsRequest">
+    <app-view-entry
+        *ngIf="ltsRequest?.requestDate"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@requestDate">Request Date</app-view-entry-name>
+        <app-view-entry-value dataQA="requestDate">
+            {{ ltsRequest.requestDate | formatDatetime | uppercase }} (UTC)
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry
+        *ngIf="ltsRequest?.requestInitiator"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@requestInitiator">Request Initiator</app-view-entry-name>
+        <app-view-entry-value dataQA="requestInitiator">
+            {{ ltsRequest.requestInitiator }}
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry
+        *ngIf="ltsRequest?.storageLocation"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@ocation">Location</app-view-entry-name>
+        <app-view-entry-value dataQA="location">
+            {{ ltsRequest.storageLocation }}
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry
+        *ngIf="ltsRequest?.storedUntil"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@storedUntil">Stored Until</app-view-entry-name>
+        <app-view-entry-value dataQA="storedUntil">
+            {{ ltsRequest.storedUntil | formatDatetime | uppercase }} (UTC)
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry
+        *ngIf="ltsRequest?.reason"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@reason">Reason</app-view-entry-name>
+        <app-view-entry-value dataQA="reason">
+            {{ ltsRequest.reason }}
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry
+        *ngIf="ltsRequest?.confirmed !== null"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@stored">Stored</app-view-entry-name>
+        <app-view-entry-value dataQA="stored">
+            <span *ngIf="ltsRequest?.confirmed === true" i18n="@@yes">Yes</span>
+            <span *ngIf="ltsRequest?.confirmed === false" i18n="@@no">No</span>
+        </app-view-entry-value>
+    </app-view-entry>
+</div>

@@ -1,0 +1,10 @@
+export enum ApmuStatus {
+    UNDEFINED = -1,
+    NORMAL = 0,
+    PASSPORT_SUSPICIOUS = 1,
+    LIKELY_DOPING = 2,
+    MEDICAL_CONDITION = 3,
+    SUSPICIOUS = 4,
+    UNANIMOUS_LIKELY_DOPING = 5,
+    APF = 6,
+}

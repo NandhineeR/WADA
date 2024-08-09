@@ -1,0 +1,7 @@
+@import '~sass/variables';
+
+div {
+    border: solid 2px $primary-background;
+    border-top: none;
+    border-top-left-radius: 35px;
+}

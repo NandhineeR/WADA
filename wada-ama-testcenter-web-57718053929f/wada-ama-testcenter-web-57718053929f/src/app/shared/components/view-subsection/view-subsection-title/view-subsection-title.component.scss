@@ -1,0 +1,17 @@
+@import '~sass/variables';
+
+h3 {
+    font-size: 20px;
+    font-weight: 600;
+    background-image: linear-gradient($gradient-one, $gradient-two);
+    stroke: $stroke-color;
+    stroke-width: 1px;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}

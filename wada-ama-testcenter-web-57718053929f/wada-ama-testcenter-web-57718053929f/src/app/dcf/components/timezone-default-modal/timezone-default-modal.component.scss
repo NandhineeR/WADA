@@ -1,0 +1,54 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~~app/shared/styles/radio';
+
+$text-color: #414042;
+$border-width: 2px;
+$popup-background: white;
+
+@mixin step($left, $right) {
+    .error {
+        border: 2px solid $incorrect-field-star;
+    }
+
+    .notification {
+        margin: 20px 20px 20px 20px;
+        .cancel-info {
+            margin-bottom: 0 !important;
+        }
+    }
+
+    .center-modal-buttons {
+        margin-top: 0px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .bottom-button-padding {
+        padding-top: 15px;
+        padding-bottom: 20px;
+    }
+}
+
+.modal__body {
+    padding: 30px;
+    display: inline-block;
+    width: 100%;
+
+    .modal__messages {
+        margin-left: 20px;
+
+        .primary__message {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    
+        .secondary__message {
+            font-size: 16px;
+        }
+    }
+}
+
+.wrapper {
+    @include step(left, right);
+}

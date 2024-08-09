@@ -1,0 +1,37 @@
+$primaryColor: #3F8532;
+$iconBorder: #333333;
+$redIconColor: #FF0000;
+$yellowIconColor: #ec8e2e;
+
+.icon {
+    display: inline-block;
+}
+
+.green-icon {
+    border: 1px solid $iconBorder;
+    border-radius: 50%;
+    background-color: $primaryColor;
+}
+
+.red-icon {
+    border: 1px solid $iconBorder;
+    background-color: $redIconColor;
+}
+
+.yellow-icon {
+    border: 1px solid $iconBorder;
+    background-color: $yellowIconColor;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.bar-icon {
+    height: 30px;
+    width: 4px;
+    border: 1px solid white;
+    background-color: $primaryColor;
+    margin: 0 8px;
+}

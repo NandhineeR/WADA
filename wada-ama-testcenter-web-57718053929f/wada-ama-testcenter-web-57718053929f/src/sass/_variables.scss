@@ -1,0 +1,99 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700);
+
+$font-family-sans-serif:  Montserrat, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-serif:       Georgia, "Times New Roman", Times, serif;
+$font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
+$font-family-base:        $font-family-sans-serif;
+
+$primary-background: #3F8532;
+$primary-background-hover: #387A2E;
+$primary-background-selected: #1E5623;
+
+// Header
+$header-height: 60px;
+$title-color: #414042;
+
+// Sidebar
+$sidebar-width: 100px;
+$sidebar-min-height: 700px;
+$menu-element-width: 100px;
+$menu-element-height: 100px;
+
+$xl-breakpoint: 1000px + $sidebar-width;
+$xxl-breakpoint: 1700px;
+$filter-background: rgba(239,239,239,0.5);
+$filter-background2: rgba(236,236,236,0.5);
+$icon-border: #333333;
+$red-icon-color: #FF0000;
+$border-color: #ddd;
+$border-thickness: 7px;
+$border-radius: 0px;
+$border-radius-view: 0px;
+$filter-border: #c0c0c0;
+$spacing: 5px;
+$buttons-spacing: 3px;
+$button-color: #3F8532;
+$font-color: #414042;
+$placeholder-font-color: #414042;
+$button-height: 30px;
+$link-color: #3A782C;
+$link-hover-color: #012e01;
+$disabled-field-color: #F2F2F2;
+$dropdown-link-active-bg: #2D6828;
+$dropdown-link-active-color: #FFFFFF;
+$dropdown-link-hover-bg: #2D6828;
+$dropdown-link-hover-color: #FFFFFF;
+$dropdown-background-color: #FFFFFF;
+
+// Variables used in tables
+$table-border: #c0c0c0;
+$total-color: #e0e0e0;
+$sport-color: #c8e9c8;
+$discipline-color: #e4f1e2;
+$header-text-color: #757575;
+$input-border: #757575;
+$highlight-color: #4FA63F;
+$disabled-color: #82CB72;
+$loading-color: rgba(215,215,215, 0.9);
+$unavailable-cell-color: #F4E6E6;
+
+
+//DCF view specific scss
+$valid-field-star: #008000;
+$incorrect-field-star: #AA1A1A;
+$incorrect-field-color: #AA1A1A;
+$section-content-background: #ffffff;
+$section-color: #ffffff;
+$section-title-background: #8F8F8F;
+$section-title-circle-background: #747474;
+
+//TO view scss
+$odd-row-color: #F2F2F2;
+$even-row-color: #FFFFFF;
+$th-font-color: #757575;
+$td-font-color: #414042;
+$show-more-color: #1E5623;
+$line-color: #c0c0c0;
+$stroke-color: #C7D62A;
+$gradient-one: #E1F049;
+$gradient-two: #CBDB2A;
+$empty-line-color: #CBDB2A;
+$to-table-border: #999;
+
+// Form colors according wada style guidelines
+$radio-button-color: #3F8532;
+$checkbox-color: #3F8532;
+$unselected-enabled-checkbox-color: #909090;
+$unselected-disabled-checkbox-color: #D7D7D7;
+$empty-background-checkbox-color: #fff;
+$form-label-color: #515151;
+$form-input-color: #414042;
+$field-bottom-message-color: #666666;
+$field-top-label-color: #515151;
+
+// Error and warning messages
+$error-color: #AA1A1A;
+$warning-color: #9A5713;
+$asterisk-color: #008000;
+$primary-delete-hover: #FDC9C9;
+$text-color: #6D6D6D; 

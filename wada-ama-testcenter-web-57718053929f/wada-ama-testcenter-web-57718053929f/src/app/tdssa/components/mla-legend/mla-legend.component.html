@@ -1,0 +1,19 @@
+<div class="legend" appInheritDir>
+    <p class="legend__title" i18n="@@tdssaMinLevelOfAnalysisLegend">TDSSA Minimum Level of Analysis (MLA) Legend</p>
+    <div class="legend__item">
+        <app-mla-icon type="green" [size]="20"></app-mla-icon>
+        <span class="legend__item-desc" i18n="@@numberOfAnalysesAboveTdssa">Number of specific analyses is above or equal to the TDSSA requirement</span>
+    </div>
+    <div class="legend__item">
+        <app-mla-icon type="red" [size]="20"></app-mla-icon>
+        <span class="legend__item-desc" i18n="@@numberOfAnalysesBelowTdssa">Number of specific analyses is less than the TDSSA requirement</span>
+    </div>
+    <div class="legend__item">
+        <app-mla-icon type="yellow" [size]="16"></app-mla-icon>
+        <span class="legend__item-desc" i18n="@@numberOfAnalysesBelowTdssaOptional">Number of specific analyses is less than the TDSSA requirement (MLA optional)</span>
+    </div>
+    <div class="legend__item">
+        <app-mla-icon type="bar" [size]="20"></app-mla-icon>
+        <span class="legend__item-desc" i18n="@@tdssaMla_uppercase">TDSSA MLA</span>
+    </div>
+</div>

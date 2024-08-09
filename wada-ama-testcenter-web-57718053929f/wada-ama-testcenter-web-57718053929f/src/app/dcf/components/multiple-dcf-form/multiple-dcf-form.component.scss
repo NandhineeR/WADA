@@ -1,0 +1,111 @@
+@import '~sass/variables';
+@import '~app/shared/styles/radio';
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+
+$bg-color-white: #ffffff;
+$green: #3F8532;
+
+@mixin step($left, $right) {
+    app-athlete-mailing-address{
+        margin-top: 20px;
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+    }
+
+    app-participant-input {
+        margin-bottom: 12px;
+    }
+
+    app-typeahead, app-dropdown, app-multi-typeahead, app-date-input {
+        width: 60%;
+        display: block;
+    }
+
+    input[type="text"] {
+        width: 60%;
+
+        &.error {
+            border: 2px solid $error-color;
+        }
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    .btn-link-timezone {
+        border: none;
+        background-color: white;
+        mat-icon {
+            vertical-align: bottom;
+            font-size: 22px;
+        }
+    }
+
+    .checkbox-field {
+        color: $checkbox-color;
+        margin-top: 5px;
+        margin-bottom: -5px;
+    }
+
+    .error-link-list {
+        @include notification-error-list($left, $right);
+    }
+
+    .field-info {
+        font-size: 0.9rem;
+    }
+
+    .form-body {
+        width: 100%;
+
+        .form-body-content {
+            background-color: $bg-color-white;
+        }
+    }
+
+    .jump-section {
+        margin-bottom: 30px;
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+
+    .error-message {
+        color: $error-color;
+    }
+
+    .lastName {
+        width: 100%;
+    }
+
+    .timezone {
+        width: 100%;
+    }
+}
+
+::ng-deep .help-timezone-tooltip {
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green;
+    padding: 5px 10px;
+    display: inline-flexbox !important;
+    max-width: fit-content !important;
+}

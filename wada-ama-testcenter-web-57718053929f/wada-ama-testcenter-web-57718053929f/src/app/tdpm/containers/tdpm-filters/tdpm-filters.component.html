@@ -1,0 +1,78 @@
+<div class="wrapper" *appLet="isFilterCollapsed$ | async as isFilterCollapsed" [class.expanded]="!isFilterCollapsed">
+    <app-collapse-button
+        [collapsed]="isFilterCollapsed"
+        (click)="toggleCollapse()">
+        <span class="expand-text" i18n="@@filters">Filters</span>
+    </app-collapse-button>
+    <div class="container table-row" *ngIf="isFilterCollapsed">
+        <div class="row row-height">
+            <div class="col-sm-2">
+                <span class="minimal-info minimal-info-label" i18n="@@dateRange">Date Range</span>
+            </div>
+            <div class="col-sm-10 date-placement">
+                <span class="minimal-info">{{ translations$ | getMonth:dateRange.fromMonth | async }} - {{ dateRange.fromYear }} <span i18n="@@to_lowercase">to</span> {{ translations$ | getMonth:dateRange.toMonth | async }} - {{ dateRange.toYear }}</span>
+                <span *ngIf="!isYearMode">
+                    <ng-container [ngSwitch]="modeString">
+                        <span>&nbsp;<span *ngSwitchCase="'Custom'" i18n="@@custom_parentheses" class="minimal-info">(Custom)</span></span>
+                        <span>&nbsp;<span *ngSwitchCase="'YearToDate'" i18n="@@yearToDate_parentheses" class="minimal-info">(Year to Date)</span></span>
+                        <span *ngSwitchDefault></span>
+                    </ng-container>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                <span class="minimal-info minimal-info-label" i18n="@@testType">Test Type</span>
+            </div>
+            <div class="col-sm-6 type-placement">
+                <span *ngIf="showType === showTypeEnum.PlannedAndComplete" class="minimal-info" i18n="@@plannedAndCompletedSamplesCollected">Planned and Completed - Sample(s) Collected</span>
+                <span *ngIf="showType === showTypeEnum.CompletedNoLabResultMatched" class="minimal-info" i18n="@@completedSamplesCollectedNoLabResultMatched">Completed-Sample(s) Collected - No laboratory result matched</span>
+                <span *ngIf="showType === showTypeEnum.Complete" class="minimal-info" i18n="@@completedSamplesCollectedLabResultReported">Complete-Sample(s) Collected - Laboratory result reported</span>
+            </div>
+        </div>
+    </div>
+    <div class="filter-layout" *ngIf="!isFilterCollapsed">
+        <app-from-to-month-picker
+            [fromToDate]="dateRange"
+            [monthLabels]="monthLabels$ | async"
+            (dateSelected)="onDateChange($event)">
+        </app-from-to-month-picker>
+        <div class="checkbox-grp filter-group radio-button-group-margin">
+            <h6 class="group-title" i18n="@@testType">Test Type</h6>
+            <div class="test-type-placement">
+                <div (click)="plannedAndComplete.click()">
+                    <input #plannedAndComplete
+                        name="test_show_type"
+                        type="radio"
+                        [ngModel]="showType"
+                        [value]="showTypeEnum.PlannedAndComplete"
+                        (change)="testTypeChanged(showTypeEnum.PlannedAndComplete)"/>
+                    <span></span>
+                    <label i18n="@@plannedAndCompletedSamplesCollected">Planned and Completed - Sample(s) Collected</label>
+                </div>
+            </div>
+            <div>
+                <div (click)="completeNoLabResultMatched.click()">
+                    <input #completeNoLabResultMatched
+                        name="test_show_type"
+                        type="radio"
+                        [ngModel]="showType"
+                        [value]="showTypeEnum.CompleteNoLabResultMatched"
+                        (change)="testTypeChanged(showTypeEnum.CompleteNoLabResultMatched)"/>
+                    <span></span>
+                    <label i18n="@@completedSamplesCollectedNoLabResultMatched">Completed-Sample(s) Collected - No laboratory result matched</label></div>
+            </div>
+            <div>
+                <div (click)="complete.click()">
+                    <input #complete
+                        name="test_show_type"
+                        type="radio"
+                        [ngModel]="showType"
+                        [value]="showTypeEnum.Complete"
+                        (change)="testTypeChanged(showTypeEnum.Complete)"/>
+                    <span></span>
+                    <label i18n="@@completedSamplesCollectedLabResultReported">Complete-Sample(s) Collected - Laboratory result reported</label></div>
+            </div>
+        </div>
+    </div>
+</div>

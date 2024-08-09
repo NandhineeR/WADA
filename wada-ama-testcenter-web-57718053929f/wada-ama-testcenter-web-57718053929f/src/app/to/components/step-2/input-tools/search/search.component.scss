@@ -1,0 +1,71 @@
+@import '~sass/variables';
+
+.search__wrapper {
+
+    margin-top: 10px;
+    display: grid;
+    grid-row-gap: 0px;
+    margin-bottom: 25px;
+
+    label {
+        grid-column-start: 1;
+        font-weight: bold;
+        margin-left: 20px;
+        margin-right: 15px;
+        margin-top: 25px;
+        text-align: right;
+    }
+
+    input {
+        grid-column-start: 2;
+        border-radius: 0px;
+        min-height: 42px;
+        font-size: 14px;
+        width: 400px;
+        height: min-content;
+        margin-top: 15px;
+    }
+
+    .search-button {
+        grid-column-start: 3;
+        grid-row-start: 1;
+        grid-row-end: 3;
+        margin-top: 15px;
+    }
+
+    .field-info {
+        grid-column-start: 2;
+        font-size: 0.9rem;
+        color: #666666;
+        margin-top: 3px;
+    }
+
+    .loading-search {
+        grid-column-start: 1;
+        grid-column-end: 4;
+        grid-row-start: 4;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 300px;
+        width: 100%;
+        font-size: 36px;
+        color: $font-color;
+    }
+
+    .loading-img {
+        display: block;
+        height: 60px;
+        animation: rotation 2s infinite linear;
+    }
+
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
+}

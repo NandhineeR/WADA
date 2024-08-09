@@ -1,0 +1,45 @@
+@import '~sass/mixins';
+
+$error-color: #AA1A1A;
+
+:host {
+    display: block;
+}
+
+.wrapper {
+    .error-message {
+        color: $error-color;
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+
+    .countryCode {
+        width: 100%;
+    }
+
+    input.phoneNumber, input.extension {
+        width: 100%;
+    }
+
+    app-dropdown {
+        width: 60%;
+        display: block;
+    }
+    
+    a, a:not([href]):not([tabindex]) {
+        display: inline-block;
+        color: #3A782C;
+        font-size: 13px;
+        text-decoration: underline;
+    
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .no-pointer-events {
+        pointer-events: none;
+    }
+}

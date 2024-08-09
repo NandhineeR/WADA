@@ -1,0 +1,25 @@
+<div class="header" appInheritDir>
+    <ng-container *ngIf="athlete">
+        <div class="title">
+            <span >{{athlete.getAthleteFullName()}}</span>
+        </div>
+        <div class="user">
+            <strong i18n="@@athlete">Athlete</strong>
+            <span class="space">
+                <app-gender-selector [gender]="athlete.sex"></app-gender-selector> &nbsp;
+                <span i18n="@@adamsIdX">ADAMS ID: {{athlete.adamsId}}</span>
+            </span>
+        </div>
+        <div class="athlete-details">
+            <div>
+                <span i18n="@@nationalities">Nationalities</span><br>
+                <strong>{{athlete?.sportNationality?.name}}</strong>
+            </div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+    </ng-container>
+
+</div>

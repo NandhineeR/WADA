@@ -1,0 +1,132 @@
+<div appInheritDir class="wrapper" [@fadeInOut] [formGroup]="form">
+    <app-form-field
+        class="wrapper"
+        columns="30% 30% 30% 30%"    
+        [hasAsterisk]="true"
+        [hasError]="collectionDateHasErrors"
+        [ngClass]="{ 'topSpace': isMultipleDCF }">
+
+        <label for="collectionDate{{sampleIndex}}" i18n="@@collectionDate">Collection Date</label>
+        <span field-top-label i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h)</span>
+        <app-datetime-picker
+            field-input
+            dataQA="collectionDateBlood"
+            fieldId="collectionDate{{sampleIndex}}"
+            formControlName="collectionDate"
+            [appDisable]="isCollectionDateDisabled() || (controls.COLLECTION_DATE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [disabled]="isCollectionDateDisabled() || (controls.COLLECTION_DATE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [hasError]="collectionDateHasErrors"
+            [locale]="locale"
+            (selected)="onSelectedCollectionDate()">
+        </app-datetime-picker>
+        <div field-info *ngIf="collectionDateHasErrors" class="error-message">
+            <span *ngIf="collectionDate.errors.validateEmptyCollectionDate?.error?.invalid"
+                i18n="@@provideCollectionDateWithSampleCode">The collection date must be provided when the sample code is set.</span>
+            <span *ngIf="collectionDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <span *ngIf="collectionDate.errors.validateDatetimeFormat?.error?.invalid" i18n="@@datetimeMustBeValidFormat">Date time must be in a valid format.</span>
+        </div>
+
+        <span field-top-label-2 i18n="@@timeZone" id="timezone{{sampleIndex}}">Time Zone</span>
+        <app-dropdown
+            field-input-2
+            class="timezone"
+            dataQA="timeZoneDropdownBlood"
+            formControlName="timezone"
+            i18n-placeholder="@@timezone"
+            id="timezone{{sampleIndex}}"
+            placeholder="Time Zone"
+            property="id"
+            style="width: 100%"
+            type="text"
+            [appDisable]="isCollectionDateDisabled() || (controls.TIMEZONE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [hasError]="timezoneHasErrors"
+            [isDisabled]="isCollectionDateDisabled() || (controls.TIMEZONE | isInputDisabled:fieldsSecurity:isEditMode)"
+            (selected)="onSelectedTimezone()">
+            <ng-container *ngFor="let item of timezones; let i = index">
+                <div [appDropdownElement]="item" class="dropdown-item" data-qa="timeZoneDropdownOptionBlood" [attr.data-qa-precision]="i">{{ item.shortName }}</div>
+            </ng-container>
+        </app-dropdown>
+        <div field-info-2 *ngIf="timezoneHasErrors" class="error-message">
+            <span *ngIf="timezone.errors.validateEmptyTimezone?.error?.invalid"
+                i18n="@@provideTimezoneWithSampleCodeOrCollectionDate">The time zone must be provided when either the sample code or the collection date is set.</span>
+            <span *ngIf="timezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field [hasAsterisk]="true" [hasError]="sampleCodeHasErrors">
+        <label i18n="@@sampleCode">Sample Code</label>
+        <input
+            field-input
+            data-qa="sampleCodeBlood"
+            formControlName="sampleCode"
+            id="sampleCode{{sampleIndex}}"
+            type="text"
+            [appDisable]="isMatchingResultType3or2or1 || (controls.SAMPLE_CODE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [class.error]="sampleCodeHasErrors || hasDuplicateException"
+            [ngClass]="{'sampleCode': !hasDuplicateException}"
+            [readonly]="readonly"
+            (focusout)="onChangeSampleCode($event.target.value)">
+        <div field-error *ngIf="sampleCodeHasErrors">
+            <span *ngIf="sampleCode.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+        <div field-warning *ngIf="sampleCode && sampleCode.errors && sampleCode.errors.invalid">
+            <span i18n="@@bloodSampleCodeXWarning">Blood sample {{ sampleCode.value }} already exists in ADAMS. Make sure these values are correct.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field [hasAsterisk]="true" [hasError]="manufacturerHasErrors">
+        <label for="manufacturer{{sampleIndex}}" i18n="@@manufacturer">Manufacturer</label>
+        <app-typeahead
+            field-input
+            dataQA="manufacturerBloodTypeahead"
+            fieldId="manufacturer{{sampleIndex}}"
+            formControlName="manufacturer"
+            suggestionField="description"
+            [appDisable]="controls.MANUFACTURER | isInputDisabled:fieldsSecurity:isEditMode"
+            [hasError]="manufacturerHasErrors || hasDuplicateException"
+            [suggestions]="manufacturersSuggestions"
+            (selected)="onSelectedManufacturer($event)">
+        </app-typeahead>
+        <div field-error *ngIf="manufacturerHasErrors">
+            <span *ngIf="manufacturer.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="!isMultipleDCF" [hasAsterisk]="true" [hasError]="laboratoryHasErrors">
+        <label for="laboratory{{sampleIndex}}" i18n="@@laboratory">Laboratory</label>
+        <app-typeahead
+            field-input
+            dataQA="laboratoryBloodTypeahead"
+            fieldId="laboratory{{sampleIndex}}"
+            formControlName="laboratory"
+            suggestionField="displayDescriptionName"
+            [hasError]="laboratoryHasErrors || hasDuplicateException"
+            [isDisabled]="isMatchingResultType3or2or1 || (controls.LABORATORY | isInputDisabled:fieldsSecurity:isEditMode)"
+            [suggestions]="laboratorySuggestions"
+            (selected)="onSelectedLaboratory($event)">
+        </app-typeahead>
+        <div field-error *ngIf="laboratoryHasErrors">
+            <span *ngIf="laboratory.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-participant-input
+        #bloodCollectionOfficialParticipantInput
+        field-input
+        *ngIf="bloodCollectionOfficials"
+        dataQAFirstName="bloodCollectionOfficialFirstName"
+        dataQALastName="bloodCollectionOfficialLastName"
+        firstNameId="firstName{{sampleIndex}}"
+        formControlName="bloodCollectionOfficial"
+        lastNameId="lastName{{sampleIndex}}"
+        [appDisable]="controls.BLOOD_OFFICIAL | isInputDisabled:fieldsSecurity:isEditMode"
+        [hasAsterisk]="true"
+        [hasError]="bloodCollectionOfficialHasErrors"
+        [hasFirstNameError]="bloodCollectionOfficialHasFirstNameErrors"
+        [hasLastNameError]="bloodCollectionOfficialHasLastNameErrors"
+        [participants]="bloodCollectionOfficials">
+        <label i18n="@@bloodCollectionOfficial">Blood Collection Official</label>
+        <span last-name-errors *ngIf="bloodCollectionOfficialHasErrors && bloodCollectionOfficial.errors?.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        <span first-name-errors *ngIf="bloodCollectionOfficialHasErrors && bloodCollectionOfficial.errors?.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+    </app-participant-input>
+</div>

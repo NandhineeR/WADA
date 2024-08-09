@@ -1,0 +1,27 @@
+// The CSS4 pseudo-class :dir(ltr)  only works with firefox...
+// Match alternative direction changes on ancestors
+@mixin ltr {
+    [dir="ltr"] #{if(&, "&", "*")},
+    #{if(&, "&", "*")}[dir="ltr"],
+    [dir="rtl"] [dir="ltr"] #{if(&, "&", "*")},
+    [dir="rtl"] #{if(&, "&", "*")}[dir="ltr"],
+    [dir="ltr"] [dir="rtl"] [dir="ltr"] #{if(&, "&", "*")},
+    [dir="ltr"] [dir="rtl"] #{if(&, "&", "*")}[dir="ltr"],
+    [dir="rtl"] [dir="ltr"] [dir="rtl"] [dir="ltr"] #{if(&, "&", "*")},
+    [dir="rtl"] [dir="ltr"] [dir="rtl"] #{if(&, "&", "*")}[dir="ltr"] {
+        @content;
+    }
+}
+
+@mixin rtl {
+    [dir="rtl"] #{if(&, "&", "*")},
+    #{if(&, "&", "*")}[dir="rtl"],
+    [dir="ltr"] [dir="rtl"] #{if(&, "&", "*")},
+    [dir="ltr"] #{if(&, "&", "*")}[dir="rtl"],
+    [dir="rtl"] [dir="ltr"] [dir="rtl"] #{if(&, "&", "*")},
+    [dir="rtl"] [dir="ltr"] #{if(&, "&", "*")}[dir="rtl"],
+    [dir="ltr"] [dir="rtl"] [dir="ltr"] [dir="rtl"] #{if(&, "&", "*")},
+    [dir="ltr"] [dir="rtl"] [dir="ltr"] #{if(&, "&", "*")}[dir="rtl"] {
+        @content;
+    }
+}

@@ -1,0 +1,25 @@
+<app-modal [scrollable]="true"
+           [resizeModal]="true"
+           [removeMargin]="true"
+           [minWidth]="'1200px'"
+           [centralizeButtons]="true"
+           [page]="route$ | async"
+           [isModalLocked]="isModalLocked"
+           (modalClose)="isSearchAthlete && removeTests()">
+    <div modal-header>
+        <span *ngIf="isSearchAthlete" i18n="@@addAthletesAndAnalyses">Add Athletes and Analyses</span>
+        <span *ngIf="isPlaceholder" i18n="@@addPlaceholdersAndAnalyses">Add Placeholders and Analyses</span>
+        <span *ngIf="isEditAnalyses" i18n="@@modifyAnalyses">Modify Analyses</span>
+        <span *ngIf="isAddAnalyses" i18n="@@addAnalyses">Add Analyses</span>
+    </div>
+
+    <div modal-body>
+        <div class="wrapper">
+            <app-add-analyses-table
+                [removeTestRows]="removeTestRows"
+                [url]="route$ | async"
+                [urlWithoutParenthesis]="urlWithoutParenthesis$ | async">
+            </app-add-analyses-table>
+        </div>
+    </div>
+</app-modal>

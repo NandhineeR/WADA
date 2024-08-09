@@ -1,0 +1,293 @@
+<div appInheritDir class="wrapper">
+    <table appSticky aria-label="tdssa-table" (lengthCovered)="lengthCoveredChanged($event)">
+        <thead #headerRef>
+            
+            <tr>
+                <th class="headerTitle no-bottom-border" colspan="2" scope="colgroup">
+                    <div i18n="@@sportDiscipline_slash">Sport / Discipline</div>
+                </th>
+                <th class="headerTitle" colspan="2" scope="colgroup">
+                    <span i18n="@@totalTests">Total Tests</span>
+                </th>
+                <th class="headerTitle" colspan="4" scope="colgroup">
+                    <span i18n="@@totalSamples">Total Samples</span>
+                </th>
+                <th class="headerTitle" scope="colgroup" [attr.colspan]="tdssaSheet.totals.analyses.length * 4">
+                    <span i18n="@@analyses">Analyses</span>
+                </th>
+            </tr>
+            
+            <tr>
+                <th class="headerTitle no-bottom-border" colspan="2" scope="colgroup">
+                    <input #searchBarRef class="search-bar" data-qa="sportDisciplineInput" type="text"/>
+                </th>
+                <th class="headerSubTitle" rowspan="2" scope="colgroup">
+                    <div
+                        appTooltip
+                        i18n="@@tests"
+                        i18n-tooltipContent="@@tdssa_testsHeaderTooltip"
+                        tooltipContent="Total tests done per Sports, Sport / disciplines and Athletes."
+                        tooltipPlacement="top">Tests</div>
+                </th>
+                <th class="headerSubTitle" rowspan="2" scope="rowgroup">
+                    <div
+                        appTooltip
+                        i18n="@@percentageOoc_uppercase"
+                        i18n-tooltipContent="@@tdssa_percentageOocHeaderTooltip"
+                        tooltipContent="%OOC: Percentage Out of Competition versus Total Tests."
+                        tooltipPlacement="top">%OOC</div>
+                </th>
+                <th class="headerSubTitle" rowspan="2" scope="rowgroup">
+                    <div i18n="@@urine">Urine</div>
+                </th>
+                <th class="headerSubTitle" rowspan="2" scope="rowgroup">
+                    <div i18n="@@blood">Blood</div>
+                </th>
+                <th class="headerSubTitle" rowspan="2" scope="rowgroup">
+                    <div i18n="@@bloodAbp">Blood ABP</div>
+                </th>
+                <th class="headerSubTitle" rowspan="2" scope="rowgroup">
+                    <div i18n="@@dbs">Dried Blood Spot</div>
+                </th>
+                <th
+                    *ngFor="let analysis of tdssaSheet.totals.analyses"
+                    class="headerSubTitle"
+                    colspan="4"
+                    scope="colgroup">
+                    <div
+                        tooltipPlacement="top"
+                        [appTooltip]="analysisTooltip"
+                        [tooltipContext]="{ analysis: analysis }">
+                        {{ translations$ | getAnalysisCategory:analysis.categoryCode | async }}
+                    </div>
+                    <ng-template #analysisTooltip>
+                        <span i18n="@@analysisHeaderTooltip">Charts for {{ translations$ | getAnalysisCategory:analysis.categoryCode | async }} analyses and breakdown for</span>
+                        <ng-container *ngFor="let subCat of analysis.subCategories; index as i">
+                            {{ translations$ | getAnalysisSubCategory:subCat.code | async }}
+                            <span *ngIf="i < analysis.subCategories.length-2" i18n="@@comma">,</span>
+                            <span *ngIf="i === analysis.subCategories.length-2" i18n="@@and_lowercase">and</span>
+                        </ng-container>
+                    </ng-template>
+                </th>
+            </tr>
+            
+            <tr>
+                <th class="collapse-button" scope="row">
+                    <app-collapse-button
+                        dataQA="showAllAppCollapseButton"
+                        [collapsed]="true"
+                        [disabled]="!anyCollapsed"
+                        (click)="showAll(true)">
+                        <span class="collapse-label" i18n="@@showAll" [class.collapse-label-disabled]="!anyCollapsed">Show All</span>
+                    </app-collapse-button>
+                </th>
+                <th class="collapse-button no-left-border" scope="row">
+                    <app-collapse-button
+                        dataQA="hideAllAppCollapseButton"
+                        [collapsed]="false"
+                        [disabled]="!anyExpanded"
+                        (click)="showAll(false)">
+                        <span class="collapse-label" i18n="@@hideAll" [class.collapse-label-disabled]="!anyExpanded">Hide All</span>
+                    </app-collapse-button>
+                </th>
+                <ng-container *ngFor="let analysis of tdssaSheet.totals.analyses; index as i">
+                    <th class="headerSubTitle" scope="row">
+                        <div
+                            tooltipPlacement="top"
+                            [appTooltip]="totalAnalysisTooltip"
+                            [tooltipContext]="{ analysis: analysis }">
+                            <span i18n="@@total">Total</span>
+                            <br/>
+                            {{ translations$ | getAnalysisCategory:analysis.categoryCode | async }}
+                        </div>
+                        <ng-template #totalAnalysisTooltip>
+                            <span i18n="@@totalAnalysisTooltip">Total {{ translations$ | getExtendedAnalysisCategory:analysis.categoryCode | async }} ({{ translations$ | getAnalysisCategory:analysis.categoryCode | async }}) analyses done per sport and sport/discipline.</span>
+                        </ng-template>
+                    </th>
+                    <th class="legendText" colspan="2" scope="colgroup">
+                        <table
+                            aria-hidden="true"
+                            aria-label="tdssa-table-sub-categories"
+                            class="legendHeader">
+                            <tr *ngFor="let subCat of analysis.subCategories">
+                                <td class="noBorder">
+                                    <div *ngIf="subCat === analysis.subCategories[0]" class="subCatIcon subCat0"></div>
+                                    <div *ngIf="subCat === analysis.subCategories[1]" class="subCatIcon subCat1"></div>
+                                    <div *ngIf="subCat !== analysis.subCategories[0] && subCat !== analysis.subCategories[1]" class="subCatIcon subCat2"></div>
+                                </td>
+                                <td class="noBorder">{{ translations$ | getAnalysisSubCategory:subCat.code | async }}</td>
+                            </tr>
+                        </table>
+                    </th>
+                    <th class="headerSubTitle dropdown-column" scope="row">
+                        <ng-template #appMLALegend>
+                            <app-mla-legend></app-mla-legend>
+                        </ng-template>
+                        <div
+                            tooltipPlacement="top"
+                            tooltipSize="550"
+                            [appTooltip]="appMLALegend">
+                            <span i18n="@@tdssaMla_uppercase">TDSSA MLA</span>
+                        </div>
+                        <div class="btn-group btn-width" dropdown>
+                            <div
+                                dropdownToggle
+                                class="mla-dropdown dropdown-toggle"
+                                [attr.data-qa]="'tdssaMla' + analysis.categoryCode + 'Dropdown'">
+                                
+                                <app-mla-icon *ngIf="mlaArray[i] === 0" class="icon-margin" type="green" [size]="10"></app-mla-icon>
+                                <app-mla-icon *ngIf="mlaArray[i] === 1" class="icon-margin" type="red" [size]="10"></app-mla-icon>
+                                
+                                <span *ngIf="mlaArray[i] === 2" i18n="@@all">All</span>
+                                <span class="caret"></span>
+                            </div>
+                            <ul *dropdownMenu class="dropdown-menu" role="menu">
+                                <li
+                                    class="dropdown-item"
+                                    role="menuitem"
+                                    [attr.data-qa]="'greenTdssaMla' + analysis.categoryCode + 'DropdownOption'"
+                                    (click)="onMLAChange(0, i)">
+                                    <app-mla-icon class="icon-margin" type="green" [size]="10"></app-mla-icon>
+                                </li>
+                                <li
+                                    class="dropdown-item"
+                                    role="menuitem"
+                                    [attr.data-qa]="'redTdssaMla' + analysis.categoryCode + 'DropdownOption'"
+                                    (click)="onMLAChange(1, i)">
+                                    <app-mla-icon class="icon-margin" type="red" [size]="10"></app-mla-icon>
+                                </li>
+                                <li
+                                    class="dropdown-item"
+                                    role="menuitem"
+                                    [attr.data-qa]="'allTdssaMla' + analysis.categoryCode + 'DropdownOption'"
+                                    (click)="onMLAChange(2, i)">
+                                    <span class="dropdown-text" i18n="@@all">All</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </th>
+                </ng-container>
+            </tr>
+            
+            <tr #grandTotalRowRef class="totalRow">
+                <th class="grandTotalHeader" colspan="2" scope="colgroup">
+                    <span class="grandTotalHeader" i18n="@@grandTotal">Grand Total</span>
+                </th>
+                <th class="alignRight" rowspan="2" scope="rowgroup">
+                    <div
+                        appTooltip
+                        i18n-tooltipContent="@@grandTotalTooltip"
+                        tooltipPlacement="top"
+                        tooltipContent="For the purposes of this calculation, one Test includes any number of Samples that are collected from one Athlete during a single Sample Collection Session. For example, a Sample Collection Session in which one (1) urine Sample and two (2) blood Samples are collected will count as one Test. Blood ABP Tests, conducted in isolation, shall not be included in this calculation.">{{ tdssaSheet.totals.testTotal }}
+                    </div>
+                </th>
+                <th class="alignRight" scope="col"><span>{{ tdssaSheet.totals.oocTotal | calculatePercentage:tdssaSheet.totals.testTotal }}%</span></th>
+                <th class="alignRight" scope="col"><span>{{ tdssaSheet.totals.totalSamplesUrine }}</span></th>
+                <th class="alignRight" scope="col"><span>{{ tdssaSheet.totals.totalSamplesBlood }}</span></th>
+                <th class="alignRight" scope="col"><span>{{ tdssaSheet.totals.totalSamplesBloodPassport }}</span></th>
+                <th class="alignRight" scope="col"><span>{{ tdssaSheet.totals.totalSamplesDriedBloodSpot }}</span></th>
+                
+                <ng-container *ngFor="let analysis of tdssaSheet.totals.analyses">
+                    <th class="alignRight" scope="col"><span>{{ analysis.total }}</span></th>
+                    <th colspan="2" class="alignRight" scope="colgroup">
+                        <app-progressbar-multi [total]="tdssaSheet.totals.testTotal" [values]="analysis | subCategoriesTotals"></app-progressbar-multi>
+                    </th>
+                    <th scope="row"></th>
+                </ng-container>
+            </tr>
+        </thead>
+        <tbody #tableBodyRef *ngIf="tdssaSheet">
+            <tr
+                #loadingOverlayRef
+                *ngIf="tableLoading"
+                class="loading-overlay">
+                <div class="overlay-spacer-before"></div>
+                <img
+                    #imgLoadingRef
+                    alt="Loading Icon"
+                    class="loading-img"
+                    i18n-alt="@@loadingIcon"
+                    src="assets/loading.png">
+                <div #textLoadingRef class="loading-text" i18n="@@loadingValuesForYou_threeDots">Loading values for you...</div>
+                <div class="overlay-spacer-after"></div>
+            </tr>
+            <ng-container *ngFor="let sport of tdssaSheet.rows">
+                <tr class="sportRow">
+                    <td class="sportHeader" colspan="2">
+                        <app-collapse-button
+                            class="sportHeader"
+                            [collapsed]="!visibilityMap[sport.sportName]"
+                            [dataQA]="sport.sportName + 'AppCollapseButton'"
+                            (click)="toggleVisibility(sport.sportName)">
+                            <div>{{ sport.sportName }}</div>
+                        </app-collapse-button>
+                    </td>
+                    
+                    <td class="alignRight"><span>{{ sport.totals.testTotal }}</span></td>
+                    <td class="alignRight"><span>{{ sport.totals.oocTotal | calculatePercentage:sport.totals.testTotal }}%</span></td>
+                    <td class="alignRight"><span>{{ sport.totals.totalSamplesUrine }}</span></td>
+                    <td class="alignRight"><span>{{ sport.totals.totalSamplesBlood }}</span></td>
+                    <td class="alignRight"><span>{{ sport.totals.totalSamplesBloodPassport }}</span></td>
+                    <td class="alignRight"><span>{{ sport.totals.totalSamplesDriedBloodSpot }}</span></td>
+                    
+                    <ng-container *ngFor="let analysis of sport.totals.analyses">
+                        <td class="alignRight"><span>{{ analysis.total }}</span></td>
+                        <td class="alignRight" colspan="2">
+                            <app-progressbar-multi
+                                [total]="sport.totals.testTotal"
+                                [values]="analysis | subCategoriesTotals">
+                            </app-progressbar-multi>
+                        </td>
+                        <td></td>
+                    </ng-container>
+                </tr>
+                <ng-container *ngFor="let disc of sport.subRows; let j = index" >
+                    <tr *ngIf="visibilityMap[sport.sportName]" class="disciplineRow">
+                        <td colspan="2">
+                            <div class="sport-discipline-padding">{{ sport.sportName }} - {{ disc.disciplineName }}</div>
+                        </td>
+                        
+                        <td class="alignRight"><span>{{ disc.totals.testTotal }}</span></td>
+                        <td class="alignRight"><span>{{ disc.totals.oocTotal | calculatePercentage:disc.totals.testTotal }}%</span></td>
+                        <td class="alignRight"><span>{{ disc.totals.totalSamplesUrine }}</span></td>
+                        <td class="alignRight"><span>{{ disc.totals.totalSamplesBlood }}</span></td>
+                        <td class="alignRight"><span>{{ disc.totals.totalSamplesBloodPassport }}</span></td>
+                        <td class="alignRight"><span>{{ disc.totals.totalSamplesDriedBloodSpot }}</span></td>
+                        
+                        <ng-container *ngFor="let analysis of disc.totals.analyses">
+                            <td class="alignRight">
+                                <span>{{ analysis.total }}</span>
+                            </td>
+                            <td class="alignRight" colspan="2">
+                                <app-progressbar-multi
+                                    tooltipPlacement="top"
+                                    tooltipSize="350"
+                                    [appTooltip]="progressbarTooltip"
+                                    [bar]="analysis.mla"
+                                    [showBar]="true"
+                                    [tooltipContext]="{ disc: disc, sport: sport, analysis: analysis }"
+                                    [total]="disc.totals.testTotal"
+                                    [values]="analysis | subCategoriesTotals">
+                                </app-progressbar-multi>
+                                <ng-template #progressbarTooltip>
+                                    <app-progressbar-tooltip
+                                        [analysis]="analysis"
+                                        [sportName]="sport.sportName + ' / ' + disc.disciplineName"
+                                        [total]="disc.totals.testTotal">
+                                    </app-progressbar-tooltip>
+                                </ng-template>
+                            </td>
+                            <td class="alignRight centered">
+                                <div *ngIf="analysis.mla > 0" [ngSwitch]="iconLevel(disc, analysis)">
+                                    <app-mla-icon *ngSwitchCase="'green'" type="green" [size]="20"></app-mla-icon>
+                                    <app-mla-icon *ngSwitchCase="'yellow'" type="yellow" [size]="16"></app-mla-icon>
+                                    <app-mla-icon *ngSwitchCase="'red'" type="red" [size]="20"></app-mla-icon>
+                                </div>
+                            </td>
+                        </ng-container>
+                    </tr>
+                </ng-container>
+            </ng-container>
+        </tbody>
+    </table>
+</div>

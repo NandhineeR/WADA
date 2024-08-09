@@ -1,0 +1,200 @@
+<div
+    appInheritDir
+    *appLet="tdssaMetrics$ | async as tdssa"
+    class="wrapper">
+    <div class="title" i18n="@@dashboard">Dashboard</div>
+    <div *appLet="metrics$ | async as metrics" [ngClass]="{'ie': isIE}">
+        <!-- TDP Row -->
+        <div class="content">
+            <app-card>
+                <div card-title data-qa="tdpAppcard" i18n="@@testDistributionPlan">Test Distribution Plan</div>
+                <div card-content i18n="@@tdpEntryPointCardContent">Test Distribution Plan has been improved and aims at <strong>planning your tests for the year</strong> so that you can <strong>monitor</strong> your plan with TDP Monitoring page.</div>
+                <div card-bottom>
+                    <a
+                        *ngIf="metrics.TDP.samplesPlannedForCurrentYear > 0 && (canShowMetrics$ | async); else startPlanning"
+                        routerLink="/tdp">
+                        <app-button dataQA="updatePlanningButton" i18n="@@updatePlanning_uppercase" type="primary">UPDATE PLANNING</app-button>
+                    </a>
+                    <ng-template #startPlanning>
+                        <div class="message-above-button" i18n="@@haventTriedItYet">Haven't tried it yet ?</div>
+                        <a routerLink="/tdp">
+                            <app-button dataQA="startPlanningButton" i18n="@@startPlanning_uppercase" type="primary">START PLANNING</app-button>
+                        </a>
+                    </ng-template>
+                </div>
+            </app-card>
+
+            <app-metrics-card *ngIf="(canShowMetrics$ | async) === false; else TDPMetrics">
+                <div card-description>
+                    <div>
+                        <app-loading-animation [isDashboard]="true"></app-loading-animation>
+                    </div>
+                </div>
+            </app-metrics-card>
+        
+            <ng-template #TDPMetrics>
+                <!-- First metric -->
+                <app-metrics-card *ngIf="afterOctober">
+                    <div
+                        card-title
+                        *ngIf="metrics.TDP.percentOfActiveADOsWithPlanningForNextYear > 50"
+                        i18n="@@xPercentOfADOsHaveAlreadyPlannedForYearX">
+                        <span class="stat">&lrm;{{ metrics.TDP.percentOfActiveADOsWithPlanningForNextYear | round }}%</span> of ADOs have already planned for {{ currentYear + 1 }}
+                    </div>
+                    <div card-value>{{ metrics.TDP.samplesPlannedForNextYear }}</div>
+                    <div card-description i18n="@@samplesPlanned">samples planned</div>
+                    <div card-sub-description i18n="@@forYearX">for {{ currentYear + 1 }}</div>
+                    <a card-bottom routerLink="/tdpm">
+                        <app-button
+                            *ngIf="metrics.TDP.samplesPlannedForNextYear; else noSamplesForNextYear"
+                            class="card-button"
+                            i18n="@@update_uppercase"
+                            type="secondary">UPDATE</app-button>
+                        <ng-template #noSamplesForNextYear>
+                            <app-button
+                                class="card-button"
+                                dataQA="planNowButton"
+                                i18n="@@planNow_uppercase"
+                                type="secondary">PLAN NOW</app-button>
+                        </ng-template>
+                    </a>
+                </app-metrics-card>
+           
+                <!-- Second metric -->
+                <app-metrics-card>
+                    <div card-value>{{ metrics.TDP.samplesPlannedForCurrentYear }}</div>
+                    <div card-description i18n="@@samplesPlanned">samples planned</div>
+                    <div card-sub-description i18n="@@forX">for {{ currentYear }}</div>
+                </app-metrics-card>
+            
+                <!-- Third metric -->
+                <app-metrics-card *ngIf="metrics.TDP.samplesPlannedForCurrentYear">
+                    <div card-title *ngIf="validOrg$ | async" i18n="@@nadosAverage">
+                        <span class="stat">{{ metrics.TDP.percentageOfNadosWithPlanning | round }}%</span>: NADOs average
+                    </div>
+                    <div card-value i18n="@@xPercent">{{ metrics.TDP.percentageOfPlannedOOCSamples | round }}%</div>
+                    <div card-description i18n="@@samplesOutOfCompetition">samples out-of-competition</div>
+                    <div card-sub-description i18n="@@forX">for {{ currentYear }}</div>
+                </app-metrics-card>
+            </ng-template>
+        </div>
+        
+        <!-- TDPM Row -->
+        <div class="content">
+            <app-card>
+                <div card-title data-qa="tdpMonitoringAppcard" i18n="@@tdpMonitoring">TDP Monitoring</div>
+                <div card-content i18n="@@tpmEntryPointCardContent">Test Distribution Plan Monitoring aims at getting an <strong>overview of how you are doing compared to what you have planned</strong> in Test Distribution Plan.</div>
+                <a card-bottom routerLink="/tdpm">
+                    <app-button
+                        dataQA="findOutHowYouAreDoingTDPMButton"
+                        i18n="@@findOutHowYouAreDoing_uppercase"
+                        type="primary">FIND OUT HOW YOU ARE DOING</app-button>
+                </a>
+            </app-card>
+
+            <app-metrics-card *ngIf="(canShowMetrics$ | async) === false; else TDPMonitoringMetrics">
+                <div card-description>
+                    <div>
+                        <app-loading-animation [isDashboard]="true"></app-loading-animation>
+                    </div>
+                </div>
+            </app-metrics-card>
+
+            <ng-template #TDPMonitoringMetrics>
+                <!-- First metric  -->
+                <app-metrics-card *ngIf="metrics.TDPM.tdpHasValues; else noTDPMetric1">
+                    <div card-value>{{ metrics.TDPM.samplesCollected }}</div>
+                    <div card-description i18n="@@dashboard_outOfXSamplesCollected">out of {{ metrics.TDPM.samplesInTDP }} samples collected</div>
+                    <div card-sub-description i18n="@@dashboard_inYearX">in {{ currentYear }}</div>
+                </app-metrics-card>
+                
+                <ng-template #noTDPMetric1>
+                    <app-metrics-card>
+                        <div card-value>{{ metrics.TDPM.samplesCollected }}</div>
+                        <div card-description i18n="@@dashboard_samplesCollected">samples collected</div>
+                        <div card-sub-description i18n="@@dashboard_inYearX">in {{ currentYear }}</div>
+                    </app-metrics-card>
+                </ng-template>
+                
+                <!-- Second metric -->
+                <app-metrics-card *ngIf="metrics.TDPM.tdpHasValues; else noTDPMetric2">
+                    <div card-value>{{ metrics.TDPM.disciplinesWithCompletedTests }}</div>
+                    <div card-description i18n="@@dashboard_outOfXDisciplines">out of {{ metrics.TDPM.disciplinesPlannedToBeTested }} disciplines</div>
+                    <div card-sub-description i18n="@@dashboard_testedInYearX">tested in {{ currentYear }}</div>
+                </app-metrics-card>
+                
+                <ng-template #noTDPMetric2>
+                    <app-metrics-card>
+                        <div card-value>{{ metrics.TDPM.disciplinesWithCompletedTests }}</div>
+                        <div card-description i18n="@@dashboard_disciplines">disciplines</div>
+                        <div card-sub-description i18n="@@dashboard_testedInYearX">tested in {{ currentYear }}</div>
+                    </app-metrics-card>
+                </ng-template>
+                
+                <!-- Third metric -->
+                <app-metrics-card>
+                    <div card-title *ngIf="validOrg$ | async" i18n="@@dashboard_nadosAverage">
+                        <span class="stat">{{ metrics.TDPM.nadosAverage | round }}%</span>: NADOs average
+                    </div>
+                    <div card-value i18n="@@dashboard_xPercent">{{ metrics.TDPM.percentageOfOOCSamplesCollected | round }}%</div>
+                    <div card-description i18n="@@dashboard_outOfCompetitionSamplesCollected">out-of-competition samples collected</div>
+                    <div card-sub-description i18n="@@dashboard_inYearX">in {{ currentYear }}</div>
+                </app-metrics-card>
+            </ng-template>
+        </div>
+        
+        <!-- TDSSA Row -->
+        <div class="content">
+            <app-card>
+                <div card-title data-qa="tdssaMonitoringAppcard" i18n="@@tdssaMonitoring">TDSSA Monitoring</div>
+                <div card-content i18n="@@dashboard_tdssaEntryPointCardContent">TDSSA Monitoring aims at getting an <strong>overview of how you are doing compared to the Minimum Level of Analysis for each Sport / Discipline</strong>.</div>
+                <a card-bottom routerLink="/tdssa">
+                    <app-button
+                        dataQA="findOutHowYouAreDoingTDSSAButton"
+                        i18n="@@findOutHowYouAreDoing_uppercase"
+                        type="primary">FIND OUT HOW YOU ARE DOING</app-button>
+                </a>
+            </app-card>
+            
+            <app-metrics-card *ngIf="(canShowTDSSAMetrics$ | async) === false; else TDSSAMetrics">
+                <div card-description>
+                    <div>
+                        <app-loading-animation [isDashboard]="true"></app-loading-animation>
+                    </div>
+                </div>
+            </app-metrics-card>
+            
+            <ng-template #TDSSAMetrics>
+                <!-- First metric -->
+                <app-metrics-card>
+                    <div card-value>{{ tdssa.disciplinesThatMeetMLA }}</div>
+                    <div card-description i18n="@@outOfXDisciplines">out of {{ tdssa.disciplinesWithMLA }} disciplines</div>
+                    <div card-sub-description i18n="@@meetTdssaMlas">meet TDSSA MLAs</div>
+                </app-metrics-card>
+                
+                <!-- Second metric -->
+                <app-metrics-card>
+                    <div card-value>{{ tdssa.testsCompletedYearToDate }}</div>
+                    <div card-description i18n="@@tests_lowercase">tests</div>
+                    <div card-sub-description i18n="@@yearToDate_lowercase">year to date</div>
+                </app-metrics-card>
+                
+                <!-- Third metric -->
+                <app-metrics-card>
+                    <div card-title *ngIf="validOrg$ | async" i18n="@@nadosAverage">
+                        <span class="stat">{{ tdssa.nadosAverage | round }}%</span>: NADOs average
+                    </div>
+                    <div card-value i18n="@@xPercent">{{ tdssa.percentageOfCompletedOOCSamples | round }}%</div>
+                    <div card-description i18n="@@outOfCompetitionTests">out-of-competition tests</div>
+                    <div card-sub-description i18n="@@yearToDate_lowercase">year to date</div>
+                </app-metrics-card>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+<div
+    class="designed"
+    i18n="@@designedAndCodedWithLove">
+    Designed and coded with <img class="heart-image" src="assets/heart.png" alt="heart icon" /> in Montreal and Sherbrooke (Canada) - Version: {{ (buildManifest$ | async)?.build?.version }}
+</div>

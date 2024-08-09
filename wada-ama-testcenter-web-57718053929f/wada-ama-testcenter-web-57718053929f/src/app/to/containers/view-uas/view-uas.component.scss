@@ -1,0 +1,87 @@
+@import '~sass/variables';
+
+::ng-deep .card-header {
+    padding: 0;
+    border-bottom: 0;
+    background: transparent;
+}
+
+::ng-deep .card {
+  border: 0;
+  background-color: transparent;
+}
+
+::ng-deep .card-body {
+    border: solid 2px $primary-background;
+    background: #fff;
+    padding: 0.75rem 0.75rem 1.50rem 0.75rem;
+    border-radius: 5px;
+}
+
+::ng-deep .panel-collapse {
+    overflow: visible !important;
+    margin: 8px 0 8px 0;
+}
+
+.btn-container {
+    float: left;
+    margin: 5px 0 0 calc(30% + 20px);
+}
+
+.margin {
+    margin-bottom: 10px;
+}
+
+.page {
+    padding-bottom: 75px;
+}
+
+.button-vertical {
+    vertical-align: baseline;
+}
+
+.success-notification {
+    color: initial;
+    padding-top: 10px;
+
+    ul {
+        padding-left: 20px;
+        padding-top: 10px;
+    }
+    .notification {
+        font-size: 14px;
+    }
+}
+
+.button-background {
+    background-color: initial;
+}
+
+.cdk-mouse-focused {
+    outline: none !important;
+    border: 0 !important;
+}
+
+.mat-icon {
+    svg {
+        vertical-align: baseline;
+    }
+}
+
+.option-menu {
+    float: right;
+}
+
+.fake-link {
+    font-family: Montserrat, sans-serif;
+    color: black;
+    cursor: pointer;
+}
+
+::ng-deep .mat-menu-item:hover {
+    background-color: initial !important;
+}
+
+.footer {
+    padding-bottom: 25px;
+}

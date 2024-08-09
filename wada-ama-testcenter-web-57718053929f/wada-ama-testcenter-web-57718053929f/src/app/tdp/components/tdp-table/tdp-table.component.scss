@@ -1,0 +1,213 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+@mixin tdpTable($left, $right) {
+    table {
+        table-layout: fixed;
+        width: 100%;
+        box-sizing: border-box;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        // This class is added/removed by the appSticky directive to make thead sticky
+        .sticky {
+            display: table;
+            position: fixed;
+            table-layout: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        th:nth-child(1) {
+            width: 26%;
+        }
+
+        th:nth-child(2) {
+            width: 8%;
+        }
+
+        th:nth-child(5) {
+            width: 7%;
+        }
+
+        thead {
+            background: white;
+        }
+
+        tr {
+            // Every cell has a left and bottom border
+            th, td {
+                border-#{$left}: 1px solid $table-border;
+                border-bottom: 1px solid $table-border;
+                height: 30px;
+
+                &.input-col {
+                    min-width: 61px; // 50px input width + 2 * 5px padding + 1px border
+                }
+
+                &.no-left-border {
+                    border-#{$left}: 0;
+                }
+
+                &.no-bottom-border {
+                    border-bottom: 0;
+                }
+            }
+
+            // This is the table right-most border
+            // The border is not added to elements with a not-last class
+            th:last-child:not(.not-last),
+            td:last-child:not(.not-last) {
+                border-#{$right}: 1px solid $table-border;
+            }
+
+            // Corner radius for top row
+            &:first-child {
+                th {
+                    border-top: 1px solid $table-border;
+                    &:first-child {
+                        border-top-#{$left}-radius: $border-radius;
+                    }
+                    &:last-child {
+                        border-top-#{$right}-radius: $border-radius;
+                    }
+                }
+            }
+
+            // Corner radius for the bottom row
+            &:last-child {
+                td {
+                    &:first-child {
+                        border-bottom-#{$left}-radius: $border-radius;
+                    }
+                    &:last-child {
+                        border-bottom-#{$right}-radius: $border-radius;
+                    }
+                }
+            }
+        }
+    }
+
+    .sport-discipline-padding {
+        padding-#{$left}: 40px;
+    }
+
+    .collapse-button {
+        padding-#{$left}: 35px;
+        text-align: $left;
+
+        .collapse-label {
+            white-space: nowrap;
+            color: #1E5623;
+            font-size: 11px;
+            text-decoration: underline;
+        }
+
+        .collapse-label-disabled {
+            color: $disabled-color;
+            text-decoration: none;
+        }
+    }
+
+    .headerTitle {
+        color: $header-text-color;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .headerSubTitle {
+        color: $header-text-color;
+        font-size: 11px;
+        vertical-align: text-top;
+        text-align: center;
+    }
+
+    .totalRow {
+        font-weight: bold;
+        color: $font-color;
+        font-size: 12px;
+        background: $total-color;
+
+        .grandTotalHeader {
+            margin-#{$left}: 35px;
+            text-align: $left;
+        }
+    }
+
+    .sportRow {
+        color: $font-color;
+        font-size: 12px;
+        background: $sport-color;
+        text-align: $left;
+
+        .sportHeader {
+            margin-#{$left}: 10px;
+            vertical-align: middle;
+        }
+    }
+
+    .disciplineRow {
+        color: $font-color;
+        font-size: 12px;
+        background: $discipline-color;
+        text-align: $left;
+    }
+
+    .alignRight {
+        text-align: $right;
+        padding-#{$right}: 5px;
+    }
+
+    .number-input {
+        min-width: 30px;
+        width: 80%;
+        border: 1px solid $input-border;
+        border-radius: $border-radius;
+        padding: 0 6px;
+        text-align: $right;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        -moz-appearance: textfield;
+
+        &.unavailable-value {
+            background: $unavailable-cell-color;
+        }
+
+        &:disabled {
+            background: transparent;
+        }
+    }
+
+    .input-padding {
+        padding: 5px;
+    }
+
+    input {
+        text-align: right;
+    }
+
+    @keyframes highlight {
+        0% {
+            background: $highlight-color;
+        }
+        100% {
+            background: $discipline-color;
+        }
+    }
+
+    .highlighted {
+        animation: highlight 5s linear;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include tdpTable(left, right);
+    }
+    @include rtl {
+        @include tdpTable(right, left);
+    }
+}

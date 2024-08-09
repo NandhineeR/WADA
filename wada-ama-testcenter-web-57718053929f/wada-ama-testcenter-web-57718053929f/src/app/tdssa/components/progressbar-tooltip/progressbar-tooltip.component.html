@@ -1,0 +1,17 @@
+<div class="wrapper">
+    <span class="uppercase"><strong>{{ sportName }}</strong></span>
+    <br />
+    <br />
+    <span i18n="@@totalTestsX">Total Tests: <strong>{{ total }}</strong></span>
+    <br />
+    <span i18n="@@tdssaAnalysisCategoryProgressbarTooltip">Total {{ translations$ | getAnalysisCategory:analysis.categoryCode | async }}: <strong>{{ analysis.total }}</strong> (<strong>{{ analysis.total | calculatePercentage:total:0 }}%</strong> vs TDSSA MLA)</span>
+    <br />
+    <div *ngFor="let subCategory of this.analysis.subCategories">
+        <span i18n="@@tdssaAnalysisSubCategoryProgressbarTooltip">{{ translations$ | getAnalysisSubCategory:subCategory.code | async }}: <strong>{{ subCategory.total }}</strong> (<strong>{{ subCategory.total | calculatePercentage:total:1 }}%</strong>)</span>
+        <br />
+    </div>
+    <br />
+    <span i18n="@@technicalDocumentForSportAnalysis">Technical Document for Sport Analysis</span>
+    <br />
+    <span i18n="@@minLevelOfAnalysisTdssaMlaX">Minimum Level of Analysis (TDSSA MLA): <strong>{{ analysis.mla | calculatePercentage:100:0 }}%</strong></span>
+</div>

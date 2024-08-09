@@ -1,0 +1,56 @@
+@import '~sass/variables';
+
+$sidebar-menu-item-background-color: #C3E6B6;
+
+::ng-deep.mat-menu-item {
+    background-color: white;
+    font-size: 16px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    text-align: left !important;
+    height: 32px !important;
+    line-height: 32px !important;
+}
+
+::ng-deep.mat-menu-item:hover {
+    background-color: $primary_background_hover;
+    color: white;
+}
+
+::ng-deep.mat-menu-item.deleteItem {
+    color: $error-color !important;
+}
+
+::ng-deep.mat-menu-item.deleteItem:hover {
+    background-color: $primary-delete-hover !important;
+    color: $error-color !important;
+}
+
+::ng-deep.mat-menu-item.cancelItem:hover {
+    background-color: unset !important;
+    color: $text-color;
+}
+
+::ng-deep.mat-menu-item.sidebar-menu-item:hover {
+    background-color: #9CD692;
+    color: black;
+}
+
+::ng-deep.mat-menu-item.sidebar-menu-item {
+    background-color: $sidebar-menu-item-background-color;
+    color: black;
+}
+
+::ng-deep.mat-menu-panel {
+    padding: 0;
+    max-width: fit-content !important;
+    overflow: visible !important;
+}
+
+::ng-deep.mat-menu-item:focus {
+    outline: none;
+}
+
+::ng-deep.cdk-overlay-pane {
+    border-radius: 5px !important;
+}

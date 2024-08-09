@@ -1,0 +1,18 @@
+<app-popover appInheritDir (closePopover)="onClose()" (openPopover)="onOpen()">
+    <app-button dataQA="addSportDisciplinePopupButton" i18n="@@addASportDiscipline_uppercase" type="secondary">ADD A SPORT / DISCIPLINE</app-button>
+    <div popover-title i18n="@@addASportDiscipline_uppercase">ADD A SPORT / DISCIPLINE</div>
+    <div popover-body class="popover-body">
+        <label><span i18n="@@sportDiscipline_slash">Sport / Discipline</span><span class="green-asterisk">*</span></label>
+        <app-typeahead
+            #typeaheadRef
+            dataQA="addSportDisciplineTypeahead"
+            suggestionField="displayName"
+            [suggestions]="sportDisciplinesSuggestions"
+            (selected)="selected($event)">
+        </app-typeahead>
+        <div class="popover-buttons">
+            <app-button dataQA="addSportDisciplineButton" i18n="@@add_uppercase" type="primary" (click)="addDiscipline()">ADD</app-button>
+            <app-button dataQA="cancelSportDisciplineButton" i18n="@@cancel_uppercase" type="secondary" (click)="requestClose()">CANCEL</app-button>
+        </div>
+    </div>
+</app-popover>

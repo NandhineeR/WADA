@@ -1,0 +1,6 @@
+package.json
+package-lock.json
+dist
+.scannerwork
+node_modules
+src/polyfills.ts

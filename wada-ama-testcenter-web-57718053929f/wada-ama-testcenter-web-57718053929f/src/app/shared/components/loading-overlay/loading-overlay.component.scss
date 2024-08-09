@@ -1,0 +1,36 @@
+.wrapper {
+    font-family: Montserrat, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+}
+
+.loading-img {
+    display: block;
+    height: 60px;
+    animation: rotation 2s infinite linear;
+}
+
+.loading-text {
+    font-size: 36px;
+    color: #414042;
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}

@@ -1,0 +1,159 @@
+<app-modal
+    *ngIf="showModal"
+    [removeMargin]="true"
+    [minHeight]="'260px'"
+    [minWidth]="'1000px'"
+    [resizeModal]="true"
+    [scrollable]="true"
+    (modalClose)="setShowModal(false)">
+    <div modal-header>
+        <span i18n="@@markAsClosedSampleNotCollected">Mark As Closed - Sample Not Collected</span>
+    </div>
+
+    <div modal-body class="modal__body">
+        <div class="wrapper">
+            <div class="modal__messages" *ngIf="displayMessages">
+                <div class="primary__message">
+                    <ng-container [ngSwitch]="testsToClose.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestWillBeClosed">The following test will be marked as Closed - Sample Not Collected:</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsWillBeClosed">The following tests will be marked as Closed - Sample Not Collected:</span>
+                    </ng-container>
+                </div>
+                <div class="secondary__message">
+                    <ul>
+                        <li *ngFor="let test of testsToClose">
+                            <span>{{ test.name }}</span>
+                        </li>
+                    </ul>
+                    <span i18n="@@cancelledTestsInformationWarning">Cancelled tests cannot be updated anymore. You will not be able to undo this action.</span>
+                </div>
+            </div>
+
+            <div *ngIf="!returnToForm" class="notification">
+                <app-notification *ngIf="testsNotUpdatedWarning.hasWarning()" type="warning">
+                    <ng-container [ngSwitch]="testsNotUpdatedWarning.names?.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestCannotBeUpdated">The following test cannot be updated:</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsCannotBeUpdated">The following tests cannot be updated:</span>
+                    </ng-container>
+                    <ul>
+                        <li *ngFor="let name of testsNotUpdatedWarning.names">
+                            <span>{{name}}</span>
+                        </li>
+                    </ul>
+                    <span i18n="@@pleaseRefreshAndTryAgain">Please refresh the page and try again.</span>
+                </app-notification>
+
+                <app-notification *ngIf="dcfOrCancelledWarning.hasWarning()" type="warning">
+                    <ng-container [ngSwitch]="dcfOrCancelledWarning.names?.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestCannotBeMarkedAsClosedSampleNotCollected">The following test cannot be marked as "Closed - Sample Not Collected":</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsCannotBeMarkedAsClosedSampleNotCollected">The following tests cannot be marked as "Closed - Sample Not Collected":</span>
+                    </ng-container>
+                    <ul>
+                        <li *ngFor="let name of dcfOrCancelledWarning.names">
+                            <span>{{name}}</span>
+                        </li>
+                    </ul>
+                </app-notification>
+
+                <app-notification *ngIf="closedTestsWarning.hasWarning()" type="warning">
+                    <ng-container [ngSwitch]="closedTestsWarning.names?.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestAlreadyMarkedAsClosedSampleNotCollected">The following test has already been marked as "Closed - sample not collected":</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsAlreadyMarkedAsClosedSampleNotCollected">The following tests have already been marked as "Closed - sample not collected":</span>
+                    </ng-container>
+                    <ul>
+                        <li *ngFor="let name of closedTestsWarning.names">
+                            <span>{{name}}</span>
+                        </li>
+                    </ul>
+                </app-notification>
+            </div>
+            
+            <app-data-table
+                *ngIf="displayMessages"
+                [columnDefs]="columns"
+                [dataSource]="dataSource"
+                [showColumnMenu]="false"
+                [showDrag]="false"
+                [showFooter]="false"
+                [showOrder]="false"
+                [showPaginator]="false"
+                [showRemove]="false"
+                [showSelect]="false"
+                [showTableFooter]="false"
+                [showTopHeader]="false">
+                <ng-container *columnCell="'reason'; let e">
+                    <div *ngIf="!e.isStatusClosed(); else displayReason">
+                        <div *ngFor="let status of testStatuses?.subStatuses; let i = index;" class="radio-container-all">
+                            <label *appLet="(isTestClosedOrCancelled(e)) as readonly" class="radio-container" >
+                                <input
+                                    name="reason{{e.testId}}{{i}}"
+                                    type="radio"
+                                    [attr.disabled]="readonly ? true : undefined"
+                                    [value]="status"
+                                    [(ngModel)]="e.reason">
+                                <span class="checkmark" [attr.data-qa]="'reason_' + status.specificCode" [ngClass]="{'error': isValidationActive && e.reason === null }"></span>
+                                <span class="radio-label">{{ status.description }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <ng-template #displayReason>
+                        <span>{{ e?.reason?.description }}</span>
+                    </ng-template>
+                </ng-container>
+
+                <ng-container *columnCell="'details'; let e; let i = index">
+                    <div class="plannedDate">
+                        <label i18n="@@date">Date</label>
+                        <app-date-input
+                            field-input
+                            dataQA="detailsDate"
+                            [appDisable]="isTestClosedOrCancelled(e)"
+                            [isLastItem]="(i + 1) === dataSource?.data?.length && i !== 0"
+                            [isMarkAsNotCollectedModal]="true"
+                            [locale]="locale"
+                            [maxDate]="currentDate"
+                            [ngModel]="isTestClosedOrCancelled(e) ? e.plannedStartDate : currentDate"
+                            (ngModelChange)="updateDate($event, e)"
+                            (showCalendarEmitter)="isCalendarDisplayed($event)">
+                        </app-date-input>
+                    </div>
+                    <textarea
+                        class="message"
+                        data-qa="message"
+                        id="details{{e.testId}}"
+                        maxlength="4000"
+                        [disabled]="e.isStatusClosed() || e.isStatusCancelled() || returnToForm"
+                        [ngClass]="{'error': isValidationActive && e.details?.length < 1 }"
+                        [(ngModel)]="e.details">
+                    </textarea>
+                </ng-container>
+            </app-data-table>
+
+            <div class="center-modal-buttons bottom-button-padding">
+                <ng-container *ngIf="!returnToForm; else returnToFormButton">
+                    <app-button
+                        dataQA="cancelMarkAsClosedButton"
+                        type="secondary"
+                        (click)="onCloseModal()">
+                        <span i18n="@@cancel" >Cancel</span>
+                    </app-button>
+                    <app-button
+                        dataQA="confirmMarkAsClosedButton"
+                        type="primary"
+                        [class.disabled]="!isSaveActive"
+                        [disabled]="!isSaveActive || !isFormValid()"
+                        (click)="onConfirm()">
+                        <span i18n="@@sample_closed_save">Done</span>
+                    </app-button>
+                </ng-container>
+
+                <ng-template #returnToFormButton>
+                    <app-button type="primary" (click)="onCloseModal()">
+                        <span i18n="@@okReturnToForm">OK, Return to Form</span>
+                    </app-button>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</app-modal>

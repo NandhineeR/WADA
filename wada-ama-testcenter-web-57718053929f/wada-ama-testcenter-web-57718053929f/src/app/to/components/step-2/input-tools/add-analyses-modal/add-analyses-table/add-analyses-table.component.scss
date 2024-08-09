@@ -1,0 +1,101 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/lime-pie-bar';
+
+@mixin step($left, $right) {
+    .limePieHeader {
+        @include bar($left, $right);
+    }
+}
+
+.wrapper {
+    @include step(left, right);
+}
+
+.analysesHeader {
+    margin-top: 10px;
+}
+
+.mat-header-row:first-of-type {
+    background: inherit !important;
+}
+
+.analyses-row {
+    padding-left: 30px;
+}
+
+/* Clear floats after the columns */
+.analyses-row:after {
+    content: "";
+    display: table;
+    clear: both;
+    width: 100%;
+}
+
+/* Create three equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 25%;
+}
+
+.center-modal-buttons {
+    margin-top: 0px;
+    display: flex;
+    justify-content: center;
+}
+
+.bottom-button-padding {
+    padding-top: 15px;
+    padding-bottom: 75px;
+}
+
+.remove-margin {
+    margin-bottom: 0px !important;
+}
+
+.disabled-button {
+    pointer-events: none;
+}
+
+.add-sample-analysis-button-wrapper {
+    margin-top: 15px;
+}
+
+.delete-button {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    float: right;
+    margin-right: 15px;
+}
+
+.analyses-title {
+    padding-top: 10px;
+}
+
+.analysis-title {
+    display: inline-block;
+    font-weight: 510;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.empty-yellow-line {
+    width: 95%;
+    position: relative;
+    background-color: $empty-line-color;
+    height: 2px;
+}
+
+.notification-wrapper {
+    margin: 15px 15px 0 15px;
+}
+
+.warning-wrapper {
+    margin-right: 15px;
+}
+
+.error-wrapper {
+    margin-top: 15px;
+}

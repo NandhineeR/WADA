@@ -1,0 +1,23 @@
+@import '../../../../sass/mixins';
+@import '../../../../sass/variables';
+
+.activity-log-title-wrapper {
+    padding: 0px 25px;
+}
+
+.activity-log-title {
+    font-size: 34px;
+    font-weight: bold;
+    line-height: 90px;
+}
+
+.no-link {
+    pointer-events: none;
+    text-decoration: none;
+    color:  black;
+}
+
+span.float-btn-right{
+    float: right;
+    margin: 35px 0px;
+}

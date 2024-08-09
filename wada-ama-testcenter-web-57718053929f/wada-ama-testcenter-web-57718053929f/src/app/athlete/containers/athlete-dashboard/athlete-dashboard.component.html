@@ -1,0 +1,15 @@
+<div class="wrapper" appInheritDir appRandomizeInput #root="appRandomizeInput">
+
+    <app-dashboard-header class="header" [athlete]="athlete$ | async" [sportIdentities]="sportIdentities$ | async">
+    </app-dashboard-header>
+
+    <div class="dashed-line"></div>
+
+    <app-dashboard-body>
+    </app-dashboard-body>
+
+    <div class="dashed-line"></div>
+
+    <app-dashboard-footer>
+    </app-dashboard-footer>
+</div>

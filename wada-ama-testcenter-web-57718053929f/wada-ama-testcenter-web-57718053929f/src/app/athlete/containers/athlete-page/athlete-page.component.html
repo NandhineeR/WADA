@@ -1,0 +1,97 @@
+<div
+    *appLet="athlete$ | async as athlete"
+    class="athlete-wrapper">
+    <div class="athlete-section left-menu">
+        <div class="photo-area">
+            <table
+                aria-hidden="true"
+                aria-label="upload-photo"
+                class="upload-photo">
+                <tr>
+                  <td>
+                    <img
+                        alt="Add Photo"
+                        class="add-circle-outline"
+                        src="assets/add_circle_outline.svg"
+                        (click)="uploadImage()"/>
+                    <br>
+                    <span i18n="@@athlete_upload_photo">UPLOAD PHOTO</span>
+                </td>
+                </tr>
+                <tr>
+                    <td *ngIf="athlete">
+                        <p class="athlete-name">{{athlete.getAthleteFullName()}}</p>
+                        <p>
+                            <app-gender-selector [gender]="athlete.sex"></app-gender-selector>
+                            <span>&nbsp;-&nbsp;<span i18n="@@adamsIdX">ADAMS ID: {{athlete.adamsId}}</span></span>
+                        </p>
+                        <p i18n="@@xDateOfBirth">{{ athlete?.dateOfBirth | date :'dd-MMM-yyyy':'-0000' | uppercase }}</p>
+                        <p>
+                            <span i18n="@@age">Age</span>:&nbsp;<span i18n="@@xAthleteAge">{{ athlete?.dateOfBirth | calculateAge }} years old</span>
+                        </p>
+                        <ng-container *ngFor="let sportDiscipline of sportDisciplines$ | async">
+                           <p>{{ sportDiscipline?.sportDescription }} / {{ sportDiscipline?.disciplineDescription }}</p>
+                        </ng-container>
+                    </td>
+                </tr>
+              </table>
+        </div>
+        
+        <div class="menu-container">
+            <a
+                class="menu-item"
+                i18n="@@dashboard_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.DASHBOARD === currentPage}"
+                [routerLink]="['dashboard']">DASHBOARD</a>
+            <a
+                class="menu-item"
+                i18n="@@profile_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.PROFILE === currentPage}"
+                [routerLink]="['profile']">PROFILE</a>
+            <a
+                class="menu-item"
+                i18n="@@tests_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.TESTS === currentPage}"
+                [routerLink]="['tests']">TESTS</a>
+            <a
+                class="menu-item"
+                i18n="@@biologicalPassport_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.BIOLOGICAL_PASSPORT === currentPage}"
+                [routerLink]="['biological-passport']">BIOLOGICAL PASSPORT</a>
+            <a
+                class="menu-item"
+                i18n="@@whereabouts_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.WHEREABOUTS === currentPage}"
+                [routerLink]="['whereabouts']">WHEREABOUTS</a>
+            <a
+                class="menu-item"
+                i18n="@@tue_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.TUE === currentPage}"
+                [routerLink]="['tue']">TUE</a>
+            <a
+                class="menu-item"
+                i18n="@@adrv_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.ADRV === currentPage}"
+                [routerLink]="['adrv']">ADRV</a>
+            <a
+                class="menu-item"
+                i18n="@@sanctions_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.SANCTIONS === currentPage}"
+                [routerLink]="['sanctions']">SANCTIONS</a>
+            <a
+                class="menu-item"
+                i18n="@@accessPermissions_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.PERMISSIONS === currentPage}"
+                [routerLink]="['permissions']">ACCESS PERMISSIONS</a>
+            <a
+                class="menu-item"
+                i18n="@@accountManagement_uppercase"
+                [ngClass]="{'highlight-menu-item': activePage.ACCOUNT === currentPage}"
+                [routerLink]="['account']">ACCOUNT MANAGEMENT</a>
+        </div>
+    </div>
+    
+    <div class="athlete-section">
+        <router-outlet></router-outlet>
+    </div>
+</div>

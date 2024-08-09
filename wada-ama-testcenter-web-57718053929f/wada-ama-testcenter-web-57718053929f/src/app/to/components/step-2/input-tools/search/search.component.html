@@ -1,0 +1,26 @@
+<div class="search__wrapper">
+    <label i18n="@@searchAthletes" for="searchAthlete">Search Athletes</label>
+    <input
+        field-input
+        #searchRef
+        type="text"
+        autocomplete="disabled"
+        id="searchAthlete"
+        (keyup)="validateLength()"
+        (keyup.enter)="searchAthleteClick()"
+        data-qa="searchAthlete">
+    <app-modal-button
+        class="search-button"
+        type="primary"
+        maxlength=255
+        (click)="searchAthleteClick()"
+        dataQA="searchAthletesButton">
+        <span i18n="@@searchAthletes">Search Athletes</span>
+    </app-modal-button>
+    <span field-info class="field-info" i18n="@@minimum2characters">Minimum of 2 characters</span>
+
+    <div *ngIf="loadingSearch" class="loading-search">
+        <img class="loading-img" src="assets/loading.png" alt="Loading Icon" i18n-alt="@@loadingIcon">
+        <span i18n="@@loadingValuesForYou_threeDots">Loading values for you...</span>
+    </div>
+</div>

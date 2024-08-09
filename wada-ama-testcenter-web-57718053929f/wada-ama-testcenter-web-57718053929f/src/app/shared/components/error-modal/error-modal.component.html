@@ -1,0 +1,21 @@
+<div appInheritDir appTabFocus *ngIf="showModal" class="modal__wrapper">
+    <div class="modal__header">
+        <div class="modal__title">
+            <span i18n="@@errorModal_cancel"><ng-content select="[modal-title]"></ng-content></span>
+        </div>
+        <div class="modal__close" (click)="onCancel()">&times;</div>
+    </div>
+    <div class="modal__body">
+        <div class="modal__messages">
+            <div class="secondary__message">
+                <ng-content select="[secondary-message]"></ng-content>
+            </div>
+        </div>
+        <div class="close-button">
+            <app-button focus="true" i18n="@@Close" type="secondary" (click)="onCancel()">
+                <ng-content select="[modal-close]"></ng-content>
+            </app-button>
+        </div>
+    </div>
+</div>
+<div class="modal__overlay" *ngIf="showModal"></div>

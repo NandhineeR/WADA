@@ -1,0 +1,193 @@
+<app-view-section-content
+    appHideControl
+    *ngIf="sample"
+    [permissions]="whiteList">
+    <ng-container *ngIf="!isMultipleDCF">
+        <app-view-subsubsection *ngFor="let result of sample.results">
+            <app-view-subsubsection-title i18n="@@sampleX">Sample {{ result.sampleJarCode }}</app-view-subsubsection-title>
+
+            <app-view-entry *ngIf="result.finding?.type && canReadLabResults()" id="finding">
+                <app-view-entry-name i18n="@@analyticalResult">Analytical result</app-view-entry-name>
+                <app-view-entry-value>
+                    <span *ngIf="result.finding?.type === finding.AAF" i18n="@@adverseAnalyticalFinding">Adverse Analytical Finding (AAF)</span>
+                    <span *ngIf="result.finding?.type === finding.ATF" i18n="@@atypicalResultFinding">Atypical Result Finding (ATF)</span>
+                    <span *ngIf="result.finding?.type === finding.Negative" i18n="@@negativeResultFinding">Negative</span>
+                    <br *ngIf="result.finding?.status?.description">
+                    <span>{{ result.finding?.status?.description }}</span>
+                </app-view-entry-value>
+                <app-view-entry-link *ngIf="actions | isActionAvailable:actionRight.ViewMatchingResult">
+                    <a
+                        appOpenObjectInClassic
+                        href=""
+                        [abpAccess]="abpAccess"
+                        [athleteId]="athleteId"
+                        [objectId]="result.finding?.id"
+                        [targetObject]="result.finding?.type">
+                        <span *ngIf="result.finding?.type === finding.AAF" i18n="@@viewAAF">View AAF</span>
+                        <span *ngIf="result.finding?.type === finding.ATF" i18n="@@viewATF">View ATF</span>
+                    </a>
+                </app-view-entry-link>
+            </app-view-entry>
+
+            <app-view-entry *ngIf="result.matchingResultStatus?.specificCode === status.ConfirmedByUser" id="matchingResultStatus">
+                <app-view-entry-name i18n="@@match">Match</app-view-entry-name>
+                <app-view-entry-value i18n="@@confirmedByUser">Confirmed by User</app-view-entry-value>
+                <app-view-entry-link
+                    *ngIf="isUserCorrector && isSampleConfirmedWithoutAdrv && (actions | isActionAvailable:actionRight.EditMatchingResult)">
+                    <app-popover-sample-correction
+                        [currentSampleCode]="sample.sampleCode"
+                        [currentSampleType]="sample.sampleTypeSpecificCode"
+                        [dcfRetentionPeriod]="dcfRetentionPeriod"
+                        [dcfToBeDeleted]="dcfToBeDeleted"
+                        [hasAdverseResult]="hasAdverseResult"
+                        [isLastMatchedSample]="isLastMatchedSample"
+                        [sampleId]="sample.id"
+                        [sampleJarCode]="result?.sampleJarCode"
+                        [sampleTargetField]="sampleTargetFieldEnum.MATCH_TYPE"
+                        (changeSampleEmitter)="changeSample($event)">
+                </app-popover-sample-correction>
+                </app-view-entry-link>
+            </app-view-entry>
+
+            <app-view-entry *ngIf="result.matchingResultStatus?.specificCode !== status.ConfirmedByUser" id="matchingResultStatus">
+                <app-view-entry-name i18n="@@matchType">Match Type</app-view-entry-name>
+                <app-view-entry-value>{{ result.matchingResultStatus?.description }}</app-view-entry-value>
+                <app-view-entry-link *ngIf="(actions | isActionAvailable:actionRight.ViewMatchingResult)">
+                    <a i18n="@@viewMatch" [routerLink]="['/', 'dcf', 'result', dcfId,'sample', _sample.id,'matching-result', result.id]">View Match</a>
+                </app-view-entry-link>
+            </app-view-entry>
+
+            <app-view-entry *ngIf="canReadLabResults()" id="labResultId" [showEntryValue]="false">
+                <app-view-entry-name i18n="@@laboratoryResults">Laboratory Results</app-view-entry-name>
+                <app-view-entry-link>
+                    <a
+                        appOpenObjectInClassic
+                        href=""
+                        targetObject="LabResult"
+                        [abpAccess]="abpAccess"
+                        [objectId]="result?.labResultId"
+                        [type]="sample.sampleTypeSpecificCode">
+                        <span i18n="@@viewLaboratoryResults">View Laboratory Results</span>
+                    </a>
+                </app-view-entry-link>
+            </app-view-entry>
+        </app-view-subsubsection>
+    </ng-container>
+
+    <app-view-entry *ngIf="sample.results?.length > 0 && !isMultipleDCF" id="valid">
+        <app-view-entry-name i18n="@@sampleValidity">Sample Validity</app-view-entry-name>
+        <app-view-entry-value>
+            <span *ngIf="sample.valid" i18n="@@valid">Valid</span>
+            <span *ngIf="!sample.valid" i18n="@@invalid">Invalid</span>
+        </app-view-entry-value>
+        <app-view-entry-link *ngIf="canUpdate('valid')">
+            <app-popover-sample-correction 
+                [currentSampleCode]="sample.sampleCode"
+                [currentSampleType]="sample.sampleTypeSpecificCode"
+                [currentValidity]="sample.valid"
+                [hasAdverseResult]="hasAdverseResult"
+                [sampleId]="sample.id"
+                [sampleTargetField]="sampleTargetFieldEnum.VALIDITY"
+                (changeSampleEmitter)="changeSample($event)">
+            </app-popover-sample-correction>
+        </app-view-entry-link>
+    </app-view-entry>
+    <app-view-entry *ngIf="!isMultipleDCF" id="chainOfCustodyId">
+        <app-view-entry-name i18n="@@chainOfCustody">Chain of Custody</app-view-entry-name>
+        <app-view-entry-value>
+            <span *ngIf="sample.chainOfCustody" i18n="@@created">Created</span>
+            <span *ngIf="!sample.chainOfCustody" i18n="@@none">None</span>
+        </app-view-entry-value>
+        <app-view-entry-link>
+            <ng-container *ngIf="!sample.chainOfCustody && (actions | isActionAvailable:actionRight.CreateChainOfCustody)">
+                <a
+                    appOpenObjectInClassic
+                    href=""
+                    targetObject="ChainOfCustody">
+                    <span i18n="@@create">Create</span>
+                </a>
+            </ng-container>
+
+            <ng-container *ngIf="sample.chainOfCustody && (actions | isActionAvailable:actionRight.ViewChainOfCustody)">
+                <a
+                    appOpenObjectInClassic
+                    href=""
+                    targetObject="ChainOfCustody"
+                    [abpAccess]="abpAccess"
+                    [objectId]="sample?.chainOfCustody">
+                    <span i18n="@@view">View</span>
+                </a>
+            </ng-container>
+        </app-view-entry-link>
+    </app-view-entry>
+
+    <app-view-entry *ngIf="!isMultipleDCF" id="sampleType">
+        <app-view-entry-name i18n="@@sampleType" [invalid]="missingFields | setHas:fields.SampleType" [required]="required">Sample Type</app-view-entry-name>
+        <app-view-entry-value>
+            <span i18n="blood">Blood</span>
+        </app-view-entry-value>
+        <app-view-entry-link *ngIf="aafOrAtfIsConfirmedByUser() && canUpdate('type')">
+            <app-popover-sample-correction
+                [currentSampleCode]="sample.sampleCode"
+                [currentSampleType]="sample.sampleTypeSpecificCode"
+                [hasSampleResults]="sample.results.length > 0"
+                [sampleId]="sample.id"
+                [sampleTargetField]="sampleTargetFieldEnum.SAMPLE_TYPE"
+                [sampleTypes]="sampleTypes"
+                (changeSampleEmitter)="changeSample($event)">
+            </app-popover-sample-correction>
+        </app-view-entry-link>
+    </app-view-entry>
+
+    <app-multiple-field-row-view
+        id="collectionDate"
+        dataQA="collectionDate"
+        [items]="[sample.timezone?.shortName]"
+        [mainItem]="sample.collectionDate | formatDatetime | uppercase">
+        <app-view-entry-name
+            i18n="@@collectionDate"
+            role="mainField"
+            [invalid]="missingFields | setHas:fields.CollectionDate"
+            [required]="required">Collection Date</app-view-entry-name>
+        <app-view-entry-name
+            i18n="@@timeZone"
+            role="field-0"
+            [invalid]="missingFields | setHas:fields.Timezone"
+            [required]="isSampleTimezoneRequired$ | async">Time Zone</app-view-entry-name>
+    </app-multiple-field-row-view>
+
+    <app-view-entry id="code">
+        <app-view-entry-name i18n="@@sampleCode" [invalid]="missingFields | setHas:fields.SampleCode" [required]="required">Sample Code</app-view-entry-name>
+        <app-view-entry-value>{{ sample.sampleCode }}</app-view-entry-value>
+        <app-view-entry-link *ngIf="aafOrAtfIsConfirmedByUser() && canUpdate('code')">
+            <app-popover-sample-correction
+                [currentSampleCode]="sample.sampleCode"
+                [currentSampleType]="sample.sampleTypeSpecificCode"
+                [hasSampleResults]="sample.results.length > 0"
+                [sampleId]="sample.id"
+                [sampleTargetField]="sampleTargetFieldEnum.SAMPLE_CODE"
+                (changeSampleEmitter)="changeSample($event)">
+        </app-popover-sample-correction>
+        </app-view-entry-link>
+    </app-view-entry>
+
+    <app-view-entry id="manufacturer" >
+        <app-view-entry-name i18n="@@manufacturer" [invalid]="missingFields | setHas:fields.Manufacturer" [required]="required">Manufacturer</app-view-entry-name>
+        <app-view-entry-value>{{ sample.manufacturer?.description }}</app-view-entry-value>
+    </app-view-entry>
+
+    <app-view-entry *ngIf="!isMultipleDCF" id="laboratory">
+        <app-view-entry-name i18n="@@laboratory" [invalid]="missingFields | setHas:fields.Laboratory" [required]="required">Laboratory</app-view-entry-name>
+        <app-view-entry-value>{{ sample.laboratory?.name }}</app-view-entry-value>
+    </app-view-entry>
+
+    <app-view-entry id="bloodCollectionOfficial">
+        <app-view-entry-name i18n="@@bloodCollectionOfficial" [invalid]="missingFields | setHas:fields.BloodCollectionOfficial" [required]="required">Blood Collection Official</app-view-entry-name>
+        <app-view-entry-value>{{ sample.displayBloodCollectionOfficialDescriptionName}}</app-view-entry-value>
+    </app-view-entry>
+
+    <app-sample-management-view
+        [hasSampleManagementReader]="hasSampleManagementReader"
+        [sampleManagementSamplesInfo]="sampleManagementSamplesInfo">
+    </app-sample-management-view>
+</app-view-section-content>

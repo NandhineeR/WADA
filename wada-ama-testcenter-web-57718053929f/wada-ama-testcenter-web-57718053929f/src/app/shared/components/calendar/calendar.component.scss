@@ -1,0 +1,123 @@
+$green: #3f8532;
+
+.calendar-wrapper {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid #dbdbdb;
+    border-radius: 5px;
+    padding: 5px;
+
+    .calendar-header {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .nav-button {
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+    }
+
+    .day-names {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+
+        .day-name {
+            text-align: center;
+            width: calc(100% * 1/7);
+        }
+    }
+
+    .days {
+        width: 100%;
+        display: flex;
+        flex-flow: wrap;
+
+        .day {
+            width: calc(100% * 1/7);
+
+            &.is-disabled {
+                .day-number {
+                    cursor: default;
+                    opacity: .25;
+                    pointer-events: none;
+                }
+            }
+
+            .day-number {
+                appearance: none;
+                background: transparent;
+                border: .1rem solid transparent;
+                border-radius: 100%;
+                color: #4a4a4a;
+                cursor: pointer;
+                height: 2.8rem;
+                line-height: 2rem;
+                padding: .3rem;
+                position: relative;
+                text-align: center;
+                text-decoration: none;
+                transition: all .2s ease;
+                vertical-align: middle;
+                white-space: nowrap;
+                width: 2.8rem;
+
+                &.fromDiffMonth {
+                    color:#dbdbdb;
+                }
+
+                &:hover {
+                    border-color: $green;
+                    text-decoration: none;
+                }
+
+                &.selected {
+                    background: $green;
+                    border-color: $green;
+                    color: white;
+                }
+
+                &.isToday {
+                    border-color: rgb(167, 162, 162);
+                    background: rgb(167, 162, 162);
+                    color: white;
+                }
+            }
+        }
+    }
+}
+
+.chevron::before {
+    display: inline-block;
+    position: relative;
+    height: 0.45em;
+    width: 0.45em;
+    left: 0.15em;
+    top: 0.15em;
+    transform: rotate(-45deg);
+    vertical-align: top;
+    border-style: solid;
+    border-width: 1px 1px 0 0;
+    content: '';
+}
+
+.chevron.left:before {
+	left: 0.25em;
+	transform: rotate(-135deg);
+}
+
+.chevron.right:before {
+    left: 0;
+    transform: rotate(45deg);
+}

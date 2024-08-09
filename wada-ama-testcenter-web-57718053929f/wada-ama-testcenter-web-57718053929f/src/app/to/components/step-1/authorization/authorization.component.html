@@ -1,0 +1,132 @@
+<app-view-section [isLoading]="!authorization">
+    <app-view-section-title
+        sectionNumber=1
+        i18n-sectionTitle="@@authorization"
+        sectionTitle="Authorization"
+        [canWrite]="canWrite"
+        [link]="['/', 'to', 'edit', (testingOrderId || ''), 'step', 1]"
+        dataQA="editAuthorizationButton"
+        [numberErrors]="missingFieldsCount">
+    </app-view-section-title>
+
+    <app-view-section-content
+        appHideControl
+        *ngIf="authorization"
+        [permissions]="whiteList">
+        
+        <app-view-entry id="{{controls.TEST_TYPE}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.TestType" i18n="@@testType">Test Type</app-view-entry-name>
+            <app-view-entry-value dataQA="testType">
+                <span *ngIf="authorization?.testType" i18n="@@inCompetition">In Competition</span>
+                <span *ngIf="!authorization.testType" i18n="@@outOfCompetition">Out of Competition</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry *ngIf="authorization?.testType" id="{{controls.MAJOR_GAME_EVENT}}">
+            <app-view-entry-name i18n="@@majorEvent">Major Event</app-view-entry-name>
+            <app-view-entry-value>
+                <app-view-entry-value dataQA="majorEvent">{{ authorization.majorEvent?.description }}</app-view-entry-value>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry *ngIf="authorization.majorEvent" id="{{controls.TEST_TIMING}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.TestTiming" i18n="@@testTiming">Test Timing</app-view-entry-name>
+            <app-view-entry-value dataQA="testTiming">
+                <span *ngIf="authorization?.testTiming == testTimingEnum.PreCompetition" i18n="@@preCompetition">Pre-Competition</span>
+                <span *ngIf="authorization?.testTiming == testTimingEnum.PostCompetition" i18n="@@postCompetition">Post-Competition</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.START_DATE}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.StartDate" i18n="@@startDate">Start Date</app-view-entry-name>
+            <app-view-entry-value dataQA="startDate">{{ authorization.startDate | formatDate :'DD-MMM-YYYY' }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.END_DATE}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.EndDate" i18n="@@endDate">End Date</app-view-entry-name>
+            <app-view-entry-value dataQA="endDate">{{ authorization.endDate | formatDate :'DD-MMM-YYYY' }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.COMPETITION_CATEGORY}}">
+            <app-view-entry-name i18n="@@competitionCategory">Competition Category</app-view-entry-name>
+            <app-view-entry-value dataQA="competitionCategory">{{ authorization.competitionCategory?.description }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.COMPETITION_NAME}}">
+            <app-view-entry-name i18n="@@competitionNameTrainingSession">Name of Competition / Training Session</app-view-entry-name>
+            <app-view-entry-value dataQA="competitionName">{{ authorization.competitionName }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.TESTING_COUNTRY}}">
+            <app-view-entry-name i18n="@@testingCountry">Country of Testing</app-view-entry-name>
+            <app-view-entry-value dataQA="countryOfTesting">{{ authorization.country?.name }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.TESTING_STATE}}">
+            <app-view-entry-name i18n="@@testingRegion">Region of Testing</app-view-entry-name>
+            <app-view-entry-value dataQA="regionOfTesting">{{ authorization.region?.name }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.TESTING_CITY}}">
+            <app-view-entry-name i18n="@@testingCity">City of Testing</app-view-entry-name>
+            <app-view-entry-value dataQA="cityOfTesting">{{ authorization.city }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.ADO_REFERENCE_NUMBER}}">
+            <app-view-entry-name i18n="@@adoReferenceNumber">ADO Reference Number</app-view-entry-name>
+            <app-view-entry-value dataQA="adoReferenceNumber">{{ authorization.adoReferenceNumber }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.TEST_AUTHORITY}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.TestingAuthority" i18n="@@testingAuthority">Testing Authority</app-view-entry-name>
+            <app-view-entry-value dataQA="testingAuthority">{{ authorization.testingAuthority?.displayDescriptionName || '' }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.FEE_FOR_SERVICE}}">
+            <app-view-entry-name i18n="@@feeForServiceTest">Fee for Service Test</app-view-entry-name>
+            <app-view-entry-value dataQA="feeForService">
+                <span *ngIf="authorization.feeForService" i18n="@@yes">Yes</span>
+                <span *ngIf="!authorization.feeForService" i18n="@@no">No</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.SAMPLE_COLLECTION_AUTHORITY}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.SampleCollectionAuthority" i18n="@@sampleCollectionAuthority">Sample Collection Authority</app-view-entry-name>
+            <app-view-entry-value dataQA="sampleCollectionAuthority">{{ authorization.sampleCollectionAuthority?.displayDescriptionName || '' }}</app-view-entry-value>
+            <span *ngIf="behalfOfSCA" i18n="@@actingOnBehalfOf">Acting on behalf of {{ behalfOfSCA.name }}</span>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.GRANT_SCA_WRITE_ACCESS}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.GrantSCAWriteAccess" i18n="@@grantAccessToSampleCollectionAuthority">Grant access to Sample Collection Authority</app-view-entry-name>
+            <app-view-entry-value dataQA="grantAccessToSCA">
+                <span *ngIf="authorization?.grantSCAWriteAccess" i18n="@@yes">Yes</span>
+                <span *ngIf="!authorization?.grantSCAWriteAccess" i18n="@@no">No</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.RESULT_MANAGEMENT_AUTHORITY}}">
+            <app-view-entry-name [required]="true" [invalid]="missingFields | setHas:fields.ResultManagementAuthority" i18n="@@resultManagementAuthority">Result Management Authority</app-view-entry-name>
+            <app-view-entry-value dataQA="resultManagementAuthority">{{ authorization.resultManagementAuthority?.displayDescriptionName || '' }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.TEST_COORDINATOR}}">
+            <app-view-entry-name i18n="@@testCoordinator">Test Coordinator</app-view-entry-name>
+            <app-view-entry-value dataQA="testCoordinator">{{ authorization.testCoordinator?.displayDescriptionName || '' }}</app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.NOTIFIED_ADOS}}">
+            <app-view-entry-name i18n="@@sendNotificationTo">Send Notification of Results to</app-view-entry-name>
+            <app-view-entry-value dataQA="sendNotification">
+                <div *ngFor="let org of authorization.notificationTo">
+                    {{ org.description }}
+                </div>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="{{controls.TESTING_DESCRIPTION}}">
+            <app-view-entry-name i18n="@@testingDescription">Description of Testing</app-view-entry-name>
+            <app-view-entry-value class="keep-text-style" dataQA="descriptionOfTesting">{{ authorization.descriptionOfTesting | trim }}</app-view-entry-value>
+        </app-view-entry>
+    
+    </app-view-section-content>
+</app-view-section>

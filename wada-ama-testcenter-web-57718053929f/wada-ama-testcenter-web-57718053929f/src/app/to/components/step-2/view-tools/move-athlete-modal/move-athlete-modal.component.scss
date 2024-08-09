@@ -1,0 +1,27 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/styles/modal';
+
+$text-color: #414042;
+$border-width: 2px;
+$popup-background: white;
+
+.to-label{
+    font-size: 13px;
+    color: $text-color;
+}
+
+@include modal-wrapper();
+
+label {
+    margin-bottom: 0;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.modal__buttons {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-items: flex-start;
+}

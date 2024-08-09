@@ -1,0 +1,196 @@
+<div class="data-table__wrapper">
+    <div class="table-container" #table [ngClass]="{'borders': !showFooter, 'white-background': whiteBackground}">
+
+        <div class="top-header" *ngIf="showTopHeader">
+            <ng-content select="[header]"></ng-content>
+            <button #menu class="menu button-background" mat-button [matMenuTriggerFor]="colMenu"
+                *ngIf="showColumnMenu">
+                <mat-icon style="vertical-align: baseline;" svgIcon="more_vert"></mat-icon>
+            </button>
+        </div>
+
+        <mat-menu #colMenu="matMenu" yPosition="above">
+            <div cdkDropList (cdkDropListDropped)="reorderCols($event)">
+                <div mat-menu-item cdkDrag *ngFor="let col of menuColumns" (click)="$event.stopPropagation()">
+                    <mat-checkbox [ngModel]="col.isActive" (ngModelChange)="col.isActive = $event; updateColumns()"
+                        [disabled]="col.mandatory">{{ col.key | matMenu | async }}</mat-checkbox>
+                </div>
+            </div>
+        </mat-menu>
+
+        <div class="table-scroll-container">
+            <app-loading-animation *ngIf="loading || error" [error]="error" [isTable]="true"></app-loading-animation>
+
+            <table mat-table cdkDropList matSort [dataSource]="dataSource" (cdkDropListDropped)="drop($event)"
+                aria-label="data-table" [ngClass]="{hidden: loading || error}">
+                <ng-container *ngFor="let column of columns">
+                    <ng-container [matColumnDef]="column.key">
+                        <ng-container *ngIf="!column.headerTemplate && !column.disabled">
+                            <th mat-header-cell *matHeaderCellDef [class.with-filter]="column.hasFiltering"
+                                [class.wrap-contain]="column.wrapContain" class="table-cell" scope="col">
+                                <div *ngIf="column.hasSorting" mat-sort-header="{{ column.key }}">
+                                    {{ column.header }}</div>
+                                <ng-container *ngIf="!column.hasSorting">{{ column.header }}</ng-container>
+                                <input *ngIf="column.hasFiltering" [value]="column.value"
+                                    (keyup)="dataSource?.filterColumn($event.target.value, column)">
+                            </th>
+                        </ng-container>
+                        <ng-container *ngIf="column.headerTemplate && !column.disabled">
+                            <th mat-header-cell *matHeaderCellDef [class.with-filter]="column.hasFiltering"
+                                [class.wrap-contain]="column.wrapContain" class="table-cell" scope="col">
+                                <div *ngIf="column.hasSorting" mat-sort-header="{{ column.key }}">
+                                    <ng-template
+                                        [ngTemplateOutletContext]="{ column: column, element: element, $implicit: element }"
+                                        [ngTemplateOutlet]="column.headerTemplate">
+                                    </ng-template>
+                                </div>
+                                <ng-container *ngIf="!column.hasSorting">
+                                    <ng-template
+                                        [ngTemplateOutletContext]="{ column: column, element: element, $implicit: element }"
+                                        [ngTemplateOutlet]="column.headerTemplate">
+                                    </ng-template>
+                                </ng-container>
+                                <input *ngIf="column.hasFiltering"
+                                    (keyup)="dataSource?.filterColumn($event.target.value, column)">
+                            </th>
+                        </ng-container>
+
+                        <ng-container *ngIf="!column.cellTemplate && !column.disabled">
+                            <td mat-cell *matCellDef="let element" class="table-cell"
+                                [class.wrap-contain]="column.wrapContain">
+                                {{ column.cell(element) }}
+                            </td>
+                        </ng-container>
+                        <ng-container *ngIf="column.cellTemplate && !column.disabled">
+                            <td mat-cell *matCellDef="let element; let i = index;" class="table-cell"
+                                [class.wrap-contain]="column.wrapContain">
+                                <ng-template
+                                    [ngTemplateOutletContext]="{ column: column, element: element, index: i, $implicit: element }"
+                                    [ngTemplateOutlet]="column.cellTemplate">
+                                </ng-template>
+                            </td>
+                        </ng-container>
+
+                        <ng-container *ngIf="!column.footerTemplate && !column.disabled">
+                            <td mat-footer-cell *matFooterCellDef class="table-cell">{{ column.footer }}</td>
+                        </ng-container>
+                        <ng-container *ngIf="column.footerTemplate && !column.disabled">
+                            <td mat-footer-cell *matFooterCellDef="let element" class="table-cell">
+                                <ng-template
+                                    [ngTemplateOutletContext]="{ column: column, element: element, $implicit: element }"
+                                    [ngTemplateOutlet]="column.footerTemplate">
+                                </ng-template>
+                            </td>
+                        </ng-container>
+
+                    </ng-container>
+                </ng-container>
+
+                <!-- drag n drop Column -->
+                <ng-container *ngIf="showDrag">
+                    <ng-container matColumnDef="drag">
+                        <th mat-header-cell *matHeaderCellDef class="select-col" scope="col">
+                        </th>
+                        <td mat-cell *matCellDef="let row" class="select-col">
+                            <img src="assets/drag-vertical.svg" alt="drag vertical" class="img"
+                                (mousedown)="mousedown()" (mouseup)="mouseup()" (mouseleave)="mouseup()" />
+                        </td>
+                        <td mat-footer-cell *matFooterCellDef class="select-col"></td>
+                    </ng-container>
+                </ng-container>
+
+                <!-- Select Column -->
+                <ng-container *ngIf="showSelect">
+                    <ng-container matColumnDef="select">
+                        <th mat-header-cell *matHeaderCellDef class="select-col select-column" scope="col">
+                            <div *ngIf="multiSelection">
+                                <input type="checkbox" #masterSelect="matTooltip"
+                                    [matTooltip]="selectedCountElement?.nativeElement?.innerText"
+                                    matTooltipPosition="above" matTooltipClass="custom-tooltip"
+                                    (change)="$event && masterToggle()"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                                <label (click)="masterToggle()" class="check"></label>
+                            </div>
+                        </th>
+                        <td mat-cell *matCellDef="let row; let i = index" class="select-col">
+                            <div *ngIf="row.canBeSelected && row.canBeSelected === true" id="fakeCheckbox"
+                                [ngClass]="{'radio-container': !multiSelection}" (click)="selection.toggle(row)">
+                                <input [type]="multiSelection ? 'checkbox' : 'radio'"
+                                    [matTooltip]="selectedCountElement?.nativeElement?.innerText"
+                                    matTooltipPosition="above" matTooltipClass="custom-tooltip"
+                                    (click)="$event.stopPropagation()" (change)="$event && selection.toggle(row)"
+                                    [checked]="selection.isSelected(row)" data-qa="athleteCheckbox"
+                                    [attr.data-qa-precision]="i">
+                                <span *ngIf="!multiSelection" class="checkmark"></span>
+                                <label class="check"></label>
+                            </div>
+                            <div *ngIf="!row.canBeSelected || row.canBeSelected === false"
+                                [ngClass]="{'radio-container': !multiSelection}" id="fakeCheckbox">
+                                <input disabled="disabled" [type]="multiSelection ? 'checkbox' : 'radio'"
+                                    [matTooltip]="selectedCountElement?.nativeElement?.innerText"
+                                    matTooltipPosition="above" matTooltipClass="custom-tooltip" [checked]="">
+                                <span *ngIf="!multiSelection" class="checkmark"></span>
+                                <label class="check"></label>
+                            </div>
+                        </td>
+                        <td mat-footer-cell *matFooterCellDef class="select-col"></td>
+                    </ng-container>
+                </ng-container>
+
+                <!-- remove Column -->
+                <ng-container *ngIf="showRemove">
+                    <ng-container matColumnDef="remove">
+                        <th mat-header-cell *matHeaderCellDef
+                            [ngClass]="{'delete-row-placeholder ': deleteRowIcon ,'select-col remove-column':!deleteRowIcon}"
+                            i18n="@@remove" scope="row">Remove</th>
+                        <td mat-cell *matCellDef="let row; let i = index" class="select-col delete-row-wrapper">
+                            <ng-template #deleteIcon>
+                                <img src="assets/delete.svg" alt="Delete Row" i18n-alt="@@deleteRow"
+                                    data-qa="deleteButton" [attr.data-qa-precision]="i"
+                                    [ngClass]="{'delete-row-wrapper-placeholder ': deleteRowIcon ,'delete-row':!deleteRowIcon}"
+                                    (click)="deleteRow(row)" />
+                            </ng-template>
+                            <ng-template #tooltip>
+                                <app-info-bubble i18n="@@cannotRemoveRowTooltip">This row cannot be removed.</app-info-bubble>
+                            </ng-template>
+                            <div *ngIf="((row.canBeDeleted || deleteRowIcon) && canDeleteRow(i)) then deleteIcon; else tooltip"
+                                class="delete-row-wrapper">
+                            </div>
+                        </td>
+                        <td mat-footer-cell *matFooterCellDef class="select-col"></td>
+                    </ng-container>
+                </ng-container>
+
+                <!-- order Column -->
+                <ng-container *ngIf="showOrder">
+                    <ng-container matColumnDef="order">
+                        <th mat-header-cell *matHeaderCellDef class="select-col" i18n="@@order" scope="col">Order
+                        </th>
+                        <td mat-cell *matCellDef="let row" class="select-col test">{{ row.order }}</td>
+                        <td mat-footer-cell *matFooterCellDef class="select-col"></td>
+                    </ng-container>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="activeColumns; sticky: true"></tr>
+                <tr mat-row [ngClass]="{'no-bottom-line': !showTableFooter, 'selected': selection.isSelected(row)}"
+                    cdkDrag [cdkDragData]="row" [cdkDragDisabled]="deleteRowIcon || !isDragEnabled"
+                    *matRowDef="let row; columns: activeColumns"></tr>
+                <div *ngIf="showTableFooter">
+                    <tr mat-footer-row *matFooterRowDef="activeColumns"></tr>
+                </div>
+            </table>
+        </div>
+
+        <div class="bottom-footer" #bottomFooter [hidden]="!showFooter">
+            <ng-content select="[footer]"></ng-content>
+        </div>
+
+        <mat-paginator class="paginator-padding" *ngIf="showPaginator" [pageSize]="paginatorChoices[defaultPaginator]"
+            [pageSizeOptions]="paginatorChoices" showFirstLastButtons></mat-paginator>
+    </div>
+</div>
+
+<span #selectedCount style="display: none">
+    <ng-content select="app-data-table-selected-count-label"></ng-content>
+</span>

@@ -1,0 +1,72 @@
+<div
+    appInheritDir
+    *ngIf="filter$ | async as filter"
+    class="frequency-wrapper">
+    <div class="frequency-user-info">
+        <ul class="tabs inline">
+            <li
+                content="Yearly"
+                data-qa="yearlyFilterFrequency"
+                i18n-content="@@yearly"
+                i18n="@@yearly"
+                [class.selected]="filter.frequency === 0"
+                (click)="changeFilter(0)">Yearly</li>
+            <li
+                content="Quarterly"
+                data-qa="quarterlyFilterFrequency"
+                i18n-content="@@quarterly"
+                i18n="@@quarterly"
+                [class.selected]="filter.frequency === 1"
+                (click)="changeFilter(1)">Quarterly</li>
+            <li
+                content="Monthly"
+                data-qa="monthlyFilterFrequency"
+                i18n-content="@@monthly"
+                i18n="@@monthly"
+                [class.selected]="filter.frequency === 2"
+                (click)="changeFilter(2)">Monthly</li>
+        </ul>
+        <app-concurrent-user
+            *ngIf="(concurrentUser$ | async)?.initialized"
+            class="concurrent-user"
+            [currentUser]="currentUsername$ | async"
+            [organization]="orgName"
+            [users]="concurrentUser$ | async">
+        </app-concurrent-user>
+    </div>
+    <ul *ngIf="filter.frequency === periodTypeEnum.Yearly" class="tabs secondary-tabs inline">
+        <ng-container *ngFor="let year of years; let i = index">
+            <li content="9999" [attr.data-qa]="yearsDataQA[i]" [class.selected]="yearSelected === year" (click)="changeYearlyFilter(i)">{{ year }}</li>
+        </ng-container>
+    </ul>
+    <div *ngIf="filter.frequency !== periodTypeEnum.Yearly" class="inline">
+        <div class="dropdown-wrapper">
+            <app-dropdown class="menu-dropdown" dataQA="yearsDropdown" [ngModel]="yearSelected" (selectedItem)="onYearChange($event)">
+                <div class="dropdown-option" data-qa="yearsDropdownOption" [appDropdownElement]="years[0]" [attr.data-qa-precision]="0">{{ years[0] }}</div>
+                <div class="dropdown-option" data-qa="yearsDropdownOption" [appDropdownElement]="years[1]" [attr.data-qa-precision]="1">{{ years[1] }}</div>
+                <div class="dropdown-option" data-qa="yearsDropdownOption" [appDropdownElement]="years[2]" [attr.data-qa-precision]="2">{{ years[2] }}</div>
+            </app-dropdown>
+        </div>
+        <ul *ngIf="filter.frequency === periodTypeEnum.Quarterly" class="tabs secondary-tabs inline">
+            <li content="Q1" data-qa="quarterly01FilterQuarter" i18n="@@q1" i18n-content="@@q1" [class.selected]="filter.quarter === 0" (click)="changeQuarterlyFilter(0)">Q1</li>
+            <li content="Q2" data-qa="quarterly02FilterQuarter" i18n="@@q2" i18n-content="@@q2" [class.selected]="filter.quarter === 1" (click)="changeQuarterlyFilter(1)">Q2</li>
+            <li content="Q3" data-qa="quarterly03FilterQuarter" i18n="@@q3" i18n-content="@@q3" [class.selected]="filter.quarter === 2" (click)="changeQuarterlyFilter(2)">Q3</li>
+            <li content="Q4" data-qa="quarterly04FilterQuarter" i18n="@@q4" i18n-content="@@q4" [class.selected]="filter.quarter === 3" (click)="changeQuarterlyFilter(3)">Q4</li>
+        </ul>
+        <ul *ngIf="filter.frequency === periodTypeEnum.Monthly" class="tabs secondary-tabs-monthly inline">
+            <li content="JAN" data-qa="janFilterMonthly" i18n="@@jan_uppercase" i18n-content="@@jan_uppercase" [class.selected]="filter.month === 0" (click)="changeMonthlyFilter(0)">JAN</li>
+            <li content="FEB" data-qa="febFilterMonthly" i18n="@@feb_uppercase" i18n-content="@@feb_uppercase" [class.selected]="filter.month === 1" (click)="changeMonthlyFilter(1)">FEB</li>
+            <li content="MAR" data-qa="marFilterMonthly" i18n="@@mar_uppercase" i18n-content="@@mar_uppercase" [class.selected]="filter.month === 2" (click)="changeMonthlyFilter(2)">MAR</li>
+            <li content="APR" data-qa="aprFilterMonthly" i18n="@@apr_uppercase" i18n-content="@@apr_uppercase" [class.selected]="filter.month === 3" (click)="changeMonthlyFilter(3)">APR</li>
+            <li content="MAY" data-qa="mayFilterMonthly" i18n="@@may_uppercase" i18n-content="@@may_uppercase" [class.selected]="filter.month === 4" (click)="changeMonthlyFilter(4)">MAY</li>
+            <li content="JUN" data-qa="junFilterMonthly" i18n="@@jun_uppercase" i18n-content="@@jun_uppercase" [class.selected]="filter.month === 5" (click)="changeMonthlyFilter(5)">JUN</li>
+            <li content="JUL" data-qa="julFilterMonthly" i18n="@@jul_uppercase" i18n-content="@@jul_uppercase" [class.selected]="filter.month === 6" (click)="changeMonthlyFilter(6)">JUL</li>
+            <li content="AUG" data-qa="augFilterMonthly" i18n="@@aug_uppercase" i18n-content="@@aug_uppercase" [class.selected]="filter.month === 7" (click)="changeMonthlyFilter(7)">AUG</li>
+            <li content="SEP" data-qa="sepFilterMonthly" i18n="@@sep_uppercase" i18n-content="@@sep_uppercase" [class.selected]="filter.month === 8" (click)="changeMonthlyFilter(8)">SEP</li>
+            <li content="OCT" data-qa="octFilterMonthly" i18n="@@oct_uppercase" i18n-content="@@oct_uppercase" [class.selected]="filter.month === 9" (click)="changeMonthlyFilter(9)">OCT</li>
+            <li content="NOV" data-qa="novFilterMonthly" i18n="@@nov_uppercase" i18n-content="@@nov_uppercase" [class.selected]="filter.month === 10" (click)="changeMonthlyFilter(10)">NOV</li>
+            <li content="DEC" data-qa="decFilterMonthly" i18n="@@dec_uppercase" i18n-content="@@dec_uppercase" [class.selected]="filter.month === 11" (click)="changeMonthlyFilter(11)">DEC</li>
+        </ul>
+    </div>
+</div>
+

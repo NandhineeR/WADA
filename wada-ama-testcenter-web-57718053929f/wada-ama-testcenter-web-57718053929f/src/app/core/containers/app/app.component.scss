@@ -1,0 +1,30 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+@mixin app($from, $to, $dir) {
+    min-width: 1000px;
+    padding: 0;
+    min-height: calc(#{$sidebar-min-height} + #{$header-height});
+    background: repeating-linear-gradient(
+            -45deg,
+            $filter-background,
+            $filter-background 2px,
+            $filter-background2 4px,
+            $filter-background2 4px
+    );
+
+    .content-container {
+        margin-#{$from}: $sidebar-width;
+        min-height: 100vh;
+        padding-top: $header-height;
+    }
+}
+
+.app-container {
+    @include ltr {
+        @include app(left, right, 1);
+    }
+    @include rtl {
+        @include app(right, left, -1);
+    }
+}

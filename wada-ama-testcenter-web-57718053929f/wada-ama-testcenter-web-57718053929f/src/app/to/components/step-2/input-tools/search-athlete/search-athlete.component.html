@@ -1,0 +1,58 @@
+<app-modal
+    [isModalLocked]="isModalLocked"
+    [page]="(route$ | async).url"
+    [removeMargin]="true"
+    [scrollable]="true"
+    (modalClose)="clearSearch()">
+
+    <div modal-header>
+        <span *ngIf="isBindAthlete" i18n="@@bindToAthlete_uppercase">BIND TO ATHLETE</span>
+        <span *ngIf="isSearchAthletes" i18n="@@searchForAthletes_uppercase">SEARCH FOR ATHLETES</span>
+    </div>
+
+    <div modal-body>
+        <div class="wrapper">
+            <div class="notification">
+                <app-notification *ngIf="isMaxNumberOfAthletesExceeded" id="notifications" type="error">
+                    <span i18n="@@exceededMaximumNumberOfAthletes">You have exceeded the maximum number of 99 athletes.</span>
+                    <ng-container [ngSwitch]="numberOfAthletesExcess">
+                        <span *ngSwitchCase="1" i18n="@@mustRemoveXAthlete">You must remove {{ numberOfAthletesExcess }} athlete.</span>
+                        <span *ngSwitchDefault i18n="@@mustRemoveXAthletes">You must remove {{ numberOfAthletesExcess }} athletes.</span>
+                    </ng-container>
+                </app-notification>
+
+                <app-notification *ngIf="searchLengthError" type="error">
+                    <span i18n="@@typeAtLeast2characters">Type at least 2 characters in the search field</span>
+                </app-notification>
+
+                <app-notification *ngIf="searchError" type="error">
+                    <span i18n="@@searchFailedAdamsUnavailable">Your search has failed because ADAMS is currently unavailable, try again.</span>
+                </app-notification>
+            </div>
+            <div class="limePieHeader">
+                <label class="remove-margin" i18n="@@athletes">Athletes</label>
+            </div>
+            <app-search
+                #search
+                [isLengthErrorActive]="searchLengthError"
+                [loadingSearch]="loadingSearch$ | async"
+                (searchAthlete)="searchAthlete($event)"
+                (searchLengthError)="showSearchLengthError($event)">
+            </app-search>
+            <app-search-results-table
+                #searchResultTable
+                [isBindAthlete]="isBindAthlete"
+                [isSearchAthletes]="isSearchAthletes"
+                [isTOIssued]="isTOIssued$ | async"
+                [loadingSearch]="loadingSearch$ | async"
+                [searchStringText]="searchStringText"
+                [selectedTestId]="selectedTestId"
+                [sportDisciplines]="sportDisciplines$ | async"
+                [urlWithoutParenthesis]="urlWithoutParenthesis$ | async"
+                (closeModalEmitter)="closeModal()"
+                (numberOfAthletesExcessEmitter)="setNumberOfAthletesExcess($event)"
+                (resetResearchEmitter)="resetResearch()">
+            </app-search-results-table>
+        </div>
+    </div>
+</app-modal>

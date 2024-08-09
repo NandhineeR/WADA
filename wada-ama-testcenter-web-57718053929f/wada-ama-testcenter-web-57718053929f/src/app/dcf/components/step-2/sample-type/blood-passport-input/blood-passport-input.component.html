@@ -1,0 +1,632 @@
+<div
+    appInheritDir
+    class="wrapper"
+    [@fadeInOut]
+    [formGroup]="form">
+    <app-form-field
+        class="wrapper"
+        columns="30% 30% 30% 30%"    
+        [hasAsterisk]="true"
+        [hasError]="collectionDateHasErrors"
+        [ngClass]="{ 'topSpace': isMultipleDCF }">
+
+        <label for="collectionDate{{sampleIndex}}" i18n="@@collectionDate">Collection Date</label>
+        <span field-top-label i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h)</span>
+        <app-datetime-picker
+            field-input
+            dataQA="collectionDateBloodPassport"
+            fieldId="collectionDate{{sampleIndex}}"
+            formControlName="collectionDate"
+            [appDisable]="isCollectionDateDisabled() || (controls.COLLECTION_DATE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [disabled]="isCollectionDateDisabled() || (controls.COLLECTION_DATE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [hasError]="collectionDateHasErrors"
+            [locale]="locale"
+            (selected)="onSelectedCollectionDate()">
+        </app-datetime-picker>
+        <div field-info *ngIf="collectionDateHasErrors" class="error-message">
+            <span *ngIf="collectionDate.errors.validateEmptyCollectionDate?.error?.invalid"
+                i18n="@@provideCollectionDateWithSampleCode">The collection date must be provided when the sample code is set.</span>
+            <span *ngIf="collectionDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <span *ngIf="collectionDate.errors.validateDatetimeFormat?.error?.invalid" i18n="@@datetimeMustBeValidFormat">Date time must be in a valid format.</span>
+        </div>
+
+        <span field-top-label-2 i18n="@@timeZone" id="timezone{{sampleIndex}}">Time Zone</span>
+        <app-dropdown
+            field-input-2
+            class="timezone"
+            dataQA="timeZoneDropdownBloodPassport"
+            formControlName="timezone"
+            i18n-placeholder="@@timezone"
+            id="timezone{{sampleIndex}}"
+            placeholder="Time Zone"
+            property="id"
+            style="width: 100%"
+            type="text"
+            [appDisable]="isCollectionDateDisabled() || (controls.TIMEZONE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [hasError]="timezoneHasErrors"
+            [isDisabled]="isCollectionDateDisabled() || (controls.TIMEZONE | isInputDisabled:fieldsSecurity:isEditMode)"
+            (selected)="onSelectedTimezone()">
+            <ng-container *ngFor="let item of timezones; let i = index">
+                <div [appDropdownElement]="item" class="dropdown-item" data-qa="timeZoneDropdownOptionBloodPassport" [attr.data-qa-precision]="i">{{ item.shortName }}</div>
+            </ng-container>
+        </app-dropdown>
+        <div field-info-2 *ngIf="timezoneHasErrors" class="error-message">
+            <span *ngIf="timezone.errors.validateEmptyTimezone?.error?.invalid"
+                i18n="@@provideTimezoneWithSampleCodeOrCollectionDate">The time zone must be provided when either the sample code or the collection date is set.</span>
+            <span *ngIf="timezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field [hasAsterisk]="true" [hasError]="sampleCodeHasErrors">
+        <label i18n="@@sampleCode">Sample Code</label>
+        <input
+            field-input
+            data-qa="sampleCodeBloodPassport"
+            formControlName="sampleCode"
+            id="sampleCode{{sampleIndex}}"
+            type="text"
+            [appDisable]="isMatchingResultType3or2or1 || (controls.SAMPLE_CODE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [class.error]="sampleCodeHasErrors || hasDuplicateException"
+            [ngClass]="{'sampleCode': !hasDuplicateException}"
+            [readonly]="readonly"
+            (focusout)="onChangeSampleCode($event.target.value)">
+        <div field-error *ngIf="sampleCodeHasErrors">
+            <span *ngIf="sampleCode.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+        <div field-warning *ngIf="sampleCode && sampleCode.errors && sampleCode.errors.invalid">
+            <span i18n="@@bloodPassportSampleCodeXWarning"> Blood passport sample {{ sampleCode.value }} already exists in ADAMS. Make sure these values are correct.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field [hasAsterisk]="true" [hasError]="manufacturerHasErrors">
+        <label for="manufacturer{{sampleIndex}}" i18n="@@manufacturer">Manufacturer</label>
+        <app-typeahead
+            field-input
+            dataQA="manufacturerBloodPassportTypeahead"
+            fieldId="manufacturer{{sampleIndex}}"
+            formControlName="manufacturer"
+            suggestionField="description"
+            [appDisable]="controls.MANUFACTURER | isInputDisabled:fieldsSecurity:isEditMode"
+            [hasError]="manufacturerHasErrors || hasDuplicateException"
+            [suggestions]="manufacturersSuggestions"
+            (selected)="onSelectedManufacturer($event)">
+        </app-typeahead>
+        <div field-error *ngIf="manufacturerHasErrors">
+            <span *ngIf="manufacturer.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field>
+        <label i18n="@@tempLoggerId">Temp Logger ID</label>
+        <input
+            field-input
+            data-qa="tempLoggerId"
+            formControlName="tempLoggerId"
+            id="tempLoggerId"
+            type="text"
+            [appDisable]="controls.TEMP_LOGGER_ID | isInputDisabled:fieldsSecurity:isEditMode">
+    </app-form-field>
+
+    <app-form-field *ngIf="tempLoggerId?.value && tempLoggerStatus">
+        <label i18n="@@tempLoggerStatus">Temp Logger Status</label>
+        <label field-input>{{ tempLoggerStatus.description }}</label>
+    </app-form-field>
+
+    <app-form-field *ngIf="!isMultipleDCF" [hasAsterisk]="true" [hasError]="laboratoryHasErrors">
+        <label for="laboratory{{sampleIndex}}" i18n="@@laboratory">Laboratory</label>
+        <app-typeahead
+            field-input
+            dataQA="laboratoryBloodPassportTypeahead"
+            fieldId="laboratory{{sampleIndex}}"
+            formControlName="laboratory"
+            suggestionField="displayDescriptionName"
+            [hasError]="laboratoryHasErrors || hasDuplicateException"
+            [isDisabled]="isMatchingResultType3or2or1 || (controls.LABORATORY | isInputDisabled:fieldsSecurity:isEditMode)"
+            [suggestions]="laboratorySuggestions"
+            (selected)="onSelectedLaboratory($event)">
+        </app-typeahead>
+        <div field-error *ngIf="laboratoryHasErrors">
+            <span *ngIf="laboratory.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-participant-input
+        #bloodCollectionOfficialParticipantInput
+        field-input
+        *ngIf="bloodCollectionOfficials"
+        dataQAFirstName="bloodPassportCollectionOfficialFirstName"
+        dataQALastName="bloodPassportCollectionOfficialLastName"
+        firstNameId="firstName{{sampleIndex}}"
+        formControlName="bloodCollectionOfficial"
+        lastNameId="lastName{{sampleIndex}}"
+        [appDisable]="controls.BLOOD_OFFICIAL | isInputDisabled:fieldsSecurity:isEditMode"
+        [hasAsterisk]="true"
+        [hasError]="bloodCollectionOfficialHasErrors"
+        [hasFirstNameError]="bloodCollectionOfficialHasFirstNameErrors"
+        [hasLastNameError]="bloodCollectionOfficialHasLastNameErrors"
+        [participants]="bloodCollectionOfficials">
+        <label i18n="@@bloodCollectionOfficial">Blood Collection Official</label>
+        <span last-name-errors *ngIf="bloodCollectionOfficialHasErrors && bloodCollectionOfficial.errors?.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        <span first-name-errors *ngIf="bloodCollectionOfficialHasErrors && bloodCollectionOfficial.errors?.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+    </app-participant-input>
+
+    <app-form-field>
+        <label i18n="@@abpSupplementaryForm" ngClass="supplementary-form-label">ABP Supplementary Report Form (SRF)</label>
+    </app-form-field>
+
+    <app-form-field [appDisable]="controls.SEATED | isInputDisabled:fieldsSecurity:isEditMode" [hasAsterisk]="true">
+        <label for="seated{{sampleIndex}}" i18n="@@athleteSeatedTenMinutes_bpInput">
+            <span ngClass="label-not-bold">Has the athlete been</span> seated for ten minutes <span ngClass="label-not-bold">prior to blood collection?</span>
+        </label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="seatedYes"
+                    formControlName="seated"
+                    id="seated{{sampleIndex}}"
+                    type="radio"
+                    [value]="true">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="seatedNo"
+                    formControlName="seated"
+                    type="radio"
+                    [value]="false">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <app-form-field [appDisable]="controls.COLLECTED_AFTER_3_DAYS | isInputDisabled:fieldsSecurity:isEditMode" [hasAsterisk]="true">
+        <label for="collectedAfter3Days{{sampleIndex}}" i18n="@@sampleCollectedLast3Days_bpInput">
+            <span ngClass="label-not-bold">Was the sample</span> collected <span ngClass="label-not-bold">immediately following</span> at least three consecutive days <span ngClass="label-not-bold">of competition (hemodilution expected)?</span>
+        </label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="collectedAfter3DaysYes"
+                    formControlName="collectedAfter3Days"
+                    id="collectedAfter3Days{{sampleIndex}}"
+                    type="radio"
+                    [value]="true">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="collectedAfter3DaysNo"
+                    formControlName="collectedAfter3Days"
+                    type="radio"
+                    [value]="false">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <app-form-field [appDisable]="controls.HAS_HAD_TRAINING | isInputDisabled:fieldsSecurity:isEditMode" [hasAsterisk]="true">
+        <label for="hasHadTrainingSession{{sampleIndex}}" i18n="@@athleteHadTrainingLastTwoHours_bpInput">
+            <span ngClass="label-not-bold">Has the athlete had a</span> training <span ngClass="label-not-bold">session or</span> competition in the past two hours?
+        </label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    #yesTraining
+                    data-qa="hasHadTrainingSessionYes"
+                    formControlName="hasHadTrainingSession"
+                    id="hasHadTrainingSession{{sampleIndex}}"
+                    type="radio"
+                    [value]="true"
+                    (change)="handleCheckChange(yesTraining.checked, yesTraining.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="hasHadTrainingSessionNo"
+                    formControlName="hasHadTrainingSession"
+                    type="radio"
+                    [value]="false"
+                    (change)="handleCheckChange(yesTraining.checked, yesTraining.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="yesTraining.checked" [@radioFadeInOut] [hasAsterisk]="yesTraining.checked" [hasError]="trainingTypeHasErrors">
+        <label i18n="@@trainingSessionOrCompetitionType">Type of training session or competition</label>
+        <input
+            field-input
+            data-qa="trainingType"
+            formControlName="trainingType"
+            id="trainingType{{sampleIndex}}"
+            type="text"
+            [appDisable]="controls.TRAINING_TYPE | isInputDisabled:fieldsSecurity:isEditMode"
+            [class.error]="trainingTypeHasErrors"
+            (ngModelChange)="emitABPValidation()">
+        <div field-error *ngIf="trainingTypeHasErrors">
+            <span *ngIf="trainingType.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field [appDisable]="controls.HAS_HIGH_ALTITUDE_TRAINING | isInputDisabled:fieldsSecurity:isEditMode" [hasAsterisk]="true">
+        <label for="hasHighAltitudeTraining{{sampleIndex}}" i18n="@@athleteTrainedAtAltitudeGreaterThan1500M_bpInput">
+            <span ngClass="label-not-bold">Has the athlete trained, competed or resided at an</span> altitude greater than 1500 meters <span ngClass="label-not-bold">within the previous two weeks?</span>
+        </label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    #yesTrainingHigh
+                    appRadioOnFocus
+                    data-qa="hasHighAltitudeTrainingYes"
+                    formControlName="hasHighAltitudeTraining"
+                    id="hasHighAltitudeTraining{{sampleIndex}}"
+                    type="radio"
+                    [value]="true"
+                    (change)="handleCheckChange(yesTrainingHigh.checked, yesTrainingHigh.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="hasHighAltitudeTrainingNo"
+                    formControlName="hasHighAltitudeTraining"
+                    type="radio"
+                    [value]="false"
+                    (change)="handleCheckChange(yesTrainingHigh.checked, yesTrainingHigh.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <div
+        *ngIf="yesTrainingHigh.checked"
+        [appDisable]="controls.HIGH_ALTITUDE_TRAINING | isInputDisabled:fieldsSecurity:isEditMode"
+        [formGroup]="altitudeTraining">
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesTrainingHigh.checked" [hasError]="locationHighHasErrors">
+            <label for="location{{sampleIndex}}" i18n="@@nameAndlocation">Name and Location</label>
+            <input
+                field-input
+                data-qa="highAltitudeTrainingLocation"
+                formControlName="location"
+                id="location{{sampleIndex}}"
+                type="text"
+                [class.error]="locationHighHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="locationHighHasErrors">
+                <span *ngIf="location.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesTrainingHigh.checked" [hasError]="altitudeHasErrors">
+            <label for="altitude{{sampleIndex}}" i18n="@@altitudeM">Altitude (m)</label>
+            <input
+                field-input
+                appRestrictToPattern="^[0-9]*$"
+                data-qa="highAltitudeTrainingAltitude"
+                formControlName="altitude"
+                id="altitude{{sampleIndex}}"
+                maxlength="5"
+                type="text"
+                [class.error]="altitudeHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="altitudeHasErrors">
+                <span *ngIf="altitude.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesTrainingHigh.checked" [hasError]="fromDateHasErrors">
+            <label for="start{{sampleIndex}}" i18n="@@from">From</label>
+            <app-date-input
+                #dateFrom
+                field-input
+                dataQA="highAltitudeTrainingDateFrom"
+                fieldId="start{{sampleIndex}}"
+                formControlName="start"
+                [hasError]="fromDateHasErrors"
+                [locale]="locale"
+                [maxDate]="maxFromDate"
+                [minDate]="minFromDate"
+                (showCalendarEmitter)="isCalendarDisplayed($event)"
+                (ngModelChange)="emitABPValidation()">
+            </app-date-input>
+            <span field-info class="field-info" i18n="@@dateFormat">dd-mm-yyyy</span>
+            <div field-error *ngIf="fromDateHasErrors">
+                <span *ngIf="fromDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesTrainingHigh.checked" [hasError]="toDateHasErrors">
+            <label for="end{{sampleIndex}}" i18n="@@to">To</label>
+            <app-date-input
+                #dateTo
+                field-input
+                dataQA="highAltitudeTrainingDateTo"
+                fieldId="end{{sampleIndex}}"
+                formControlName="end"
+                [hasError]="toDateHasErrors"
+                [maxDate]="maxToDate"
+                [minDate]="minToDate"
+                (ngModelChange)="emitABPValidation()">
+            </app-date-input>
+            <span field-info class="field-info" i18n="@@dateFormat">dd-mm-yyyy</span>
+            <div field-error *ngIf="toDateHasErrors">
+                <span *ngIf="toDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="false" *appLet="(fromDate?.value | duration:toDate?.value) as duration">
+            <label i18n="@@stayDuration">Duration of Stay</label>
+            <label field-input *ngIf="duration !== null">
+                <ng-container [ngSwitch]="duration">
+                    <span *ngSwitchCase="1" i18n="@@xDay">{{duration}} day</span>
+                    <span *ngSwitchDefault i18n="@@xDays">{{duration}} days</span>
+                </ng-container>
+            </label>
+        </app-form-field>
+    </div>
+
+    <app-form-field
+        [appDisable]="controls.HAS_HIGH_ALTITUDE_SIMULATION | isInputDisabled:fieldsSecurity:isEditMode"
+        [hasAsterisk]="true"
+        [hasError]="hasHighAltitudeSimulationHasErrors">
+        <label for="hasHighAltitudeSimulation{{sampleIndex}}" i18n="@@athleteUsedAltitudeSimulation_bpInput">
+            <span ngClass="label-not-bold">Has the athlete used any form of</span> altitude simulation, <span ngClass="label-not-bold">such as a hypoxic tent, mask, etc during the</span> previous two weeks?
+        </label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    #yesSimulationHigh
+                    appRadioOnFocus
+                    data-qa="hasHighAltitudeSimulationYes"
+                    formControlName="hasHighAltitudeSimulation"
+                    id="hasHighAltitudeSimulation{{sampleIndex}}"
+                    type="radio"
+                    [value]="true"
+                    (change)="handleCheckChange(yesSimulationHigh.checked, yesSimulationHigh.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="hasHighAltitudeSimulationNo"
+                    formControlName="hasHighAltitudeSimulation"
+                    type="radio"
+                    [value]="false"
+                    (change)="handleCheckChange(yesSimulationHigh.checked, yesSimulationHigh.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <div
+        *ngIf="yesSimulationHigh.checked"
+        [appDisable]="controls.HIGH_ALTITUDE_SIMULATION | isInputDisabled:fieldsSecurity:isEditMode"
+        [formGroup]="altitudeSimulation">
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesSimulationHigh.checked" [hasError]="deviceTypeHasErrors">
+            <label i18n="@@deviceType">Type of Device</label>
+            <input
+                field-input
+                formControlName="deviceType"
+                id="deviceType{{sampleIndex}}"
+                type="text"
+                [class.error]="deviceTypeHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="deviceTypeHasErrors">
+                <span *ngIf="deviceType.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesSimulationHigh.checked" [hasError]="userMannerHasErrors">
+            <label i18n="@@useManner">Manner of use (frequency, duration, intensity, etc)</label>
+            <input
+                field-input
+                formControlName="useManner"
+                id="useManner{{sampleIndex}}"
+                type="text"
+                [class.error]="userMannerHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="userMannerHasErrors">
+                <span *ngIf="useManner.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+    </div>
+
+    <app-form-field
+        [appDisable]="controls.HAS_BLOOD_LOSS | isInputDisabled:fieldsSecurity:isEditMode"
+        [hasAsterisk]="true"
+        [hasError]="hasBloodLossHasErrors">
+        <label for="hasBloodLoss{{sampleIndex}}" i18n="@@athleteDonatedBloodLossOrLostBlood_bpInput">
+            <span ngClass="label-not-bold">Has the athlete</span> donated blood or lost blood <span ngClass="label-not-bold">as a result of medical or emergency condition during the</span> previous three months?
+        </label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    #yesBloodLoss
+                    appRadioOnFocus
+                    data-qa="hasBloodLossYes"
+                    formControlName="hasBloodLoss"
+                    id="hasBloodLoss{{sampleIndex}}"
+                    type="radio"
+                    [value]="true"
+                    (change)="handleCheckChange(yesBloodLoss.checked, yesBloodLoss.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="hasBloodLossNo"
+                    formControlName="hasBloodLoss"
+                    type="radio"
+                    [value]="false"
+                    (change)="handleCheckChange(yesBloodLoss.checked, yesBloodLoss.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <div
+        *ngIf="yesBloodLoss.checked"
+        [appDisable]="controls.BLOOD_LOSS | isInputDisabled:fieldsSecurity:isEditMode"
+        [formGroup]="bloodDonationOrLoss">
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesBloodLoss.checked" [hasError]="timeBloodLossHasErrors">
+            <label i18n="@@when">When</label>
+            <input
+                field-input
+                data-qa="bloodLossWhen"
+                formControlName="timeBloodLoss"
+                id="timeBloodLoss{{sampleIndex}}"
+                type="text"
+                [class.error]="timeBloodLossHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="timeBloodLossHasErrors">
+                <span *ngIf="timeBloodLoss.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesBloodLoss.checked" [hasError]="causeBloodLossHasErrors">
+            <label i18n="@@bloodLossCause">Cause of the Blood Loss</label>
+            <input
+                field-input
+                data-qa="bloodLossCause"
+                formControlName="cause"
+                id="cause{{sampleIndex}}"
+                type="text"
+                [class.error]="causeBloodLossHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="causeBloodLossHasErrors">
+                <span *ngIf="cause.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesBloodLoss.checked" [hasError]="volumeBloodLossHasErrors">
+            <label i18n="@@estimatedBloodVolume">Estimated Volume of Blood (ml)</label>
+            <input
+                field-input
+                appRestrictToPattern="^[0-9]*$"
+                data-qa="bloodLossEstimated"
+                formControlName="volumeBloodLoss"
+                id="volumeBloodLoss{{sampleIndex}}"
+                type="text"
+                [class.error]="volumeBloodLossHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="volumeBloodLossHasErrors">
+                <span *ngIf="volumeBloodLoss.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+    </div>
+
+    <app-form-field
+        [appDisable]="controls.HAS_BLOOD_TRANSFUSION | isInputDisabled:fieldsSecurity:isEditMode"
+        [hasAsterisk]="true"
+        [hasError]="hasBloodTransfusionHasErrors">
+        <label for="hasBloodTransfusion{{sampleIndex}}" i18n="@@athleteHadBloodTransfusionLastThreeMonths_bpInput">
+            <span ngClass="label-not-bold">Has the athlete</span> given or received any blood <span ngClass="label-not-bold">transfusion(s) during the</span> previous three months?
+        </label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    #yesBloodTransfusion
+                    appRadioOnFocus
+                    data-qa="hasBloodTransfusionYes"
+                    formControlName="hasBloodTransfusion"
+                    id="hasBloodTransfusion{{sampleIndex}}"
+                    type="radio"
+                    [value]="true"
+                    (change)="handleCheckChange(yesBloodTransfusion.checked, yesBloodTransfusion.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="hasBloodTransfusionNo"
+                    formControlName="hasBloodTransfusion"
+                    type="radio"
+                    [value]="false"
+                    (change)="handleCheckChange(yesBloodTransfusion.checked, yesBloodTransfusion.id)">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+
+    <div
+        *ngIf="yesBloodTransfusion.checked"
+        [appDisable]="controls.TRANSFUSION | isInputDisabled:fieldsSecurity:isEditMode"
+        [formGroup]="bloodTransfusion">
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesBloodTransfusion.checked" [hasError]="timeTransfusionHasErrors">
+            <label i18n="@@when">When</label>
+            <input
+                field-input
+                data-qa="bloodTransfusionWhen"
+                formControlName="timeBloodTransfusion"
+                id="timeBloodTransfusion{{sampleIndex}}"
+                type="text"
+                [class.error]="timeTransfusionHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="timeTransfusionHasErrors">
+                <span *ngIf="timeTransfusion.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [@radioFadeInOut] [hasAsterisk]="yesBloodTransfusion.checked" [hasError]="volumeTransfusionHasErrors">
+            <label i18n="@@estimatedBloodVolume">Estimated Volume of Blood (ml)</label>
+            <input
+                field-input
+                appRestrictToPattern="^[0-9]*$"
+                data-qa="bloodTransfusionEstimated"
+                formControlName="volumeBloodTransfusion"
+                id="volumeBloodTransfusion{{sampleIndex}}"
+                type="text"
+                [class.error]="volumeTransfusionHasErrors"
+                (ngModelChange)="emitABPValidation()">
+            <div field-error *ngIf="volumeTransfusionHasErrors">
+                <span *ngIf="volumeTransfusion.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+    </div>
+
+    <app-form-field [appDisable]="controls.EXTREME_ENVIRONMENT | isInputDisabled:fieldsSecurity:isEditMode" [hasAsterisk]="true">
+        <label for="extremeEnvironment{{sampleIndex}}" i18n="@@athleteExposedToExtremeEnvironmentLastTwoHours_bpInput"><span ngClass="label-not-bold">Has the Athlete been exposed to</span> any extreme environmental conditions in the 2 hours <span ngClass="label-not-bold">prior to blood sample colletion?</span></label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="extremeEnvironmentYes"                       
+                    formControlName="extremeEnvironment"
+                    id="extremeEnvironment{{sampleIndex}}"
+                    type="radio"
+                    [value]="true">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="extremeEnvironmentNo"
+                    formControlName="extremeEnvironment"
+                    type="radio"
+                    [value]="false">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+</div>

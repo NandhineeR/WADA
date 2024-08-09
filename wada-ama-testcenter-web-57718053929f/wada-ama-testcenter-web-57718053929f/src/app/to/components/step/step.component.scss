@@ -1,0 +1,74 @@
+$circleSize: 50px;
+$thickness: 2px;
+$labelNotVisitedColor: #414042;
+$numberNotVisitedColor: #515151;
+$circleNotVisitedBackgroundColor: #ffffff;
+$circleNotVisitedBorderColor: #757575;
+$labelCompletedColor: #414042;
+$numberCompletedColor: #ffffff;
+$circleCompletedBackgroundColor: #757575;
+$circleCompletedBorderColor: #757575;
+$labelActiveColor: #3f8532;
+$numberActiveColor: #ffffff;
+$circleActiveBackgroundColor: #3f8532;
+$circleActiveBorderColor: #3f8532;
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+
+    a {
+        text-decoration: none;
+    }
+
+    .circle {
+        cursor: pointer;
+        width: $circleSize;
+        height: $circleSize;
+        line-height: $circleSize;
+        border-radius: $circleSize;
+        text-align: center;
+        font-weight: bold;
+
+        color: $numberNotVisitedColor;
+        background-color: $circleNotVisitedBackgroundColor;
+        border: $thickness solid $circleNotVisitedBorderColor;
+
+        &.active {
+            cursor: default;
+            color: $numberActiveColor;
+            background-color: $circleActiveBackgroundColor;
+            border: $thickness solid $circleActiveBorderColor
+        }
+
+        &.completed {
+            color: $numberCompletedColor;
+            background-color: $circleCompletedBackgroundColor;
+            border: $thickness solid $circleCompletedBorderColor
+        }
+    }
+
+    .label {
+        margin-top: 5px;
+        font-size: 13px;
+        color: $labelNotVisitedColor;
+        text-align: center;
+
+        &.active {
+            color: $labelActiveColor;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        &.completed {
+            color: $labelCompletedColor;
+        }
+    }
+
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+}

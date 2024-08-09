@@ -1,0 +1,14 @@
+<div
+    [appTooltip]="tooltipTemplate"
+    [hideAllTooltips]="!isTooltip">
+    <button
+        mat-menu-item
+        [attr.data-qa]="dataQA"
+        [disabled]="disabled"
+        [ngClass]="{'deleteItem' : isDeletable, 'sidebar-menu-item' : isSidebarMenu, 'cancelItem': disabled}">
+        <ng-content></ng-content>
+    </button>
+</div>
+<ng-template #tooltipTemplate>
+    <ng-content select="[tooltip]"></ng-content>
+</ng-template>

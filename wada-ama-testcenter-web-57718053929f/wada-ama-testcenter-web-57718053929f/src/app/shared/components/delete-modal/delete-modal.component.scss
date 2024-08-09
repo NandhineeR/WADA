@@ -1,0 +1,52 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/styles/field-asterisk';
+
+$nameColor: #414042;
+$statusColor: #414042;
+$default-color: #212529;
+$linkColor: #3A782C;
+$errorColor: #952406;
+
+.modal__body {
+    padding: 30px;
+}
+
+@include field-asterisk();
+
+.textarea__reason {
+    width: 100%;
+    line-height: 150%;
+
+    &.error {
+        border: 2px solid $incorrect-field-star;
+    }
+}
+
+.primary__message {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 150%;
+}
+
+.secondary__message {
+    font-size: 16px;
+    line-height: 150%;
+}
+
+.div__errorReasonMandatory {
+    margin-left: 10px;
+    color: $errorColor;
+    display: inline-block;
+}
+
+.center-modal-buttons {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+}
+
+.bottom-button-padding {
+    padding-top: 15px;
+    padding-bottom: 20px;
+}

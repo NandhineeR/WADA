@@ -1,0 +1,130 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+@import '~~app/shared/styles/fake-link';
+
+@mixin wrapper($left, $right) {
+    font-family: Montserrat, sans-serif;
+    padding: 20px 25px 25px 25px;
+
+    .title {
+        font-size: 34px;
+        font-weight: bold;
+        color: $title-color;
+        margin-bottom: 20px;
+    }
+    
+
+    .actions-wrapper {
+        display: flex;
+        margin-top: 25px;
+        margin-#{right}: 25px;
+        margin-#{left}: 25px;
+    }
+
+    .search-action {
+        width: 50%;
+        display: flex;
+
+        app-form-field {
+            ::ng-deep .field-label {
+                margin-top: 7px;
+            }
+
+            input {
+                min-height: 42px;
+                height: min-content;
+            }
+
+            .collapsed-label {
+                margin-left: 25px;
+            }
+        }
+    }
+
+    .create-action {
+        display: flex;
+        width: 50%;
+        justify-content: flex-end;
+    }
+
+    .notifications {
+        margin: 20px;
+    }
+
+    .filter-action {
+        margin-top: 20px;
+        margin-#{right}: 20px;
+        margin-#{left}: 20px;
+
+        padding: 20px;
+        border: 2px solid #3F8532;
+        border-radius: 10px;
+        background: #FFFFFF;
+
+        .search-action {
+            width: 50%;
+            margin-#{left}: 25px;
+            display: grid;
+    
+            app-form-field {
+                text-align: left;
+                padding-bottom: 12px;
+                display: flex;
+                
+                ::ng-deep .field-label {
+                    margin-top: 7px;
+                }
+
+                ::ng-deep .label-align {
+                    text-align: $left;
+                }
+
+                ::ng-deep .form-control {
+                    border: 1px solid transparent;
+                }
+    
+                input {
+                    min-height: 30px;
+                    height: min-content;
+                }
+
+                ::ng-deep .label-align {
+                    text-align: $left;
+                }
+            }
+        }
+
+        .clear-action {
+            text-align: right;
+        }
+    }
+
+    .search-results-table__wrapper {
+        .underline {
+            text-decoration: underline;
+        }
+    
+        @include fake-link(left, right);
+
+    }
+    
+    :host ::ng-deep .table-container {
+        margin-bottom: 20px !important;
+    }
+    
+   
+}
+
+.wrapper {
+    @include ltr {
+        @include wrapper(left, right);
+    }
+    @include rtl {
+        @include wrapper(right, left);
+    }
+}
+
+.footer {
+    height: 50px;
+}
+

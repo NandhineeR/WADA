@@ -1,0 +1,17 @@
+.container {
+    display: flex;
+    padding-left: 0;
+
+    app-view-entry-name {
+        padding-right: 15px;
+    }
+
+    app-view-entry-value {
+        padding-right: 30px;
+    }
+
+    app-view-entry-value.main-item {
+        min-width: 140px;
+        padding-right: 15px;
+    }
+}

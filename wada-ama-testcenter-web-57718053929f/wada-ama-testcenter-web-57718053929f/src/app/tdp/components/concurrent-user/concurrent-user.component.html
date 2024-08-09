@@ -1,0 +1,21 @@
+<div class="wrapper" appInheritDir>
+    <div
+        *ngFor="let user of users.concurrentUser"
+        class="initials"
+        [appTooltip]="sampleTooltip"
+        [tooltipContext]="{ user: user, currentUser: currentUser }"
+        tooltipPlacement="top">
+        <app-initials
+            [user]="user"
+            [loggedInUser]="currentUser">
+        </app-initials>
+        <ng-template #sampleTooltip>
+            <span i18n="@@userXisEditingThisTDP">{{ user.lastName + ', ' + user.firstName }} is editing this Test Distribution Plan</span>
+        </ng-template>
+    </div>
+    <div class="concurrent-user">
+        <span class="spacer"></span>
+        <span i18n="@@lastUpdatedDateByUserXfromOrgX">Last updated <strong>{{ day }}-{{ translations$ | getMonth:month | async }}-{{ year }} {{ gmtDate | date:'HH:mm' }} GMT</strong>, by <strong>{{ users.lastUpdateUser.lastName + ', ' + users.lastUpdateUser.firstName }}</strong> from <strong>{{ organization }}</strong></span>
+        <span class="spacer"></span>
+    </div>
+</div>

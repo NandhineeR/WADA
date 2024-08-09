@@ -1,0 +1,76 @@
+<app-modal
+    *ngIf="isOpened"
+    [centralizeButtons]="true"  
+    [isModalLocked]="true"
+    [minHeight]="'250px'"
+    [minWidth]="'680px'"
+    [scrollable]="true"
+    [removeMargin]="true"
+    [resizeModal]="true"
+    (modalClose)="onClose()">
+    <div modal-header>
+        <span i18n="changeStatusForObjectTargetXToX_uppercase">Set
+            {{ translations$ | getTargetObject:targetObject | async }} status to
+            {{ translations$ | getStatus:enumStringValue | async }}</span>
+    </div>
+
+    <div modal-body class="modal__body">
+        <ng-content select="[notifications]"></ng-content>
+        <ng-container *ngIf="hiddenBody; else defaultContent">
+            <app-notification type="warning">
+                <div>
+                    <ul *ngFor="let name of testsAthleteWithoutSamples">
+                        <li>
+                            <span i18n="@@">Athlete {{ name }} does not have a sample type. Please add a sample type if you'd like to issue the testing order.</span>
+                        </li>
+                    </ul>
+                </div>
+            </app-notification>
+        </ng-container>
+
+        <ng-template #defaultContent>
+            <label class="primary__message">
+                <span i18n="@@confirmChangeStatusForObjectTargetXToX">Are you sure you want to set this
+                    {{ translations$ | getTargetObject:targetObject | async }} status to
+                    {{ translations$ | getStatus:enumStringValue | async }}?</span>
+            </label>
+
+            <form [formGroup]="form">
+                <label>
+                    <span class="secondary__message" i18n="@@reason">Reason</span><span class="field-asterisk" [class.error]="reasonHasErrors">*</span>
+                </label>
+                <div field-error *ngIf="reasonHasErrors" class="div__errorReasonMandatory" i18n="@@pleaseEnterAValue">Please enter a value.</div>
+                <textarea
+                    #textareaReason
+                    field-input
+                    class="textarea__reason"
+                    data-qa="reasonChangeStatus"
+                    fieldId="reason"
+                    formControlName="reason"
+                    maxlength="4000"
+                    rows="5"
+                    [class.error]="reasonHasErrors">
+                </textarea>
+           </form>
+        </ng-template>
+        <div class="center-modal-buttons bottom-button-padding">
+            <ng-container *ngIf="hiddenBody; else defaultButtons">
+                <app-button class="button" i18n="@@backToForm" type="primary" (click)="onClose()">BACK TO FORM</app-button>
+            </ng-container>
+            <ng-template #defaultButtons>
+                <app-button
+                    class="button"
+                    dataQA="confirmChangeStatus"
+                    i18n="@@yesUpdateStatus_uppercase"
+                    type="primary"
+                    (click)="changeStatus()">YES, UPDATE STATUS</app-button>
+                <app-button
+                    class="button"
+                    dataQA="cancelChangeStatus"
+                    i18n="@@no_uppercase"
+                    type="secondary"
+                    (click)="onClose()">NO</app-button>
+            </ng-template>
+        </div>
+    </div>
+</app-modal>

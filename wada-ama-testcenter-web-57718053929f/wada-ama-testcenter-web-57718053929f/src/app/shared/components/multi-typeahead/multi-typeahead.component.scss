@@ -1,0 +1,45 @@
+@import '~sass/mixins';
+
+@mixin typeahead($left, $right) {
+    display: inline-flex;
+    flex-wrap: wrap;
+
+    .nationality-tag-content {
+        display: inline-block;
+        border-radius: 20px;
+        background-color: #e3e3e3;
+        margin-top: 5px;
+        align-content: center;
+        align-items: center;
+        margin-#{$right}: 6px;
+
+        .tag {
+            display: table-cell;
+            line-height: 1.3;
+            padding: 10px;
+        }
+
+        .tag-remove-icon {
+            padding-#{$right}: 7px;
+            padding-#{$left}: 7px;
+            display: table-cell;
+            font-size: 23px;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+    }
+
+    .max-message {
+        color: #9a5b26;
+        font-weight: 700;
+    }
+}
+
+:host {
+    @include ltr {
+        @include typeahead(left, right);
+    }
+    @include rtl {
+        @include typeahead(right, left);
+    }
+}

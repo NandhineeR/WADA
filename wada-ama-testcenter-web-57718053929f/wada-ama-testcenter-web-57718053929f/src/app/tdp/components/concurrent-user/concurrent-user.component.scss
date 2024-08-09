@@ -1,0 +1,39 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+@mixin concurrentUserSection($left, $right) {
+    display: flex;
+
+    div[tooltip-content] {
+        color: #414042;
+        font-size: 12px;
+    }
+
+    .initials {
+        margin: 5px;
+    }
+
+    .concurrent-user {
+        display: flex;
+        flex-direction: column;
+
+        margin: 5px;
+        line-height: 20px;
+        color: #414042;
+        font-size: 12px;
+        font-weight: normal;
+
+        .spacer {
+            flex: 1;
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include concurrentUserSection(left, right);
+    }
+    @include rtl {
+        @include concurrentUserSection(right, left);
+    }
+}

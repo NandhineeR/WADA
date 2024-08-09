@@ -1,0 +1,62 @@
+<table data-layout="default">
+    <colgroup>
+        <col style="width: 148.0px;" />
+        <col style="width: 86.0px;" />
+        <col style="width: 139.0px;" />
+        <col style="width: 122.0px;" />
+        <col style="width: 126.0px;" />
+        <col style="width: 139.0px;" />
+    </colgroup>
+    <tbody>
+        <tr>
+            <th data-highlight-colour="#f4f5f7">
+                <p><strong>Environment</strong></p>
+            </th>
+            <th data-highlight-colour="#f4f5f7">
+                <p><strong>Version</strong><br/><i>on Nexus</i></p>
+            </th>
+            <th data-highlight-colour="#f4f5f7">
+                <p><strong>Build</strong></p>
+            </th>            
+            <th data-highlight-colour="#f4f5f7">
+                <p><strong>Image Tag</strong><br/><i>on ECR</i></p>
+            </th>            
+            <th data-highlight-colour="#f4f5f7">
+                <p><strong>Build Source</strong></p>
+            </th>
+            <th data-highlight-colour="#f4f5f7">
+                <p><strong>Deployment Date</strong></p>
+            </th>
+            <th data-highlight-colour="#f4f5f7">
+                <p><strong>Deployed By</strong></p>
+            </th>
+        </tr>
+        <% environments.each { item -> %> 
+        <tr>
+            <td>
+                <p>$item.env</p>
+            </td>
+            <td>
+                <p> <a target="_blank" href="https://nexus.wada-ama.org/#browse/browse:ADAMS-Public:com/cgi/testcenter-webserver/$item.version">$item.version</a></p>
+            </td>            
+            <td>
+                <p> <a target="_blank" href="https://nexus.wada-ama.org/#browse/browse:ADAMS-Public:com/cgi/testcenter-webserver/$item.version<% out << (item.nexus_version != "" ? "/$item.nexus_version" : "") %>">$item.build</a> 
+                </p>
+
+            </td>
+            <td>
+                <p>$item.image_tag</p>
+            </td>            
+            <td>
+                <p><a target="_blank" href="$item.source_url">$item.source_name</a></p>
+            </td>
+            <td>
+                <p>$item.date<br/>$item.time</p>
+            </td>
+            <td>
+                <p>$item.deploy_by</p>
+            </td>
+        </tr>
+        <% } %>
+    </tbody>
+</table>

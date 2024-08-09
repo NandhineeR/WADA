@@ -1,0 +1,21 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/lime-pie-bar';
+
+@mixin step($left, $right) {
+    .limePieHeader {
+        @include bar($left, $right);
+    }
+}
+
+.wrapper {
+    @include step(left, right);
+
+    .notification {
+        margin: 20px;
+    }
+}
+
+.remove-margin {
+    margin-bottom: 0px !important;
+}

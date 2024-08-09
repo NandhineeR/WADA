@@ -1,0 +1,23 @@
+$error-color: #AA1A1A;
+
+:host {
+    display: block;
+}
+
+.wrapper {
+    .error-message {
+        color: $error-color;
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+
+    .lastName {
+        width: 100%;
+    }
+
+    input.firstName {
+        width: 100%;
+    }
+}

@@ -1,0 +1,15 @@
+<div class="invalid-feedback d-block" *ngIf="isDirty">
+    <div *ngIf="control.errors.required; else format">
+        <span i18n="@@requiredField">The field is required</span>
+    </div>
+    <ng-template #format>
+        <div *ngIf="control.errors.format; else business">
+            <span i18n="@@wrongFormat">Wrong format</span>
+        </div>
+    </ng-template>
+    <ng-template #business>
+        <div *ngIf="control.errors.business">
+            <span i18n="@@businessRule">Business rule</span>
+        </div>
+    </ng-template>
+</div>

@@ -1,0 +1,55 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+
+@mixin step($left, $right) {
+    .error-link-list {
+        @include notification-error-list($left, $right);
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    input[type="text"] {
+        width: 60%;
+    }
+    app-typeahead, app-to-typeahead {
+        width: 60%;
+        display: inline-flex;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}
+
+.loading-animation {
+    .loading-img {
+        display: inline-block;
+        height: 25px;
+        animation: rotation 2s infinite linear;
+        margin-left: 5px;
+    }
+    
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
+}

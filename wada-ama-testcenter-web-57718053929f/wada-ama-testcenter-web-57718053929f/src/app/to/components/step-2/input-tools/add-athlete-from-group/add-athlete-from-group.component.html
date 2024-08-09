@@ -1,0 +1,87 @@
+<app-modal
+    [page]="(route$ | async)?.url"
+    [scrollable]="true">
+    <div modal-header>
+        <span i18n="@@addAthletesFromGroup">Add Athletes From Group</span>
+    </div>
+    <div modal-body class="wrapperNoMinHeight">
+        <div
+            *appLet="{
+                inCreation: inCreation$ | async,
+                isLoading: loadingAthleteGroups$ | async,
+                security: fieldsSecurity$ | async
+            } as state"
+            class="wrapper">
+
+            <div class="notifications">
+                <app-notification
+                    *ngIf="isMaxNumberOfAthletesExceeded"
+                    id="notifications"
+                    type="error">
+                    <span i18n="@@exceededMaximumNumberOfAthletes">You have exceeded the maximum number of 99 athletes.</span>
+                    <ng-container [ngSwitch]="numberOfAthletesExcess">
+                        <span *ngSwitchCase="1" i18n="@@mustRemoveXAthlete">You must remove {{ numberOfAthletesExcess }} athlete.</span>
+                        <span *ngSwitchDefault i18n="@@mustRemoveXAthletes">You must remove {{ numberOfAthletesExcess }} athletes.</span>
+                    </ng-container>
+                </app-notification>
+            </div>
+
+            <div class="limePieHeader">
+                <label class="remove-margin" i18n="@@groups">Groups</label>
+            </div>
+
+            <div *ngIf="!state.isLoading; else loadingAnimation">
+                <div class="notifications">
+                    <app-notification
+                        *ngIf="!(athletesError$ | async) && viewModels.length === 0"
+                        type="warning">
+                        <span i18n="@@noAthleteGroupsAvailable">There are no athlete groups available.</span>
+                    </app-notification>
+                    
+                    <app-notification
+                        *ngIf="athletesError$ | async"
+                        type="error">
+                        <span i18n="@@groupsCouldNotBeRetrieved">The athlete groups could not be retrieved.</span>
+                    </app-notification>
+                </div>
+                <accordion [closeOthers]="true">
+                    <accordion-group
+                        #group
+                        *ngFor="let model of viewModels; let mIndex=index;"
+                        [isOpen]="model === currentGroupId">
+                        <div accordion-heading (click)="toggleAccordion(model)">
+                            <app-view-section-title
+                                [arrowDirection]="model.active ? 'up' : 'down'"
+                                [canWrite]="false"
+                                [isActive]="model.active"
+                                [isInModal]="true"
+                                [rightInfo]="getRightInfo(model.data.numberOfAthletes) | async"
+                                [sectionNumber]="mIndex + 1"
+                                [sectionTitle]="model.title"
+                                [singleForm]="model.singleGroup"
+                                [theme]="model.active ? 'modal-accordion-title-active' : 'modal-accordion-title-inactive'">
+                            </app-view-section-title>
+                        </div>
+    
+                        <app-add-athlete-from-group-table
+                            [athletesFromGroup]="model.data.athletes"
+                            [fieldsSecurity]="fieldsSecurity$ | async"
+                            [groupId]="model.groupId"
+                            [inCreation]="inCreation$ | async"
+                            [isTOIssued]="isTOIssued$ | async"
+                            [sportDisciplines]="sportDisciplines$ | async"
+                            [urlWithoutParenthesis]="urlWithoutParenthesis$ | async"
+                            (closeModalEmitter)="closeModal()"
+                            (numberOfAthletesExcessEmitter)="setNumberOfAthletesExcess($event)">
+                        </app-add-athlete-from-group-table>
+                    </accordion-group>
+                </accordion>
+            </div>
+
+            <ng-template #loadingAnimation>
+                <app-loading-animation [isTemplate]="true"></app-loading-animation>
+            </ng-template>
+        </div>
+    </div>
+</app-modal>
+

@@ -1,0 +1,114 @@
+<div class="page">
+    <app-to-page appInheritDir>
+        <div title>
+            <ng-container [ngSwitch]="ids.length">
+                <span *ngSwitchCase="0"></span>
+                <span *ngSwitchCase="1" data-qa="viewUnsuccessfulAttempt" i18n="@@viewUnsuccessfulAttempt">View Unsuccessful Attempt</span>
+                <span *ngSwitchDefault data-qa="viewUnsuccessfulAttempts" i18n="@@viewUnsuccessfulAttempts">View Unsuccessful Attempts</span>
+            </ng-container>
+            
+            <app-generic-menu class="option-menu" hasCustomLook="true">
+                <button
+                    mat-button
+                    menu-look
+                    class="button-background">
+                    <mat-icon class="button-vertical" svgIcon="more_vert"></mat-icon>
+                </button>
+                <ng-container>
+                    <app-menu-item [isSidebarMenu]="false" (click)="print()">
+                        <a
+                            *ngIf="ids.length === 1"
+                            class="fake-link"
+                            data-qa="printUaForm"
+                            i18n="@@printUAForm">Print UA Form</a>
+                        <a
+                            *ngIf="ids.length > 1"
+                            class="fake-link"
+                            data-qa="printUaForms"
+                            i18n="@@printUAForms">Print UA Forms</a>
+                    </app-menu-item>
+                </ng-container>
+            </app-generic-menu>
+        </div>
+    
+        <app-notification
+            *ngIf="hasBeenDeleted$ | async"
+            type="success">
+            <span data-qa="deletedConfirmed" i18n="@@unsuccessfulAttemptForAthleteXDeleted">Unsuccessful Attempt for {{uaDeletion?.athleteName}} has been deleted.</span>
+            <div class="success-notification">
+                <div class="title" i18n="@@whatsNext_strong">
+                    <strong>What's next?</strong>
+                </div>
+                <div>
+                    <ul>
+                        <li>
+                            <a i18n="@@backToTestingOrder" [routerLink]="['/', 'to', 'view', toId]" (click)="resetUA()">Back to Testing Order</a>
+                        </li>
+                        <li>
+                            <a i18n="@@backToTestingOrderManagement" routerLink='/tos' (click)="resetUA()">Back to Testing Order Management</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </app-notification>
+    
+        <app-loading-frame
+            [error]="error$ | async"
+            [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+            [loading]="loading$ | async">
+            <accordion [closeOthers]="true">
+                <accordion-group
+                    #group
+                    *ngFor="let model of viewModels; let mIndex=index; let last=last"
+                    class="margin"
+                    closeOthers="true"
+                    [isOpen]="model.active">
+                    <div accordion-heading (click)="toggleAccordion(model, model.uaId)">
+                        <app-view-section-title
+                            dataQA="editUnsuccessfulAttemptButton"
+                            [arrowDirection]="model.active ? 'up' : 'down'"
+                            [canWrite]="canEditUA(model.uaId) | async"
+                            [formatErrors]=""
+                            [hasBeenSaved]="true"
+                            [inView]="inView"
+                            [isActive]="model.active"
+                            [queryParams]="{ id: ids.toString(), active: model.uaId }"
+                            [link]="['/', 'to', 'ua', 'edit']"
+                            [numberErrors]="model.errors?.size"
+                            [rightControls]="true"
+                            [rightInfo]="translations$ | getUnsuccessfulAttemptStatus:model.status | async"
+                            [rightInfoIcon]="model.errors?.size <= 0 && model.status === 1"
+                            [sectionNumber]="mIndex+1"
+                            [sectionTitle]="model.title"
+                            [singleForm]="viewModels.length === 1"
+                            [theme]="model.active ? 'accordion-title-active' : 'accordion-title-inactive'">
+                            {{model.uaId}}
+                        </app-view-section-title>
+                    </div>
+                    <app-ua-view-section
+                        [errors]="model.errors"
+                        [fieldsSecurity]="model.security"
+                        [locale]="locale$ | async"
+                        [showErrors]="showErrors"
+                        [ua]="model.data"
+                        (showDeleteUAEmitter)="openDeleteUA($event)">
+                    </app-ua-view-section>
+                </accordion-group>
+            </accordion>
+        </app-loading-frame>
+    </app-to-page>
+    
+    <app-footer
+        [creationInfo]="createInfo"
+        [updateInfo]="updateInfo">
+    </app-footer>
+    
+    <app-delete-modal 
+        [name]="uaDeletion?.athleteName"
+        [objectId]="uaDeletion?.unsuccessfulAttemptId"
+        [targetObject]="objectTargetEnum.UA"
+        (deleteObject)="deleteUnsuccessfulAttempt($event)">
+    </app-delete-modal>
+</div>
+
+<div class="footer"></div>

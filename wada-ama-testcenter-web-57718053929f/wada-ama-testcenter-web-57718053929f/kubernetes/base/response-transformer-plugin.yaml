@@ -1,0 +1,9 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: sample-management-response-transformer
+config:
+  remove:
+    headers:
+    - Www-Authenticate
+plugin: response-transformer

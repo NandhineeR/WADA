@@ -1,0 +1,55 @@
+@import '~sass/variables';
+
+$saveColor: #3F8532;
+
+.wrapper  {
+    margin-bottom: 5px;
+    padding: 20px;
+}
+
+.success-issue {
+    color: initial;
+    padding-top: 10px;
+
+    ul {
+        padding-left: 20px;
+        padding-top: 10px;
+    }
+    .notification {
+        font-size: 14px;
+    }
+}
+
+.button-background {
+    background-color: initial;
+}
+
+.cdk-mouse-focused {
+    outline: none !important;
+    border: 0 !important;
+}
+
+.mat-icon {
+    svg {
+        vertical-align: baseline;
+    }
+}
+
+.option-menu {
+    float: right;
+}
+
+.informative {
+    text-align: center;
+    padding-right: 35px;
+}
+
+div.float-btn-right{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.activity-table__wrapper {
+    margin-bottom: 80px;
+}

@@ -1,0 +1,95 @@
+<app-modal
+    *ngIf="showModal"
+    [removeMargin]="true"
+    [scrollable]="true"
+    (modalClose)="setShowModal(false)">
+
+    <div modal-header>
+        <span i18n="@@markAsCancelled">Mark as Cancelled</span>
+    </div>
+
+    <div modal-body class="modal__body">
+        <div class="wrapper">
+            <div *ngIf="displayMessages" class="modal__messages">
+                <div class="primary__message">
+                    <ng-container [ngSwitch]="testsToCancel.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestWillBeCancelled">The following test will be marked as Cancelled:</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsWillBeCancelled">The following tests will be marked as Cancelled:</span>
+                    </ng-container>
+                </div>
+                <div class="secondary__message">
+                    <ul>
+                        <li *ngFor="let test of testsToCancel">
+                            <span>{{ test.name }}</span>
+                        </li>
+                    </ul>
+                    <span i18n="@@cancelledTestsInformationWarning">Cancelled tests cannot be updated anymore. You will not be able to undo this action.</span>
+                </div>
+            </div>
+
+            <div class="notification">
+                <app-notification *ngIf="testsNotUpdatedWarning.hasWarning()" type="error">
+                    <ng-container [ngSwitch]="testsNotUpdatedWarning.names.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestCouldNotBeUpdated">The following test could not be updated:</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsCouldNotBeUpdated">The following tests could not be updated:</span>
+                    </ng-container>
+                    <ul>
+                        <li *ngFor="let name of testsNotUpdatedWarning.names">
+                            <span>{{name}}</span>
+                        </li>
+                    </ul>
+                    <span i18n="@@pleaseRefreshAndTryAgain">Please refresh the page and try again.</span>
+                </app-notification>
+
+                <app-notification *ngIf="cannotBeCancelledWarning.hasWarning()" type="warning">
+                    <ng-container [ngSwitch]="cannotBeCancelledWarning.names.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestCannotBeMarkedAsCancelled">The following test cannot be marked as Cancelled:</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsCannotBeMarkedAsCancelled">The following tests cannot be marked as Cancelled:</span>
+                    </ng-container>
+                    <ul class="cancel-info">
+                        <li *ngFor="let name of cannotBeCancelledWarning.names">
+                            <span>{{name}}</span>
+                        </li>
+                    </ul>
+                    <ng-container [ngSwitch]="cannotBeCancelledWarning.names.length">
+                        <span *ngSwitchCase="1" i18n="@@reasonTestCannotBeMarkedAsCancelled">because there is already a DCF created. To Cancel this test, please cancel the DCF before.</span>
+                        <span *ngSwitchDefault i18n="@@reasonTestsCannotBeMarkedAsCancelled">because there is at least one DCF created. To Cancel these tests, please cancel all the DCF attached to them before.</span>
+                    </ng-container>
+                </app-notification>
+
+                <app-notification *ngIf="alreadyCancelledWarning.hasWarning()" type="warning">
+                    <ng-container [ngSwitch]="alreadyCancelledWarning.names.length">
+                        <span *ngSwitchCase="1" i18n="@@followingTestAlreadyMarkedAsCancelled">The following test has already been marked as Cancelled:</span>
+                        <span *ngSwitchDefault i18n="@@followingTestsAlreadyMarkedAsCancelled">The following tests have already been marked as Cancelled:</span>
+                    </ng-container>
+                    <ul>
+                        <li *ngFor="let name of alreadyCancelledWarning.names">
+                            <span>{{name}}</span>
+                        </li>
+                    </ul>
+                </app-notification>
+            </div>
+
+            <div class="center-modal-buttons bottom-button-padding">
+                <ng-container>
+                    <app-button
+                        dataQA="cancelMarkAsCancelledButton"
+                        type="secondary"
+                        (click)="onCloseModal(false)">
+                        <span i18n="@@cancel">Cancel</span>
+                    </app-button>
+
+                    <app-button
+                        dataQA="confirmMarkAsCancelledButton"
+                        type="primary"
+                        [class.disabled]="!isSaveActive"
+                        [disabled]="!isSaveActive"
+                        (click)="onConfirm()">
+                        <span i18n="@@done">Done</span>
+                    </app-button>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+
+</app-modal>

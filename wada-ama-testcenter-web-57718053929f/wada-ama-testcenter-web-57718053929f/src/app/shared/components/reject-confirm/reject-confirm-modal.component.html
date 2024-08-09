@@ -1,0 +1,30 @@
+<div appInheritDir appTabFocus *ngIf="showModal" class="modal__wrapper">
+    <div class="modal__header">
+        <div class="modal__title">
+            <span><ng-content select="[title]"></ng-content></span>
+            <span *ngIf="!hasCustomTitleText" i18n="@@rejectMatch_uppercase">{{isRejectMatch ? 'REJECT MATCH' : 'CONFIRM MATCH'}}</span>
+        </div>
+        <div class="modal__close" (click)="onCancel()">&times;</div>
+    </div>
+    <div class="modal__body">
+        <div class="modal__messages">
+            <div class="primary__message">
+                <ng-content select="[primary-message]"></ng-content>
+            </div>
+            <div class="secondary__message">
+                <ng-content select="[secondary-message]"></ng-content>
+            </div>
+        </div>
+        <div class="modal__buttons">
+            <app-button dataQA="cancelButton" focus="true" type="secondary" (click)="onCancel()">
+                <span><ng-content select="[no]"></ng-content></span>
+                <span *ngIf="!hasCustomNoText" i18n="@@no_uppercase">NO</span>
+            </app-button>
+            <app-button dataQA="confirmButton" type="primary" (click)="isRejectMatch ? onReject(): onConfirm()">
+                <span><ng-content select="[yes]"></ng-content></span>
+                <span *ngIf="!hasCustomYesText" i18n="@@yes_uppercase">YES</span>
+            </app-button>
+        </div>
+    </div>
+</div>
+<div class="modal__overlay" *ngIf="showModal"></div>

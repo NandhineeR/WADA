@@ -1,0 +1,31 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~app/shared/styles/radio';
+
+$line-border-color: #414042;
+$background-error: #F4E6E6;
+$error-color: #AA1A1A;
+
+.table-container {
+    display: grid;
+    grid-template-columns: 4fr 5fr 7fr;
+    grid-row-gap: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+
+    &.table-header {
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        border-bottom: 1px solid $line-border-color;
+    }
+
+    &.has-error {
+        background-color: $background-error;
+        border-color: $error-color;
+        color: $error-color;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 5px;
+    }
+}

@@ -1,0 +1,26 @@
+@import '~sass/variables';
+
+$rowHeight: 225px;
+$minEntryPointCardWidth: 350px;
+$maxEntryPointCardWidth: 450px;
+$minMetricsCardWidth: 160px;
+$maxMetricsCardWidth: 200px;
+
+.ie {
+
+    .content {
+        display: block;
+        min-width: 1125px;
+
+        app-card {
+            min-width: $minEntryPointCardWidth;
+            max-width: $maxEntryPointCardWidth;
+        }
+
+        app-metrics-card {
+            min-width: $minMetricsCardWidth;
+            max-width: $maxMetricsCardWidth;
+            margin-left: 20px;
+        }
+    }
+}

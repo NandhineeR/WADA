@@ -1,0 +1,63 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+$sectionColor: '#8F8F8F';
+
+div {
+    .valid-field {
+        color: $valid-field-star;
+    }
+
+    .error-field {
+        color: $incorrect-field-star;
+    }
+}
+
+.error-field-name {
+    color: $incorrect-field-color;
+}
+
+.complete {
+    margin-left: 20px;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: bold;
+    color: $sectionColor;
+    background-color: $sectionColor;
+
+    img {
+        width: 18px;
+        height: 30px;
+        transform: translateY(-2px);
+    }
+}
+
+.missing-field {
+    vertical-align: middle;
+    margin-left: 20px;
+    width: 145px;
+    height: 16px;
+    border-radius: 35px 35px 35px 35px;
+    background: $sectionColor;
+    transform: translateY(-5px);
+
+    .inner-circle {
+        vertical-align: middle;
+        width: 20px;
+        height: 20px;
+        border-radius: 20px;
+        text-align: center;
+        font-weight: bold;
+        transform: translateY(-22px) translateX(-2px);
+        color: $sectionColor;
+        background-color: $sectionColor;
+
+        img {
+            width: 18px;
+            height: 30px;
+            transform: translateY(-2px);
+        }
+    }
+}

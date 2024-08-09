@@ -1,0 +1,300 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+@mixin tdssaTable($left, $right) {
+    table {
+        table-layout: fixed;
+        width: 100%;
+        box-sizing: border-box;
+        border-collapse: separate;
+        border-spacing: 0;
+        position: relative;
+
+        // This class is added/removed by the appSticky directive to make thead sticky
+        .sticky {
+            display: table;
+            position: fixed;
+            table-layout: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        th:nth-child(1) {
+            width: 25%;
+        }
+
+        thead {
+            background: white;
+        }
+
+        tr {
+            // Every cell has a left and bottom border
+            th, td {
+                border-#{$left}: 1px solid $table-border;
+                border-bottom: 1px solid $table-border;
+                height: 30px;
+
+                &.no-left-border {
+                    border-#{$left}: 0px;
+                }
+
+                &.no-bottom-border {
+                    border-bottom: 0;
+                }
+            }
+
+            // This is the table right-most border
+            th:last-child,
+            td:last-child {
+                border-#{$right}: 1px solid $table-border;
+            }
+
+            // Corner radius for top row
+            &:first-child {
+                th {
+                    border-top: 1px solid $table-border;
+                    &:first-child {
+                        border-top-#{$left}-radius: $border-radius;
+                    }
+                    &:last-child {
+                        border-top-#{$right}-radius: $border-radius;
+                    }
+                }
+            }
+
+            // Corner radius for the bottom row
+            &:last-child {
+                td {
+                    &:first-child {
+                        border-bottom-#{$left}-radius: $border-radius;
+                    }
+                    &:last-child {
+                        border-bottom-#{$right}-radius: $border-radius;
+                    }
+                }
+            }
+        }
+    }
+
+    .sport-discipline-padding {
+        padding-#{$left}: 40px;
+    }
+
+    .collapse-button {
+        padding-#{$left}: 35px;
+        vertical-align: bottom;
+        text-align: $left;
+
+        .collapse-label {
+            white-space: nowrap;
+            color: #1E5623;
+            font-size: 11px;
+            text-decoration: underline;
+        }
+
+        .collapse-label-disabled {
+            color: $disabled-color;
+            text-decoration: none;
+        }
+    }
+
+    .headerTitle {
+        color: $header-text-color;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .headerSubTitle {
+        color: $header-text-color;
+        font-size: 11px;
+        vertical-align: text-top;
+        text-align: center;
+    }
+
+    .totalRow {
+        font-weight: bold;
+        color: $font-color;
+        font-size: 12.5px;
+        background: $total-color;
+
+        .grandTotalHeader {
+            margin-#{$left}: 35px;
+            text-align: $left;
+        }
+    }
+
+    .sportRow {
+        color: $font-color;
+        font-size: 12px;
+        background: $sport-color;
+        text-align: $left;
+
+        .sportHeader {
+            margin-#{$left}: 10px;
+            vertical-align: middle;
+            word-break: break-word;
+            max-width: 16vw;
+        }
+    }
+
+    .disciplineRow {
+        color: $font-color;
+        font-size: 12px;
+        background: $discipline-color;
+        text-align: $left;
+    }
+
+    .alignRight {
+        text-align: $right;
+        padding-#{$right}: 5px;
+    }
+
+    // Legend
+    .legendText {
+        color: $header-text-color;
+        font-size: 9px;
+        vertical-align: top;
+
+        .legendHeader {
+            border: none;
+            table-layout: auto;
+
+            tr > td {
+                height: auto;
+            }
+
+            .subCatIcon {
+                width: 20px;
+                height: 10px;
+            }
+
+            .subCat0 {
+                background-color: #000;
+            }
+
+            .subCat1 {
+                background-color: #7d7d7d;
+            }
+
+            .subCat2 {
+                background-color: #c3c3c3;
+            }
+
+            .noBorder {
+                border: none !important;
+                vertical-align: top;
+            }
+        }
+    }
+
+    .btn-width {
+        width: 35px;
+    }
+
+    // MLA dropdown
+    .mla-dropdown {
+        width: 100%;
+        padding: 0;
+        border: 1px $table-border solid;
+        cursor: pointer;
+        margin-bottom: 5px;
+
+        .icon-margin {
+            margin-top: 3px;
+        }
+    }
+
+    .dropdown-menu {
+        min-width: 0;
+        padding: 0;
+        line-height: 1;
+        top: 18px !important;
+        z-index: 2000;
+
+        .dropdown-item {
+            padding-left: 10px;
+            padding-right: 10px;
+            text-align: center;
+            cursor: pointer;
+
+            .dropdown-text {
+                color: $font-color;
+                font-size: 11px;
+            }
+        }
+    }
+
+    .dropdown-column {
+        max-width: 50px;
+    }
+
+    // The loading overlay
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: $loading-color;
+        border-radius: $border-radius;
+        z-index: 1100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .overlay-spacer-before {
+            flex: 0 1 150px; // max size 150px, can shrink, won't grow
+        }
+
+        .overlay-spacer-after {
+            flex: 1 1 auto; // max size 150px, can shrink, won't grow
+        }
+
+        .loading-img {
+            flex: 0 0 auto; // size auto, won't grow or shrink
+            height: 60px;
+            animation: rotation 2s infinite linear;
+
+            &.none {
+                height: 0;
+            }
+        }
+
+        .loading-text {
+            flex: 0 0 auto; // size auto, won't grow or shrink
+            vertical-align: top;
+            font-size: 36px;
+            color: $font-color;
+
+            &.small {
+                font-size: 20px;
+            }
+        }
+
+        @keyframes rotation {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(359deg);
+            }
+        }
+    }
+
+    .search-bar {
+        vertical-align: middle;
+    }
+
+    .centered {
+        text-align: center !important;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include tdssaTable(left, right);
+    }
+    @include rtl {
+        @include tdssaTable(right, left);
+    }
+}

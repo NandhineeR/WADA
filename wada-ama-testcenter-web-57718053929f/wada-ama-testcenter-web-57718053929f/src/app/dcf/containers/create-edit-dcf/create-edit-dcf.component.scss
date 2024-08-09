@@ -1,0 +1,57 @@
+@import '~sass/mixins';
+@import '~app/shared/styles/next-button-container';
+
+$arrow-size: 10px;
+$frameColor: #3f8532;
+$messageColor: #414042;
+$maxNumberOfSteps: 10;
+$stepWidth: 150px;
+
+@mixin createEditStyle($left, $right, $dir) {
+    .form-frame {
+        border-radius: 5px;
+        border: 2px solid $frameColor;
+        background-color: #ffffff;
+        width: 100%;
+        padding: 10px 0px 60px;
+        margin-top: $arrow-size;
+        margin-bottom: 50px;
+        position: relative;
+
+        div.field-label{
+            color: form-label-color;
+        }
+
+        .frame-arrow {
+            content: " ";
+            position: absolute;
+            top: 0;
+            #{$left}: 0;
+            width: 0;
+            height: 0;
+            border-width: $arrow-size;
+            border-style: solid;
+            border-color: transparent;
+            border-bottom-color: $frameColor;
+
+            @for $i from 1 through $maxNumberOfSteps {
+                &.step-active-#{$i} {
+                    transform: translateX(-50% * $dir) translateX($stepWidth / 2 * $dir + $stepWidth * ($i - 1) * $dir) translateY(-100%)
+                }
+            }
+        }
+
+        .next-button-container {
+            @include next-button-container($left, $right);
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include createEditStyle(left, right, 1);
+    }
+    @include rtl {
+        @include createEditStyle(right, left, -1);
+    }
+}

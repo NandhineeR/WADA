@@ -1,0 +1,7 @@
+<div class="wrapper" appInheritDir *ngIf="creationInfo || updateInfo">
+    <div class="align footer" i18n="@@originallyCreatedXByXFromX">Originally created<strong> {{ creationInfo.timestamp | date:displayFormat }}, </strong>by<strong> {{ creationInfo.user.lastName }}, {{ creationInfo.user.firstName }} </strong>from <strong>{{ creationInfo.organizationName }}</strong></div>
+    <div class="align footer"
+        *ngIf="updateInfo.timestamp && creationInfo.timestamp !== updateInfo.timestamp"
+        i18n="@@lastUpdatedXByXFromX">Last updated<strong> {{ updateInfo.timestamp | date:displayFormat }}, </strong>by<strong> {{ updateInfo.user.lastName }}, {{ updateInfo.user.firstName }} </strong>from<strong> {{ updateInfo.organizationName }}</strong>
+    </div>
+</div>

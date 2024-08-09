@@ -1,0 +1,12 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+.show-more-less {
+    padding-top: 0.5em;
+    text-decoration: underline;
+    cursor: pointer;
+    display: block;
+    color: $show-more-color;
+    font-size: 11px;
+}
+

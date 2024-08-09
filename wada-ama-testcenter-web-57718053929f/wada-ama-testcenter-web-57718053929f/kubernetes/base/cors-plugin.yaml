@@ -1,0 +1,13 @@
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: testcenter-web-cors-plugin
+  namespace: default
+config:
+    origins:
+      - ^http(?:s)?:\/\/\S+\.wada-ama\.org(?::\d+)?$
+    credentials: false
+    max_age: 3600
+    preflight_continue: false
+plugin: cors

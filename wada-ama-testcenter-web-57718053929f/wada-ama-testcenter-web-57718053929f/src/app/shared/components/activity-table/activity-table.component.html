@@ -1,0 +1,101 @@
+<div class="activity-log-title-wrapper">
+    <span class="activity-log-title" i18n="@@activityLog">Activity Log</span>
+    <span *ngIf="userHasCreateRoles" class="float-btn-right">
+        <app-button
+            appOpenObjectInClassic
+            class="margin-btn-bottom"
+            i18n="@@createActivity_uppercase"
+            type="secondary"
+            [athleteId]="athleteId"
+            [objectId]="ownerId"
+            [targetObject]="targetObject">CREATE ACTIVITY</app-button>
+    </span>
+</div>
+
+<app-data-table
+    #table
+    [allowMultiSelect]="false"
+    [columnDefs]="columns"
+    [dataSource]="dataSource"
+    [error]="error"
+    [loading]="loading"
+    [showDrag]="false"
+    [showOrder]="false"
+    [showRemove]="false"
+    [showSelect]="false"
+    [whiteBackground]="true">
+    <ng-container *columnCell="'referenceDate'; let e; let i = index">
+        <span data-qa="activityReferenceDate" [attr.data-qa-precision]="i">{{ e.referenceDate | formatDate :'DD MMM YYYY' | uppercase }}</span>
+    </ng-container>
+
+    <ng-container *columnCell="'subject'; let e; let i = index" >
+        <span *ngIf="fromTO">
+            <a
+                appOpenObjectInClassic
+                data-qa="activitySubject"
+                href=""
+                targetObject="MissionOrderActivity"
+                [attr.data-qa-precision]="i"
+                [objectId]="e.id"
+                [toId]="toId$ | async">
+                {{ e.subject }}
+            </a>
+        </span>
+
+        <span *ngIf="fromDCF">
+            <a 
+                appOpenObjectInClassic
+                data-qa="activitySubject"
+                href=""
+                targetObject="DCFActivity"
+                [abpAccess]="abpAccess"
+                [athleteId]="athleteId$ | async"
+                [attr.data-qa-precision]="i"
+                [dcfId]="dcfId$ | async"
+                [ngClass]="{'no-link': !canViewActivityDetails(e.subject)}"
+                [objectId]="e.id">
+                {{ e.subject }}
+            </a>
+        </span>
+
+        <span *ngIf="!fromDCF && !fromTO" data-qa="activitySubject" [attr.data-qa-precision]="i">
+            {{ e.subject }}
+        </span>
+    </ng-container>
+
+    <ng-container *columnCell="'type'; let e; let i = index">
+        <span data-qa="activityType" [attr.data-qa-precision]="i">{{ e.type }}</span>
+    </ng-container>
+
+    <ng-container *columnCell="'createdBy'; let e; let i = index">
+        <span data-qa="activityCreatedBy" [attr.data-qa-precision]="i">{{ e.createdBy.lastName }}, {{ e.createdBy.firstName }} ({{ e.createdBy.userName }})</span>
+    </ng-container>
+
+    <ng-container *columnCell="'lastUpdatedBy'; let e; let i = index">
+        <span data-qa="activityLastUpdatedBy" [attr.data-qa-precision]="i">{{ e.lastUpdatedBy.lastName }}, {{ e.lastUpdatedBy.firstName }} ({{ e.lastUpdatedBy.userName }})</span>
+    </ng-container>
+
+    <ng-template #referenceDateHeader>
+        <div i18n="@@referenceDate">Reference Date</div>
+    </ng-template>
+
+    <ng-template #subjectHeader>
+        <div i18n="@@subject">Subject</div>
+    </ng-template>
+
+    <ng-template #typeHeader>
+        <div i18n="@@activityType">Type</div>
+    </ng-template>
+
+    <ng-template #createdByHeader>
+        <div i18n="@@createdBy">Created By</div>
+    </ng-template>
+
+    <ng-template #organizationHeader>
+        <div i18n="@@organization">Organization</div>
+    </ng-template>
+
+    <ng-template #lastUpdatedByHeader>
+        <div i18n="@@lastUpdatedBy">Last Updated By</div>
+    </ng-template>
+</app-data-table>

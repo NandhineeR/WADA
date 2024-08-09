@@ -1,0 +1,42 @@
+@import '~sass/mixins';
+
+:host {
+    display: inline-block;
+}
+
+@mixin popover($left, $right) {
+    width: 500px;
+    text-align: $left;
+
+    .popover-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 40px;
+    }
+}
+
+.popover-body {
+    @include ltr {
+        @include popover(left, right);
+    }
+    @include rtl {
+        @include popover(right, left);
+    }
+}
+
+.delete-button {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.delete-button-disabled {
+    cursor: not-allowed;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    background-color: rgb(255, 255, 255);
+    opacity: 0.6;
+}

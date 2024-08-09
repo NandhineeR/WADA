@@ -1,0 +1,21 @@
+<div class="popover__wrapper" #targetRef>
+    <div (click)="onToggle($event)" class="popover__target">
+        <ng-content></ng-content>
+    </div>
+    <div *ngIf="opened">
+        <div
+            [ngClass]="['popover__content', 'popover__' + placement]"
+            #popoverRef
+            appClickOutside
+            (clickOutside)="onClose()">
+            <div class="popover__header">
+                <div class="popover__title">
+                    <ng-content select="[popover-title]"></ng-content>
+                </div>
+                <div class="popover__close" (click)="onClose()">&times;</div>
+            </div>
+            <ng-content select="[popover-body]"></ng-content>
+            <div class="popover__arrow" #arrowRef></div>
+        </div>
+    </div>
+</div>

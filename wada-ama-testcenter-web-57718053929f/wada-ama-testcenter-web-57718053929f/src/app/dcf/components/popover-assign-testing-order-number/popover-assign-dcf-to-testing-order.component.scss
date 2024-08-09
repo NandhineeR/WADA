@@ -1,0 +1,90 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/components/notification/mixins';
+@import '~app/shared/styles/fake-link';
+
+@include fake-link(left, right);
+
+$linkColor: #3A782C;
+$textColor: #212529;
+
+.link__changeStatus {
+    color: $linkColor;
+    font-family: Montserrat, sans-serif;
+    font-size: 13px;
+    text-decoration: underline;
+    margin-left: 7px;
+    padding-left: 25px;
+}
+
+.link__changeStatus:hover {
+    cursor: pointer;
+}
+
+.popover__title {
+    min-width: 500px;
+    line-height: 150%;
+}
+
+.textarea__reason {
+    width: 100%;
+    line-height: 150%;
+    margin-bottom: 15px;
+    border: 1px solid black;
+    &.error {
+        border: 2px solid $incorrect-field-star;
+    }
+}
+
+.primary__message {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 150%;
+}
+
+.secondary__message {
+    font-size: 16px;
+    line-height: 150%;
+    color: $textColor;
+    font-weight: normal;
+}
+
+.div__errorReasonMandatory {
+    margin-left: 10px;
+    color: $error-color;
+    display: inline-block;
+}
+
+
+.field-asterisk {
+    padding-left: 4px;
+    color: $asterisk-color;
+    font-weight: bold;
+
+    &.error {
+        color: $error-color;
+    }
+}
+
+app-to-typeahead {
+    width: 75%;
+    display: inline-flex;
+}
+
+.loading-animation {
+    .loading-img {
+        display: inline-block;
+        height: 20px;
+        animation: rotation 2s infinite linear;
+        margin-left: 5px;
+    }
+    
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
+}

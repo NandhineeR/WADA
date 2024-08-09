@@ -1,0 +1,46 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+$filterBorder: #c0c0c0;
+
+@mixin wrapper($left, $right) {
+    font-family: Montserrat, sans-serif;
+    padding: 20px 25px 25px 25px;
+
+    .controls {
+        margin-top: 15px;
+        margin-#{right}: 25px;
+        margin-#{left}: 15px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .title {
+        font-size: 34px;
+        font-weight: bold;
+        color: $title-color;
+        margin-bottom: 20px;
+    }
+
+    .header {
+        margin-left: -25px;
+        margin-right: -25px;
+    }
+
+    .message {
+        margin-top: 20px;
+    }
+
+    .steps {
+        margin-top: 20px;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include wrapper(left, right);
+    }
+    @include rtl {
+        @include wrapper(right, left);
+    }
+}

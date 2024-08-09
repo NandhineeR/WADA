@@ -1,0 +1,20 @@
+<div class="wrapper" appInheritDir>
+        <dp-date-picker 
+                attachTo=".mat-input-wrapper"
+                class="datetime-wrapper"
+                mode="daytime"
+                theme="dp-material"
+                [class.error]="hasError"
+                [config]="datetimePickerConfig"
+                [disabled]="disabled"
+                [displayDate]="selectedMonthDate"
+                [id]="fieldId"
+                [ngModel]="selectedDatetime"
+                (focusout)="onFocusOutEvent($event)"
+                (keyup)="onKeyUp($event)"
+                (ngModelChange)="modelChangeFn($event)"
+                (onLeftNav)="onLeftNav()"
+                (onRightNav)="onRightNav()"
+                (open)="onOpen()">
+        </dp-date-picker>
+</div>

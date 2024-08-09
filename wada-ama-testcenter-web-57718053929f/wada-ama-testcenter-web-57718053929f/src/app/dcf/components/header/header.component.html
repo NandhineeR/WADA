@@ -1,0 +1,94 @@
+<div
+    appInheritDir
+    *ngIf="!isUserAnonymous"
+    class="header">
+    <div class="">
+        <div
+            *ngIf="athlete.lastName || athlete.firstName"
+            class="athlete-field round-top-border side-padding">
+            <label i18n="athlete">Athlete</label>
+            <a
+                appOpenObjectInClassic
+                *ngIf="athlete.lastName || athlete.firstName"
+                href=""
+                [abpAccess]="abpAccess"
+                [objectId]="athlete.id"
+                [targetObject]="'Athlete'">
+                {{ athlete.lastName }}, {{ athlete.firstName }}
+            </a>
+        </div>
+        
+        <div
+            *ngIf="athlete.adamsId"
+            class="athlete-field side-padding">
+            <label i18n="@@adamsIdNumber">ADAMS ID Number</label>
+            <span>{{ athlete?.adamsId }}</span>
+        </div>
+        
+        <div
+            *ngIf="athlete.bpNumber"
+            class="athlete-field side-padding">
+            <label i18n="@@biologicalPassportNumber">Biological Passport Number</label>
+            <span>{{ athlete?.bpNumber }}</span>
+        </div>
+        
+        <div
+            *ngIf="athlete.sex"
+            class="athlete-field side-padding">
+            <label i18n="@@sportGender">Sport Gender</label>
+            <span><app-gender-selector [gender]="athlete.sex"></app-gender-selector></span>
+        </div>
+        
+        <div
+            *ngIf="athlete.sportNationality"
+            class="athlete-field side-padding">
+            <label i18n="@@sportNationality">Sport Nationality</label>
+            <span>{{ athlete?.sportNationality?.name }}</span>
+        </div>
+        
+        <div
+            *ngIf="athlete.dateOfBirth"
+            class="athlete-field round-bottom-border side-padding">
+            <label i18n="@@dateOfBirth">Date of Birth</label>
+            <span i18n="@@xDateOfBirth">{{ athlete?.dateOfBirth | date :'dd-MMM-yyyy':'-0000' | uppercase }}</span>
+        </div>
+
+        <div
+            *ngIf="athlete.dateOfBirth"
+            class="athlete-field round-bottom-border side-padding">
+            <label i18n="@@age">Age</label>
+            <span i18n="@@xDCFAthleteAge">{{ athlete?.dateOfBirth | calculateAge }} years old</span>
+        </div>
+    </div>
+
+    <div *ngIf="isDCFMode; else matchTypeStatus">
+        <div
+            *ngIf="statusString"
+            class="round-top-border round-bottom-border side-padding status">
+            <span i18n="@@status_colon">Status: </span>
+            <ng-container [ngSwitch]="statusString">
+                <span *ngSwitchCase="'Draft'" i18n="@@draft" [ngClass]="statusClass">Draft</span>
+                <span *ngSwitchCase="'Completed'" i18n="@@completed" [ngClass]="statusClass">Completed</span>
+                <span *ngSwitchCase="'Cancelled'" i18n="@@cancelled" [ngClass]="statusClass">Cancelled</span>
+                <span *ngSwitchDefault></span>
+            </ng-container>
+            
+            <span class="spacer"></span>
+            
+            <app-cancel-modal
+                [hasError]="false"
+                [isCancellable]="isCancellable"
+                (cancelEmitter)="changeStatusToCancel($event)">
+                <ng-container
+                    field-label
+                    i18n="@@cancelDcfPopoverQuestion">Are you sure you want to cancel this Doping Control Form for {{ athlete.lastName }}, {{ athlete.firstName }}?</ng-container>
+            </app-cancel-modal>
+        </div>
+    </div>
+    
+    <ng-template #matchTypeStatus>
+        <div *ngIf="matchType" class="status">
+            <span i18n="@@matchTypeX">Match Type: <span [ngClass]="statusClass">{{ matchType }}</span></span>
+        </div>
+    </ng-template>
+</div>

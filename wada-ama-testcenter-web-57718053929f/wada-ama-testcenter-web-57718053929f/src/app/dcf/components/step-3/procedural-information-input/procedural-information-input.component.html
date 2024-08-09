@@ -1,0 +1,264 @@
+<div
+    appInheritDir
+    appRandomizeInput
+    *ngIf="autoCompletes"
+    #root="appRandomizeInput"
+    class="wrapper">
+    <app-dcf-notifications
+        *ngIf="(
+                (form | formErrors:showErrors:dcfStatus) ||
+                (hasSaveConflict && hasOptimisticLockException) ||
+                (saveError && !(hasSaveConflict && hasOptimisticLockException))
+            ) && !isMultipleDCF"
+            id="dcf-notifications"
+            type="error"
+            [conflictException]="conflictException"
+            [dcfId]="dcfId"
+            [saveError]="saveError" >
+        <span *ngIf="!conflictException && !saveError" i18n="@@errorsDetectedInFollowingFields">Some error(s) were detected in the following fields:</span>
+        
+        <ul links class="error-link-list">
+            <li *ngIf="athleteRepresentativeHasErrors && athleteRepresentative.errors.lastNameRequired">
+                <a href="{{ route }}#{{ root.getId('athleteRepresentativeLastName') }}" i18n="@@athleteRepresentativeLastName">Athlete Representative Last Name</a>
+            </li>
+            <li *ngIf="athleteRepresentativeHasErrors && athleteRepresentative.errors.firstNameRequired">
+                <a href="{{ route }}#{{ root.getId('athleteRepresentativeFirstName') }}" i18n="@@athleteRepresentativeFirstName">Athlete Representative First Name</a>
+            </li>
+            <li *ngIf="dopingControlOfficerHasErrors && dopingControlOfficer.errors.lastNameRequired">
+                <a href="{{ route }}#{{ root.getId('dopingControlOfficerLastName') }}" i18n="@@dopingControlOfficerLastName">Doping Control Officer Last Name</a>
+            </li>
+            <li *ngIf="dopingControlOfficerHasErrors && dopingControlOfficer.errors.firstNameRequired">
+                <a href="{{ route }}#{{ root.getId('dopingControlOfficerFirstName') }}" i18n="@@dopingControlOfficerFirstName">Doping Control Officer First Name</a>
+            </li>
+            <li *ngIf="consentForResearchHasErrors">
+                <a href="{{ route }}#{{ root.getId('consentForResearch') }}" i18n="@@consentForResearch">Consent for Research</a>
+            </li>
+            <li *ngIf="proceduralIrregularitiesHasErrors">
+                <a href="{{ route }}#{{ root.getId('proceduralIrregularities') }}" i18n="@@proceduralIrregularities">Procedural Irregularities</a>
+            </li>
+            <li *ngIf="declarationOfTransfusionHasErrors">
+                <a href="{{ route }}#{{ root.getId('declarationOfTransfusion') }}" i18n="@@declarationOfTransfusion">Declaration of Blood Transfusions</a>
+            </li>
+            <li *ngIf="declarationOfSupplementsHasErrors">
+                <a href="{{ route }}#{{ root.getId('declarationOfSupplements') }}" i18n="@@medicationSupplementsDeclaration">Declaration of Medication Supplements</a>
+            </li>
+            <li *ngIf="endOfProcedureDateHasErrors">
+                <a href="{{ route }}#{{ root.getId('endOfProcedureDate') }}" i18n="@@endOfProcedureDate">Date of End of Procedure</a>
+            </li>
+            <li *ngIf="timezoneHasErrors">
+                <a href="{{ route }}#{{ root.getId('timezone') }}" i18n="@@dcf_timezone">Timezone</a>
+            </li>
+            <ng-container *ngFor="let item of nonConformities.controls;let i=index">
+                <ng-container *ngFor="let key of item | formControlKeys">
+                    <div *ngIf="item.controls | controlErrors:showErrors:dcfStatus:key">
+                        <li *ngIf="item.controls.category.errors">
+                            <a href="{{ route }}#{{ root.getId('category'+i) }}" (click)="openCategoryDropdown(root.getId('category'+i))">
+                                <span i18n="@@nonConformities">Non-Conformity&nbsp;{{ i+1 }} - </span>
+                                <span i18n="@@nonConformityCategory">Category of Non-Conformity</span>
+                            </a>
+                        </li>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </ul>
+    </app-dcf-notifications>
+
+    <form [formGroup]="form">
+        <app-participant-input
+            field-input
+            *ngIf="!isMultipleDCF"
+            dataQAFirstName="athleteRepresentativeFirstName"
+            dataQALastName="athleteRepresentativeLastName"
+            firstNameId="athleteRepresentativeFirstName"
+            formControlName="athleteRepresentative"
+            lastNameId="athleteRepresentativeLastName"
+            [hasError]="athleteRepresentativeHasErrors"
+            [hasFirstNameError]="athleteRepresentativeHasErrors && athleteRepresentative.errors.firstNameRequired"
+            [hasLastNameError]="athleteRepresentativeHasErrors && athleteRepresentative.errors.lastNameRequired"
+            [isDisabled]="controls.ATHLETE_REPRESENTATIVE | isInputDisabled:fieldsSecurity:isEditMode"
+            [isStartingFocus]="true"
+            [participants]="athleteRepresentatives">
+            <label i18n="@@athleteRepresentative">Athlete Representative</label>
+            <span last-name-errors *ngIf="athleteRepresentativeHasErrors && athleteRepresentative.errors.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <span first-name-errors *ngIf="athleteRepresentativeHasErrors && athleteRepresentative.errors.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </app-participant-input>
+
+        <app-participant-input
+            #dcoParticipantInput
+            field-input
+            dataQAFirstName="dcoFirstName"
+            dataQALastName="dcoLastName"
+            firstNameId="dopingControlOfficerFirstName"
+            formControlName="dco"
+            lastNameId="dopingControlOfficerLastName"
+            [hasAsterisk]="true"
+            [hasError]="dopingControlOfficerHasErrors"
+            [hasFirstNameError]="dopingControlOfficerHasFirstNameErrors"
+            [hasLastNameError]="dopingControlOfficerHasLastNameErrors"
+            [isDisabled]="controls.DCO | isInputDisabled:fieldsSecurity:isEditMode"
+            [participants]="dopingControlOfficers"
+            (inputChange)="updateDCO($event)">
+            <label i18n="@@dopingControlOfficer">Doping Control Officer</label>
+            <span last-name-errors *ngIf="dopingControlOfficerHasErrors && dopingControlOfficer.errors?.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <span first-name-errors *ngIf="dopingControlOfficerHasErrors && dopingControlOfficer.errors?.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </app-participant-input>
+
+        <app-form-field
+            [appDisable]="controls.CONSENT_FOR_RESEARCH | isInputDisabled:fieldsSecurity:isEditMode"
+            [hasAsterisk]="true"
+            [hasError]="consentForResearchHasErrors">
+            <label i18n="@@consentForResearch">Consent for Research</label>
+            <div field-input>
+                <label class="radio-container">
+                    <input #yes formControlName="consentForResearch" type="radio" [value]="true">
+                    <span class="checkmark"></span>
+                    <span class="radio-label" i18n="@@yes">Yes</span>
+                </label>
+                <label class="radio-container">
+                    <input formControlName="consentForResearch" type="radio" [value]="false">
+                    <span class="checkmark"></span>
+                    <span class="radio-label" i18n="@@no">No</span>
+                </label>
+            </div>
+            <div field-error *ngIf="consentForResearchHasErrors">
+                <span *ngIf="consentForResearch.errors.required" i18n="@@pleaseSelectAValue">Please select a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field *ngIf="!isMultipleDCF">
+            <label i18n="@@proceduralIrregularities">Procedural Irregularities</label>
+            <textarea
+                field-input
+                formControlName="proceduralIrregularities"
+                id="proceduralIrregularities"
+                maxlength="100000"
+                [appDisable]="controls.IRREGULARITIES | isInputDisabled:fieldsSecurity:isEditMode">
+            </textarea>
+        </app-form-field>
+
+        <app-form-field *ngIf="!isMultipleDCF">
+            <label i18n="@@bloodTransfusionsDeclaration">Declaration of Blood Transfusions</label>
+            <textarea
+                field-input
+                formControlName="declarationOfTransfusion"
+                id="declarationOfBloodTransfusions"
+                maxlength="4000"
+                [appDisable]="controls.BLOOD_TRANSFUSION_DECLARATION | isInputDisabled:fieldsSecurity:isEditMode">
+            </textarea>
+        </app-form-field>
+
+        <app-form-field *ngIf="!isMultipleDCF">
+            <label i18n="@@declarationMedicationSupplements">Declaration of Medication Supplements</label>
+            <textarea
+                field-input
+                formControlName="declarationOfSupplements"
+                id="declarationOfMedicationsSupplements"
+                maxlength="4000"
+                [appDisable]="controls.DECLARATION_OF_SUPPLEMENTS | isInputDisabled:fieldsSecurity:isEditMode">
+            </textarea>
+        </app-form-field>
+
+        <app-form-field
+            *ngIf="!isMultipleDCF"
+            class="wrapper"
+            columns="30% 30% 30% 30%"    
+            [hasAsterisk]="true"
+            [hasError]="endOfProcedureDateHasErrors"
+            [ngClass]="{ 'topSpace': isMultipleDCF }">
+
+            <label i18n="@@endOfProcedureDate">Date of End of Procedure</label>
+            <span field-top-label>
+                <span i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h) </span>
+                <app-info-bubble *ngIf="!timezone?.value" i18n="@@timezoneMustBeProvidedInfo">The time zone must be provided before entering a value</app-info-bubble>
+            </span>
+            <app-datetime-picker
+                field-input
+                dataQA="endOfProcedureDate"
+                fieldId="endOfProcedureDate"
+                formControlName="endOfProcedureDate"
+                [appDisable]="controls.PROCEDURE_END_DATE | isInputDisabled:fieldsSecurity:isEditMode"
+                [disabled]="controls.PROCEDURE_END_DATE | isInputDisabled:fieldsSecurity:isEditMode || !timezone?.value"
+                [hasError]="endOfProcedureDateHasErrors"
+                [locale]="locale">
+            </app-datetime-picker>
+            <div field-info *ngIf="endOfProcedureDateHasErrors" class="error-message">
+                <span *ngIf="endOfProcedureDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span *ngIf="endOfProcedureDate.errors.validateDatetimeFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                <span *ngIf="endOfProcedureDate.errors.dateIsRemoved?.error?.invalid" i18n="@@endOfProcedureDateCantBeRemoved">The date of end of procedure can be updated but cannot be removed.</span>
+            </div>
+
+            <div field-top-label-2>
+                <span id="timezone" i18n="@@timeZone">Time Zone</span>
+                <app-info-bubble i18n="@@endOfProcedureDateTimezoneDisableInfo">Field not editable. It replicates the timezone inserted for the arrival date</app-info-bubble>
+            </div>
+            <app-dropdown
+                field-input-2            
+                dataQA="timeZoneDropdownEndOfProcedureDate"
+                formControlName="timezone"
+                i18n-placeholder="@@timezone"
+                id="timezone"
+                placeholder="Time Zone"
+                property="id"
+                style="width: 100%"
+                type="text"
+                [appDisable]="true"
+                [hasError]="timezoneHasErrors"
+                [isDisabled]="true">
+                <ng-container *ngFor="let item of timezones; let i = index">
+                    <div class="dropdown-item" data-qa="timeZoneDropdownOptionEndOfProcedureDate" [appDropdownElement]="item" [attr.data-qa-precision]="i">{{ item.shortName }}</div>
+                </ng-container>
+            </app-dropdown>
+            <div field-info-2 *ngIf="timezoneHasErrors" class="error-message">
+                <span 
+                    *ngIf="timezone.errors.validateEmptyTimezone?.error?.invalid"
+                    i18n="@@provideTimezoneWithEndOfProcedureDate">The time zone must be provided when the end-of-procedure date is set.</span>
+                <span *ngIf="timezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field *ngIf="!isMultipleDCF">
+            <label i18n="@@dcoComment">DCO Comment</label>
+            <textarea
+                field-input
+                formControlName="dcoComment"
+                id="dcoComment"
+                [appDisable]="true">
+            </textarea>
+        </app-form-field>
+
+        <app-form-field *ngIf="!isMultipleDCF">
+            <label i18n="@@athleteComment">Athlete Comment</label>
+            <textarea
+                field-input
+                formControlName="athleteComment"
+                id="athleteComment"
+                [appDisable]="true">
+            </textarea>
+        </app-form-field>
+   
+        <div *ngIf="!isMultipleDCF" formArrayName="nonConformities">
+            <app-non-conformity-input
+                *ngFor="let item of nonConformities.controls; let i=index"
+                [dcfStatus]="dcfStatus"
+                [fieldsSecurity]="fieldsSecurity"
+                [formGroup]="item"
+                [inCreation]="inCreation"
+                [isEditMode]="isEditMode"
+                [isMultipleDCF]="isMultipleDCF"
+                [nonConformityCategories]="autoCompletes.nonConformityCategories"
+                [nonConformityIndex]="i"
+                [showErrors]="showErrors"
+                (deleteNonConformity)="deleteNonConformity($event)">
+            </app-non-conformity-input>
+            
+            <app-form-field *ngIf="nonConformities.length < MAX_NON_CONFORMITIES">
+                <app-button
+                    field-input
+                    dataQA="addNonConformityButton"
+                    i18n="@@addNonConformity"
+                    type="secondary"
+                    (click)="addNonConformity()">Add Non-Conformity</app-button>
+            </app-form-field>
+        </div>
+    </form>
+</div>

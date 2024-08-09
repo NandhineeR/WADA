@@ -1,0 +1,85 @@
+@import '~sass/variables';
+
+$unselectedColor: #414042;
+$bottomBorderColor: #2d6828;
+$selectedColor: #2d6828;
+
+.frequency-wrapper {
+    height: auto;
+    padding-bottom: 0;
+}
+
+.frequency-user-info {
+    display: flex;
+    justify-content: space-between;
+}
+
+.inline {
+    display: flex;
+}
+
+ul.tabs {
+    height: 40px;
+    line-height: 40px;
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 0;
+    font-size: 19px;
+
+    &.secondary-tabs-monthly li {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    & li {
+        text-align: center;
+        padding-right: 25px;
+        padding-left: 25px;
+        font-weight: 500;
+        color: $unselectedColor;
+        margin-bottom: 0;
+        cursor: default;
+
+        // An hidden block is placed over each <li> to give them the same size as the bolded content
+        // This is to prevent the right shift that happens to <li>'s when an <li> to the left changes to bold
+        // see: https://stackoverflow.com/questions/556153/inline-elements-shifting-when-made-bold-on-hover
+        &:after {
+            display: block;
+            content: attr(content);
+            font-weight: bold;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        &:hover {
+            font-weight: 600;
+            box-shadow: inset 0 -1px 0px 0px $bottomBorderColor;
+        }
+
+        &.selected {
+            font-weight: bold;
+            color: $selectedColor;
+            box-shadow: inset 0 -3px 0px 0px $bottomBorderColor;
+        }
+    }
+}
+
+.dropdown-wrapper {
+    cursor: default;
+    padding-right: 25px;
+    padding-left: 25px;
+    font-size: 17px;
+    color: $unselectedColor;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    .dropdown-option {
+        padding-left: 6px;
+        font-weight: 500;
+
+        &:hover {
+            background-color: #82CB72;
+        }
+    }
+}

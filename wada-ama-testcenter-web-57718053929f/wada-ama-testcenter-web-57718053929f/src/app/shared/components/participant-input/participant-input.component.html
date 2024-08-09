@@ -1,0 +1,55 @@
+<app-form-field
+    class="wrapper"
+    columns="30% 30% 30% 30%"
+    [hasAsterisk]="hasAsterisk"
+    [hasError]="hasError">
+    <ng-content select="label"></ng-content>
+
+    <span field-top-label i18n="@@lastName">Last Name</span>
+    <app-typeahead #typeahead
+        field-input
+        class="lastName"
+        suggestionField="lastName"
+        [allowArbitraryInput]="!isDCOParticipant"
+        [bindAsString]="true"
+        [dataQA]="dataQALastName"
+        [fieldId]="lastNameId"
+        [hasError]="hasLastNameError"
+        [isDisabled]="isDisabled"
+        [isReadonly]="isReadonly"
+        [isStartingFocus]="isStartingFocus"
+        [itemTemplate]="personEntryTemplate"
+        [suggestions]="suggestions"
+        [(ngModel)]="lastName"
+        (inputBlur)="notifyThroughLastName()"
+        (last-name-touched)="isLastNameTouched"
+        (ngModelChange)="notifyThroughLastName()"
+        (selected)="participantSelected($event)">
+    </app-typeahead>
+    <ng-template #personEntryTemplate let-model="item" let-query="query">
+        <span [innerHtml]="(model.lastName + ', ' + model.firstName) | highlight:query"></span>
+    </ng-template>
+    <div field-info>
+        <div class="error-message" *ngIf="hasLastNameError">
+            <ng-content select="[last-name-errors]"></ng-content>
+        </div>
+        <ng-content select=".checkbox-field"></ng-content>
+    </div>
+
+    <span field-top-label-2 i18n="@@firstName">First Name</span>
+    <input #firstNameInput
+        field-input-2
+        class="firstName"
+        type="text"
+        autocomplete="disabled"
+        [attr.data-qa]="dataQAFirstName"
+        [attr.disabled]="isDisabled || isReadonly ? true : undefined"
+        [class.error]="hasFirstNameError"
+        [id]="firstNameId"
+        [(ngModel)]="firstName"
+        (blur)="notifyThroughFirstName()"
+        (ngModelChange)="notifyThroughFirstName()">
+    <div field-info-2 class="error-message" *ngIf="hasFirstNameError">
+        <ng-content select="[first-name-errors]"></ng-content>
+    </div>
+</app-form-field>

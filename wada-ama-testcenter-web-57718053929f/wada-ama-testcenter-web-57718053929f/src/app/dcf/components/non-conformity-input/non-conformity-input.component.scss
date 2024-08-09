@@ -1,0 +1,80 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/radio';
+
+$green: #3F8532;
+$error-color: #AA1A1A;
+
+@mixin step($left, $right) {
+
+    .non-conformity-header {
+        font-size: 20px;
+        font-weight: 600;
+        background-image: linear-gradient($gradient-one, $gradient-two);
+        stroke: $stroke-color;
+        stroke-width: 1px;
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 20px;
+    }
+
+    .delete-non-conformity-wrapper {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .delete-non-conformity {
+        height: 25px;
+        width: 25px;
+    }
+
+    .error-link-list {
+        @include notification-error-list($left, $right);
+    }
+
+    .dropdown {
+        width: 60%;
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    textarea {
+        width:60%;
+        border: 1px solid #757575;
+        border-radius: 5px;
+        padding: 0 6px;
+        min-height: 50px;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}
+
+.no-pointer-events {
+    pointer-events: none;
+}

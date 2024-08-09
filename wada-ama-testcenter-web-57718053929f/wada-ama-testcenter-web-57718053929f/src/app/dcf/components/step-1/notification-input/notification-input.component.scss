@@ -1,0 +1,102 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/radio';
+
+$green: #3F8532;
+$error-color: #AA1A1A;
+
+@mixin step($left, $right) {
+    .error-link-list {
+        @include notification-error-list($left, $right);
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+    app-participant-input {
+        margin-bottom: 12px;
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    .field-info {
+        font-size: 0.9rem;
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    input[type="text"] {
+        width: 60%;
+    }
+
+    app-typeahead, app-date-input, app-dropdown {
+        width: 60%;
+        display: block;
+    }
+
+    .lastName {
+        width: 100%;
+    }
+    input.firstName {
+        width: 100%;
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+
+    .no-pointer-events {
+        pointer-events: none;
+    }
+
+    .btn-link-timezone {
+        border: none;
+        background-color: white;
+        mat-icon {
+            vertical-align: bottom;
+            font-size: 22px;
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+
+    .error-message {
+        color: $error-color;
+    }
+
+    input.error  {
+        border: 2px solid $error-color;
+    }
+
+    .lastName {
+        width: 100%;
+    }
+
+    .timezone {
+        width: 100%;
+    }
+}
+
+::ng-deep .help-timezone-tooltip {
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green;
+    padding: 5px 10px;
+    display: inline-flexbox !important;
+    max-width: fit-content !important;
+}

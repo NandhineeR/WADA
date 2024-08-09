@@ -1,0 +1,15 @@
+@import '~sass/variables';
+
+@mixin fake-link($left, $right) {
+    .fake-link {
+        color: $link-color;
+        text-decoration: underline;
+        cursor: pointer;
+        background-color: transparent; // Remove the gray background on active links in IE 10.
+
+        &:hover {
+          color: $link-hover-color;
+          text-decoration: underline;
+        }
+      }
+}

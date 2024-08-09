@@ -1,0 +1,4 @@
+<app-view-entry-value>
+    <span *ngIf="yes; else no" i18n="@@yes">Yes</span>
+    <ng-template #no><span *ngIf="yes === false" i18n="@@no">No</span></ng-template>
+</app-view-entry-value>

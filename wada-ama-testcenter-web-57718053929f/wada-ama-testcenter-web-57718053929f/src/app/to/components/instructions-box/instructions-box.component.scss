@@ -1,0 +1,43 @@
+@import '~sass/variables';
+
+.clear-fix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.box {
+    float: left;
+    padding: 20px;
+}
+
+.remove-padding-top {
+    padding-top: 0px;
+}
+
+.remove-padding-bottom {
+    padding-bottom: 0px;
+}
+
+.first-box-padding {
+    padding-top: 35px;
+}
+
+.instruction {
+    clear:right;
+}
+
+.field-label {
+    text-align: right !important;
+    color: $form-label-color;
+    font-weight: bolder;
+}
+
+.box-width-small{
+    width: 30%!important;
+}
+
+.box-width-large{
+    width: 70%!important;
+}
+

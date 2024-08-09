@@ -1,0 +1,49 @@
+<app-view-section [isLoading]="!athleteAndAnalyses">
+    <app-view-section-title
+        dataQA="editAthleteAndAnalysesButton"
+        i18n-sectionTitle="@@athletesAndAnalyses"
+        sectionNumber=2
+        sectionTitle="Athletes and Analyses"
+        [canWrite]="canWrite"
+        [link]="['/', 'to', 'edit', (testingOrderId || ''), 'step', 2]"
+        [numberErrors]="missingFieldsCount">
+    </app-view-section-title>
+
+    <app-view-section-content
+        appHideControl
+        *ngIf="athleteAndAnalyses"
+        [permissions]="whiteList">
+        <app-athletes-and-analyses-table
+            [actions]="actions"
+            [cancelledTests]="cancelledTests"
+            [clearTableWarnings]="clearTableWarnings"
+            [closedAnalysis]="closedAnalysis"
+            [closedTests]="closedTests"
+            [currentUrl]="routeState?.urlWithoutBaseHref"
+            [isBplrReaderOrWriter]="isBplrReaderOrWriter"
+            [isLrReaderOrWriter]="isLrReaderOrWriter"
+            [missionOrderId]="missionOrderId"
+            [statusUpdateError]="statusUpdateError"
+            [testStatuses]="testStatuses"
+            [testingOrder]="testingOrder"
+            [tests]="athleteAndAnalyses?.tests"
+            [toEndDate]="toEndDate"
+            [toStartDate]="toStartDate"
+            [whiteList]="whiteList"
+            (analysisToCloseEmitter)="closeAnalysis($event)"
+            (cleanCancelledTests)="cleanCancelledTests()"
+            (cleanClosedAnalysis)="cleanClosedAnalysis()"
+            (cleanClosedTests)="cleanClosedTests()"
+            (moveToTOEmitter)="moveToTestingOrder($event)"
+            (testsToCancelEmitter)="cancelTests($event)"
+            (testsToCloseEmitter)="closeTests($event)">
+        </app-athletes-and-analyses-table>
+        
+        <ng-container *ngFor="let note of athleteAndAnalyses?.laboratoryNotes">
+            <app-view-entry *ngIf="note.laboratory" id="{{controls.LABORATORY_NOTES}}" [addTopPadding]="true">
+                <app-view-entry-name i18n="@@analysisInstructionsForLabX">Analysis Instructions for <br>{{ note.laboratory.description }}</app-view-entry-name>
+                <app-view-entry-value class="keep-text-style"><span>{{ note.note | trim }}</span></app-view-entry-value>
+            </app-view-entry>
+        </ng-container>
+    </app-view-section-content>
+</app-view-section>

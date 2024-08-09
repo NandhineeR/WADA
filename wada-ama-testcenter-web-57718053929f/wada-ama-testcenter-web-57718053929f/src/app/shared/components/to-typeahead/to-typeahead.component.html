@@ -1,0 +1,35 @@
+<input
+    #inputRef
+    id="{{ fieldId }}"
+    type="text"
+    [typeahead]="dataSource$"
+    [(ngModel)]="value"
+    (blur)="onBlur($event)"
+    (focus)="onFocus($event)"
+    (typeaheadLoading)="typeaheadLoading($event)"
+    (typeaheadOnSelect)="typeaheadOnSelect($event)"
+    (typeaheadNoResults)="typeaheadNoResults($event)"
+    [typeaheadWaitMs]="0"
+    [typeaheadOptionsLimit]="50"
+    [typeaheadOptionsInScrollableView]="7"
+    [typeaheadScrollable]="true"
+    [typeaheadItemTemplate]="testingOrderItemTemplate"
+    [typeaheadLatinize]="true"
+    [typeaheadOptionField]="suggestionField"
+    [class.is-invalid]="isInvalid"
+    [disabled]="isDisabled"
+    [class.error]="hasError"
+    [attr.data-qa]="dataQA"
+    [attr.data-qa-precision]="dataQAIndex"
+/>
+
+<ng-template #testingOrderItemTemplate let-model="item" let-query="query">
+    <span *ngIf="!showTestingOrderNumberOnly && model.test?.id === ''; else to" i18n="@@newAthleteIn">New athlete in </span>
+    <span *ngIf="!showTestingOrderNumberOnly && model.test?.id === ''" [innerHtml]="model.testingOrderNumber | highlight:query"></span>
+    <ng-template #to>
+        <span [innerHtml]="model.testingOrderNumber | highlight:query"></span>
+        <span *ngIf="!model.placeholder && !showTestingOrderNumberOnly">- {{ model.athlete.lastName }}, {{ model.athlete.firstName }} {{ model.athlete.sportNationality.name }} - </span>
+        <span *ngIf="model.placeholder && !showTestingOrderNumberOnly">- {{ model.placeholder }} -</span>
+        <span *ngIf="model.sportDiscipline">{{ model.sportDiscipline.sportDescription }} / {{ model.sportDiscipline.disciplineDescription }} - {{ model.testingOrderStatus.description }}</span>
+    </ng-template>
+</ng-template>

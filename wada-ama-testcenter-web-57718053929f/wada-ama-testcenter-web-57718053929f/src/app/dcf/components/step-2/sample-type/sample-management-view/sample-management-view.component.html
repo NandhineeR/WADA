@@ -1,0 +1,44 @@
+<app-view-section-content
+    *ngIf="hasSampleManagementReader"> 
+<app-view-entry>
+    <app-view-entry-name>
+        <app-view-entry-link>
+            <a href="javascript:void(0)" role="button" (click)="openTestInSampleManagement()">Sample Management</a>
+            <a href="javascript:void(0)" role="button" >
+                <img 
+                    alt="Refresh Icon" 
+                    class="sm-refresh" 
+                    i18n-alt="@@refreshIcon" 
+                    src="assets/refresh.svg" 
+                    (click)="refreshSampleManagementRequest()"/> 
+            </a>
+        </app-view-entry-link>        
+    </app-view-entry-name>
+    <app-view-entry-value>
+        <span class="sm-info" *ngIf="sampleManagementSamplesInfo?.ltsRequest">LTS 
+            <img 
+                class="sm-tooltip" 
+                src="assets/informative-green.svg"
+                [appTooltip]="ltstooltip"/>
+            <ng-template #ltstooltip>
+                <app-view-long-term-storage  
+                    [isSampleInfo]="true" 
+                    [ltsRequest]="sampleManagementSamplesInfo?.ltsRequest || null">
+                </app-view-long-term-storage>
+            </ng-template>
+        </span>
+        <span class="sm-info" *ngIf="sampleManagementSamplesInfo?.qtaRequest">QTA
+            <img 
+                class="sm-tooltip" 
+                [appTooltip]="qtatooltip" 
+                src="assets/informative-green.svg"/>
+            <ng-template #qtatooltip>
+                <app-view-quick-turn-around  
+                    [isSampleInfo]="true" 
+                    [qtaRequest]="sampleManagementSamplesInfo?.qtaRequest || null">
+                </app-view-quick-turn-around>
+            </ng-template>
+        </span>
+    </app-view-entry-value>
+</app-view-entry>
+</app-view-section-content>

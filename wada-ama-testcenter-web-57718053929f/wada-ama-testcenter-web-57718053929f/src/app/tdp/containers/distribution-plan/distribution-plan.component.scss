@@ -1,0 +1,94 @@
+@import '~sass/variables';
+
+$saveColor: #3F8532;
+$saveFailedColor: #b4002d;
+
+.wrapper  {
+    margin-bottom: 5px;
+    padding: 20px;
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .title {
+            font-size: 34px;
+            font-weight: bold;
+            color: $font-color;
+        }
+
+        .top-message {
+            font-size: 16px;
+            color: $saveColor;
+            text-align: right;
+
+            .saved-image {
+                width: 25px;
+                height: 25px;
+                margin: 0 5px 0 5px;
+            }
+
+            &.save-failed {
+                color: $saveFailedColor;
+            }
+
+            .save-failed-image {
+                width: 25px;
+                height: 25px;
+                margin: 0 5px 0 5px;
+            }
+        }
+    }
+
+    .content  {
+        padding: 20px;
+        border: 2px solid $primary-background;
+        border-radius: 5px;
+        background: #FFFFFF;
+
+        .section  {
+            margin-top: 20px;
+        }
+
+        .bottom-message {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid $filter-border;
+            border-radius: 5px;
+            height: 300px;
+            width: 100%;
+            background-color: rgba(215, 215, 215, 0.9);
+
+            .loading-img {
+                display: block;
+                height: 60px;
+                animation: rotation 2s infinite linear;
+            }
+
+            .no-tdp {
+                font-size: 36px;
+                color: $font-color;
+            }
+
+            .view-tdpm {
+                color: $link-color;
+                font-size: 20px;
+                text-decoration: underline;
+                
+            }
+
+            @keyframes rotation {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(359deg);
+                }
+            }
+        }
+    }
+}

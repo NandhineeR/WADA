@@ -1,0 +1,53 @@
+@import '~sass/mixins';
+
+$size: 35px;
+$font-color: #414042;
+$chevron-width: 2px;
+$chevron-color: black;
+$font-size: 16px;
+
+:host {
+    display: block;
+}
+
+@mixin numericInput($left, $right) {
+    display: flex;
+    justify-content: space-between;
+    height: $size;
+    line-height: $size;
+    font-size: $font-size;
+    color: $font-color;
+
+    .value {
+        flex: 1;
+        text-align: center;
+    }
+
+    .chevron {
+        cursor: pointer;
+        margin: auto 5px auto 5px;
+        display: inline-block;
+        width: $size / 2.5;
+        height: $size / 2.5;
+
+        &.chevron-#{$left} {
+            border-right: $chevron-width solid $chevron-color;
+            border-bottom: $chevron-width solid $chevron-color;
+            transform: rotate(-225deg);
+        }
+        &.chevron-#{$right} {
+            border-right: $chevron-width solid $chevron-color;
+            border-bottom: $chevron-width solid $chevron-color;
+            transform: rotate(-45deg);
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include numericInput(left, right);
+    }
+    @include rtl {
+        @include numericInput(right, left);
+    }
+}

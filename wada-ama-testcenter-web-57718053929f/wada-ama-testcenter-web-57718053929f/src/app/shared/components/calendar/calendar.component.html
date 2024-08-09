@@ -1,0 +1,34 @@
+<div class="calendar-wrapper">
+	<header class="calendar-header">
+		<div class="calendar-nav-left">
+			<button class="nav-button" (mousedown)="changeMonth(-1)">
+				<span class="chevron left"></span>
+			</button>
+		</div>
+		<h3>{{ headerDate }}</h3>
+		<div class="calendar-nav-right">
+			<button class="nav-button" (mousedown)="changeMonth(1)">
+				<span class="chevron right"></span>
+			</button>
+		</div>
+	</header>
+	<div class="day-names">
+		<p *ngFor="let day of weekDays" class="day-name">
+			{{ day }}
+		</p>
+	</div>
+	<div class="days">
+		<div
+			*ngFor="let day of dayGrid"
+			class="day"
+			[class.is-disabled]="!day.available">
+			<button
+				*ngIf="day.value !== 0"
+				class="day-number"
+				[class.fromDiffMonth]="!(navDate | isSameDate:day.date:true) && day.available"
+				[class.isToday]="isToday(day.date) && !(date | isSameDate:day.date:false)"
+				[class.selected]="date | isSameDate:day.date:false"
+				(mousedown)="selectDay(day)">{{ day.value }}</button>
+		</div>
+	</div>
+</div>

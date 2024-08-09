@@ -1,0 +1,5 @@
+export const OPTIMISTIC_LOCK_EXCEPTION = 'Optimistic lock exception';
+export const SAMPLE_CODE_VALIDATION_ERROR = 'SampleCodeDuplicatedException';
+export const SAMPLE_CODE_VALIDATION_WARNING = 'SampleCodeDuplicatedWarningException';
+export const SEND_NOTIFICATION_RESULT_TO_COUNT_EXCEEDED = 'SEND_NOTIFICATION_RESULT_TO_COUNT_EXCEEDED';
+export const TESTINGORDER_TEST_COUNT_EXCEEDED = 'TESTINGORDER_TEST_COUNT_EXCEEDED';

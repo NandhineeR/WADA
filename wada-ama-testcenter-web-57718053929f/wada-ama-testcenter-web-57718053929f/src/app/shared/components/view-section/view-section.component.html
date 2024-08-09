@@ -1,0 +1,13 @@
+<div class="view-section">
+    <ng-content select="app-view-section-title"></ng-content>
+
+    <div class="view-section-content">
+        <ng-container *ngIf="!isLoading">
+            <ng-content></ng-content>
+        </ng-container>
+
+        <div class="view-section-loading" *ngIf="isLoading">
+            <img class="loading-img" src="assets/loading.png" alt="Loading Icon" i18n-alt="@@loadingIcon">
+        </div>
+    </div>
+</div>

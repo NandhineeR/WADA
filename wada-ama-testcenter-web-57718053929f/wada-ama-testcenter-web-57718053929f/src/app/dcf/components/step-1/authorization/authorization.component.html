@@ -1,0 +1,58 @@
+<app-view-section [isLoading]="!authorization">
+    <app-view-section-content appHideControl *ngIf="authorization" [permissions]="whiteList">
+        <app-view-entry id="testingOrderCode">
+            <app-view-entry-name i18n="@@testingOrderNumber">Testing Order Number</app-view-entry-name>
+            <app-view-entry-value>
+                {{ authorization.testingOrderNumber }}
+            </app-view-entry-value>
+            
+            <app-view-entry-link *ngIf="authorization.testingOrderId">
+                <a
+                    *ngIf="authorization.testingOrderId"
+                    i18n="@@view"
+                    [routerLink]="['/','to', 'view', authorization.testingOrderId]">View</a>
+                <ng-container *ngIf="isUserCorrector && (actions | isActionAvailable:actionRight.BindTestingOrder)">
+                    <app-popover-change-testing-order
+                        [currentTestingOrderId]="authorization.testingOrderId"
+                        [dcfId]="dcfId"
+                        (changeTestingOrderEmitter)="bindDCFToTestingOrder($event)">
+                    </app-popover-change-testing-order>
+                </ng-container>
+            </app-view-entry-link>
+            
+            <app-view-entry-link *ngIf="!authorization.testingOrderId">
+                <ng-container *ngIf="isUserCorrector && (actions | isActionAvailable:actionRight.BindTestingOrder)">
+                    <app-popover-assign-testing-order
+                        [dcfId]="dcfId"
+                        (assignTestingOrderEmitter)="bindDCFToTestingOrder($event)">
+                    </app-popover-assign-testing-order>
+                </ng-container>
+            </app-view-entry-link>
+        </app-view-entry>
+
+        <app-view-entry id="adoReferenceNumber">
+            <app-view-entry-name i18n="@@adoReferenceNumber">ADO Reference Number</app-view-entry-name>
+            <app-view-entry-value>{{ authorization.adoReferenceNumber }}</app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry id="testAuthority">
+            <app-view-entry-name i18n="@@testingAuthority" [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled" [invalid]="missingFields | setHas:fields.TestingAuthority">Testing Authority</app-view-entry-name>
+            <app-view-entry-value><span *ngIf="authorization.testingAuthority">{{ authorization.testingAuthority!.displayDescriptionName }}</span></app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="sampleCollectionAuthority">
+            <app-view-entry-name i18n="@@sampleCollectionAuthority" [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled" [invalid]="missingFields | setHas:fields.SampleCollectionAuthority">Sample Collection Authority</app-view-entry-name>
+            <app-view-entry-value><span *ngIf="authorization.sampleCollectionAuthority">{{ authorization.sampleCollectionAuthority!.displayDescriptionName }}</span></app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="resultManagementAuthority">
+            <app-view-entry-name i18n="@@resultManagementAuthority" [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled" [invalid]="missingFields | setHas:fields.ResultManagementAuthority">Result Management Authority</app-view-entry-name>
+            <app-view-entry-value><span *ngIf="authorization.resultManagementAuthority">{{ authorization.resultManagementAuthority!.displayDescriptionName }}</span></app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="testCoordinator">
+            <app-view-entry-name i18n="@@testCoordinator">Test Coordinator</app-view-entry-name>
+            <app-view-entry-value><span *ngIf="authorization.testCoordinator">{{ authorization.testCoordinator!.displayDescriptionName }}</span></app-view-entry-value>
+        </app-view-entry>
+    </app-view-section-content>    
+</app-view-section>

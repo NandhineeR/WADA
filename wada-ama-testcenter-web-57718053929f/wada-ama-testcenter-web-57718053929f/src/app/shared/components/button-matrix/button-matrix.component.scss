@@ -1,0 +1,41 @@
+$size: 37px;
+$font-color: #414042;
+$primary-color: #3F8532;
+
+:host {
+    display: block;
+}
+
+.matrix {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: $font-color;
+
+    .matrix-item {
+        .matrix-item-button {
+            margin: 0 auto 0 auto;
+            width: $size;
+            height: $size;
+            text-align: center;
+            line-height: $size - 3;
+            border: 1px solid transparent;
+            border-radius: $size;
+            background: transparent;
+            cursor: pointer;
+
+            &:hover {
+                color: #2d6828;
+                border: 1px solid $primary-color;
+            }
+
+            &.selected {
+                background: $primary-color;
+                border: 1px solid $primary-color;
+                color: white;
+            }
+        }
+    }
+}

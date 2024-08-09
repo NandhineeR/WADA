@@ -1,0 +1,18 @@
+<app-view-entry [id]="id">
+    <app-view-entry-name>
+        <ng-content select="app-view-entry-name[role=mainField]" [attr.data-qa]="dataQA + 'MainName'"></ng-content>
+    </app-view-entry-name>
+
+    <div class="container">
+        <app-view-entry-value class="main-item" [attr.data-qa]="dataQA + 'MainValue'">{{ mainItem }}</app-view-entry-value>
+        
+        <ng-container *ngIf="!isMainItemNullOrBlank()">
+            <ng-container *ngFor="let item of items; let i = index">
+                <app-view-entry-name [attr.data-qa]="dataQA + 'Name'" [attr.data-qa-precision]="i">
+                    <ng-content (select)="getSelectedField(i)"></ng-content>
+                </app-view-entry-name>
+                <app-view-entry-value [attr.data-qa]="dataQA + 'Value'" [attr.data-qa-precision]="i">{{ item }}</app-view-entry-value>
+            </ng-container>
+        </ng-container>
+    </div>
+</app-view-entry>

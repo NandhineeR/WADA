@@ -1,0 +1,24 @@
+<div class="success-issue">
+    <div i18n="@@whatsNext_strong"><strong>What's next?</strong></div>
+    <ng-content></ng-content>
+    <div>
+        <ul>
+            <li *ngIf="isMissionOrderWriter$ | async">
+                <a  
+                    i18n="@@createAnotherTestingOrder"
+                    data-qa="viewTestingOrder.createAnotherTestingOrder"
+                    routerLink='/to/new'>
+                    Create Another Testing Order
+                </a>
+            </li>
+            <li>
+                <a  
+                    i18n="@@goBackToTestingOrderManagement"
+                    routerLink='/tos'
+                    data-qa="viewTestingOrder.goBackToTestingOrderManagement">
+                    Go Back to Testing Order Management
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

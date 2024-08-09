@@ -1,0 +1,357 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~~app/shared/styles/radio';
+
+$green: #3F8532;
+$border-radius: 10px;
+$selected-color: #cec;
+$even-color: transparent;
+$odd-color: #eee;
+$border-color: #999;
+$whiteBackground: #fff;
+
+@mixin step($left, $right) {
+    .radio-container {
+        @include radio($left, $right);
+        top: 10px;
+        left: 10px;
+    }
+}
+
+button:not(.menu) {
+    background: green;
+    color: white;
+}
+
+.top-header {
+    height: 50px;
+    font-size: 14px;
+    padding-left: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid $border-color;
+}
+
+.bottom-footer {
+    font-size: 14px;
+    width: 100%;
+    height: 50px;
+    padding-left: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid $border-color;
+    text-align: center;
+}
+
+.mat-icon {
+    svg {
+        vertical-align: baseline;
+    }
+}
+
+.table-container {
+    margin: 20px 20px 0px 20px;
+    border: 2.4px solid $border-color;
+    border-radius: $border-radius;
+    font-size: 14px;
+
+    @include step(left, right);
+
+    &.white-background {
+        background-color: $whiteBackground;
+
+        
+    }
+}
+
+.table-scroll-container {
+    overflow: auto;
+}
+
+.mat-table {
+    border-radius: $border-radius;
+    width: 100%;
+}
+
+.mat-row {
+
+    td.mat-cell {
+        border-bottom-style: none;
+        word-wrap: break-word;
+        white-space: normal !important;
+    }
+
+    &:not(:last-of-type) {
+        border: none;
+    }
+
+    transition: background-color 250ms cubic-bezier(0, 0, 0.2, 1);
+
+    &.selected:not(.cdk-drag-preview) {
+        background-color: $selected-color;
+    }
+
+    .bottom-footer {
+        font-size: 14px;
+        width: 100%;
+        height: 50px;
+        padding-left: 15px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid $border-color;
+        text-align: center;
+    }
+
+    &:nth-child(odd):not(.selected):not(.cdk-drag-preview) {
+        background-color: $odd-color;
+    }
+
+    &:nth-child(even):not(.selected):not(.cdk-drag-preview) {
+        background-color: $even-color;
+    }
+
+    &.cdk-drag-preview {
+        background-color: transparent;
+    }
+}
+
+tr.no-bottom-line:last-of-type {
+    >td.mat-cell {
+        border-bottom-width: 0px;
+    }
+}
+
+div.borders {
+    tr.no-bottom-line:last-of-type {
+        >td.mat-cell:last-of-type {
+            border-bottom-right-radius: $border-radius;
+        }
+
+        >td.mat-cell:first-of-type {
+            border-bottom-left-radius: $border-radius;
+        }
+    }
+}
+
+.mat-header-row:first-of-type {
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+}
+
+.mat-header-row {
+    background: inherit;
+}
+
+.mat-footer-row:last-of-type {
+    border: none;
+}
+
+.mat-header-cell {
+    color: initial;
+
+    &.with-filter {
+        display: table-cell;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: stretch;
+
+        div {
+            white-space: nowrap;
+        }
+
+        input {
+            width: calc(100% - 5px);
+            box-sizing: border-box;
+        }
+    }
+    
+}
+
+.wrap-contain {
+    white-space: normal !important;
+}
+
+::ng-deep .mat-checkbox {
+
+    .mat-checkbox-frame {
+        height: 14px;
+        width: 14px;
+        border-radius: 5px;
+        border: 2px solid $border-color;
+        background-color: white;
+    }
+
+    &.mat-checkbox-disabled {
+        .mat-checkbox-layout {
+            .mat-checkbox-inner-container {
+                .mat-checkbox-background {
+                    border-radius: 5px;
+                    background-color: grey;
+                }
+            }
+        }
+
+    }
+
+    &.mat-checkbox-checked {
+        .mat-checkbox-background {
+            border-radius: 5px;
+            background-color: $primary-background;
+        }
+    }
+}
+
+::ng-deep .mat-checkbox-layout {
+    .mat-checkbox-inner-container {
+        height: 14px;
+        width: 14px;
+    }
+}
+
+.table-cell {
+    white-space: nowrap;
+    padding: 0 10px 0 10px;
+    max-width: 400px;
+}
+
+th {
+    font-weight: normal;
+}
+
+input[type="checkbox"] {
+    margin-top: 4px;
+}
+
+.mat-row,
+.mat-header-row,
+.mat-footer-row {
+    align-items: stretch;
+}
+
+.mat-footer-cell {
+    border-bottom: 0;
+}
+
+.button-background {
+    background-color: inherit;
+    margin-left: auto;
+}
+
+.select-col {
+    min-width: 35px;
+
+    &:last-of-type {
+        padding-right: 5px;
+    }
+
+    &:first-of-type {
+        padding-left: 5px;
+    }
+}
+
+.cdk-drag-preview {
+    display: flex;
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .mat-row:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.img {
+    cursor: move;
+}
+
+.delete-row-wrapper {
+    text-align: center;
+}
+
+.delete-row {
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+}
+
+.delete-row-placeholder {
+    margin-right: 80px;
+    height: 25px;
+    width: 25px;
+}
+
+.delete-row-wrapper-placeholder {
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+}
+
+input[type="checkbox"]:checked+label:after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 3px;
+    background: transparent;
+    top: 6px;
+    left: -14px;
+    border: 2px solid white;
+    border-top: none;
+    border-right: none;
+    transform: rotate(1 * -45deg);
+}
+
+::-webkit-scrollbar {
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+::-webkit-scrollbar-track {
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    background: #eeeeee;
+}
+
+::-webkit-scrollbar-thumb {
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    background: #b0b0b0;
+}
+
+.paginator-padding {
+    padding-right: 12px;
+}
+
+.check {
+    pointer-events: none;
+}
+
+::ng-deep .custom-tooltip {
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green !important;
+    padding: 5px 10px !important;
+}
+
+tr.mat-row:last-of-type {
+    border-bottom: 1px solid;
+}
+
+.hidden {
+    display: none;
+}

@@ -1,0 +1,28 @@
+<div *ngIf="qtaRequest">
+    <app-view-entry
+        *ngIf="qtaRequest?.requestDate"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@requestDate">Request Date</app-view-entry-name>
+        <app-view-entry-value dataQA="requestDate">
+            {{ qtaRequest.requestDate | formatDatetime | uppercase }} (UTC)
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry
+        *ngIf="qtaRequest?.requestInitiator"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@requestInitiator">Request Initiator</app-view-entry-name>
+        <app-view-entry-value dataQA="requestInitiator">
+            {{ qtaRequest.requestInitiator }}
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry
+        *ngIf="qtaRequest?.comments"
+        [showEntryLink]="false">
+        <app-view-entry-name i18n="@@comments">Comments</app-view-entry-name>
+        <app-view-entry-value dataQA="comments">
+            {{ qtaRequest.comments }}
+        </app-view-entry-value>
+    </app-view-entry>
+</div>

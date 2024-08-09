@@ -1,0 +1,57 @@
+<div appInheritDir class="wrapper">
+    <div class="left-column">
+        <label class="daterange-label">
+            <span i18n="@@fromDateFormat">From <span class="date-format">({{ dateFormat }})</span></span>&#x200e;
+        </label>
+        <mat-form-field>
+            <input
+                matInput
+                data-qa="fromInput"
+                [value]="displayDate(fromDate)"
+                (change)="editDateManually($event.target.value, true)">
+            <mat-calendar
+                #fromCalendar
+                data-qa="fromCalendar"
+                [maxDate]="maxDate"
+                [selected]="fromDate"
+                (selectedChange)="dateChanged($event, true)">
+            </mat-calendar>
+        </mat-form-field>
+    </div>
+    <div class="center-column">
+        <label
+            *ngFor="let filter of quickFilters; let i = index"
+            for="{{ filter.value }}"
+            [attr.data-qa]="filter.dataQA"
+            [class.selected]="filter.value === value.quickFilter.value">
+            <input
+                id="{{ filter.value }}"
+                name="daterangeFilter"
+                type="radio"
+                value="{{ filter.value }}"
+                [(ngModel)]="selectedFilter"
+                (ngModelChange)="changeFilter(i)"
+            />
+            {{ translations$ | getDaterangeCalendarButtons:filter.displayName | async }}
+        </label>
+    </div>
+    <div class="right-column">
+        <label class="daterange-label">
+            <span i18n="@@toDateFormat">To <span class="date-format">({{ dateFormat }})</span></span>&#x200e;
+        </label>
+        <mat-form-field>
+            <input
+                matInput
+                data-qa="toInput"
+                [value]="displayDate(toDate)"
+                (change)="editDateManually($event.target.value, false)">
+            <mat-calendar
+                #toCalendar
+                data-qa="toCalendar"
+                [minDate]="minDate"
+                [selected]="toDate"
+                (selectedChange)="dateChanged($event, false)">
+            </mat-calendar>
+        </mat-form-field>
+    </div>
+</div>

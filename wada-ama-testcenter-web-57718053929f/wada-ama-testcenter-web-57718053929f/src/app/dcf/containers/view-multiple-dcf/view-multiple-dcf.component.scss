@@ -1,0 +1,58 @@
+@import '~sass/variables';
+
+::ng-deep .card-header {
+  padding: 0;
+  border-bottom: 0;
+  background: transparent;
+}
+
+::ng-deep .card {
+  border: 0;
+  background-color: transparent;
+}
+
+::ng-deep .card-body {
+  border: solid 2px $primary-background;
+  background: #fff;
+  padding: 0.75rem 0 1.50rem 0;
+  border-radius: 5px;
+}
+
+::ng-deep .panel-collapse {
+  overflow: visible !important;
+  margin: 8px 0 8px 0;
+}
+
+.btn-container {
+  float: left;
+  margin: 5px 0 0 calc(30% + 20px);
+}
+
+.margin {
+    margin-bottom: 8px;
+}
+
+.margin-bottom {
+    margin-bottom: 2px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 60%;
+}
+.column {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    flex-basis: 100%;
+}
+
+.strong {
+    font-weight: bold;
+}
+
+.footer {
+    padding-bottom: 25px;
+}

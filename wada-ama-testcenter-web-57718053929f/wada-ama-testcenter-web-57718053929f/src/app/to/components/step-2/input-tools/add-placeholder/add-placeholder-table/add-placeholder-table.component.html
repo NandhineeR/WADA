@@ -1,0 +1,112 @@
+<app-notification *ngIf="showError" id="notifications" type="error">
+    <span i18n="@@exceedMaximumNumberOfAthletesRemovePlaceholder">You have exceeded the maximum number of 99 athletes. Either remove a placeholder or create a new Testing Order.</span>
+</app-notification>
+
+<app-notification *ngIf="showErrorSportDiscipline" id="notifications" type="error">
+    <span i18n="@@placeholdersAreMissingSportD">One or many placeholders are missing a sport/discipline. Please add a sport/discipline to all placeholders.</span>
+</app-notification>
+
+<div
+    *appLet="{ security: fieldsSecurity$ | async, inCreation: inCreation$ | async } as state"
+    class="add-placeholder-table__wrapper">
+    <app-data-table
+        [dataSource]="dataSource"
+        [deleteRowIcon]="deleteRowIcon"
+        [showDrag]="false"
+        [showPaginator]="false"
+        [showOrder]="false"
+        [showRemove]="true"
+        [showSelect]="false"
+        [showTableFooter]="false"
+        [columnDefs]="columns"
+        (deletedRow)="onDelete()">
+        <ng-container *columnCell="'placeholder'; let e; let i=index">
+            <input
+                class="input-placeholder"
+                id="input-placeholder-{{i}}"
+                [attr.data-qa]="'placeholderDescription'" 
+                [attr.data-qa-precision]="i"
+                [ngClass]="{'columnStyle': !columnWidth}" 
+                [(ngModel)]="e.placeholder" />
+        </ng-container>
+
+        <ng-container *columnCell="'sportDiscipline'; let e; let i = index">
+            <app-typeahead
+                dataQA="sportDisciplineTypeahead"
+                suggestionField="displayDescriptionName"
+                [dataQAIndex]="i"
+                [ngClass]="{'columnStyle': !columnWidth}"
+                [suggestions]="sportDisciplineSuggestions"
+                [(ngModel)]="e.sportDiscipline"
+                (click)="$event.stopPropagation()"
+                (selected)="onSelectSportDiscipline(event)">
+            </app-typeahead>
+        </ng-container>
+
+        <ng-container *columnCell="'gender'; let e; let i = index">
+            <app-dropdown
+                dataQA="genderDropdown"
+                i18n-placeholder="@@addPlaceholderGender"
+                id="gender"
+                placeholder="Select"
+                type="text"
+                [dataQAIndex]="i"
+                [ngClass]="{'columnStyle': !columnWidth}"
+                [(ngModel)]="e.gender">
+                <ng-container *ngFor="let item of genders; let indexDropdown = index">
+                    <div
+                        class="dropdown-item"
+                        data-qa="genderDropdownOption"
+                        [appDropdownElement]="item.value"
+                        [attr.data-qa-precision]="indexDropdown">
+                        {{ translations$ | getGender:item.value | async }}
+                    </div>
+                </ng-container>
+
+            </app-dropdown>
+        </ng-container>
+
+        <ng-container *columnCell="'button'; let e; let i = index">
+            <a
+                class="margin-right"
+                dataQA="copyPlaceholderButton"
+                (click)="copyRow(e)">
+                <span i18n="@@copy">Copy</span>
+            </a>
+        </ng-container>
+
+        <ng-container header>
+            <div *ngIf="((state.security?.actions | isActionAvailable:actionRight.EditAnalyses) || state.inCreation); else noAnalyses">
+                <app-button
+                    dataQA="addAnalysesToPlaceholdersButton"
+                    type="primary"
+                    (click)="onAddAnalyses()">
+                    <span i18n="@@addAnalysesToPlaceholders">Add Analyses to Placeholders</span>
+                </app-button>
+                <a
+                    class="link"
+                    id="skipLink"
+                    (click)="submitData()">
+                    <span i18n="@@orSkipAnalysesAndAddPlaceholders_lowercase" data-qa="skipAnalysesForPlaceholders">or skip analyses for now and add placeholders</span>
+                </a>
+            </div>
+            <ng-template #noAnalyses>
+                <app-button
+                    dataQA="addPlaceholdersButton"
+                    type="primary"
+                    (click)="submitData()">
+                    <span i18n="@@addPlaceholders">Add Placeholders</span>
+                </app-button>
+            </ng-template>
+        </ng-container>
+        <ng-container footer>
+            <app-modal-button
+                dataQA="addNewPlaceholderButton"
+                id="addNewPlaceholderButton"
+                type="secondary"
+                (click)="addRow()">
+                <span i18n="@@addNewPlaceholder_uppercase">ADD NEW PLACEHOLDER</span>
+            </app-modal-button>
+        </ng-container>
+    </app-data-table>
+</div>

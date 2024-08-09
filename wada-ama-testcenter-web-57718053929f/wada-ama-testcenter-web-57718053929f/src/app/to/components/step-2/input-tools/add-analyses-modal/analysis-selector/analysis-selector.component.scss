@@ -1,0 +1,50 @@
+@import '~sass/variables';
+
+.empty-yellow-line {
+    width: 95%;
+    position: relative;
+    background-color: $empty-line-color;
+    height: 2px;
+}
+
+.analyses-title {
+    padding-top: 10px;
+}
+
+.analyses-subtitle {
+    font-weight: 510;
+}
+
+.selection-section {
+    padding-top: 6px;
+}
+
+.checkbox-field {
+    display: flex;
+
+    label {
+        float: left;
+    }
+}
+
+.add-sample-analysis-button {
+    margin-top: 8px;
+}
+
+.min-width {
+    min-width: 14px;
+}
+
+app-form-field {
+    .field-label {
+        text-align: left !important;
+    }
+}
+
+.input-line{
+    display: flex;
+}
+
+.free-form-text {
+    width: 100%;
+}

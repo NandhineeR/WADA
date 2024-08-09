@@ -1,0 +1,153 @@
+@import '~sass/variables';
+
+$header-image-width: 150px;
+$right-menu-width: 200px;
+$search-athlete-margin-side: 100px;
+$search-button-width: 300px;
+$search-athlete-input-min-width: 215px;
+
+.header {
+    display: block;
+    height: $header-height;
+    background: white;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    min-width: calc(#{$header-image-width} + #{$right-menu-width} + #{$search-button-width} + #{$search-athlete-input-min-width} + #{$search-athlete-margin-side} * 2);
+    position: absolute;
+    z-index: 50;
+
+    .adams-img {
+        height: 50px;
+        margin-top: 5px;
+        margin-left: 5px;
+        width: $header-image-width;
+    }
+
+    .global-search-athlete {
+        margin-left: $search-athlete-margin-side;
+        margin-top: 5px;
+        display: none; /* put inline-block; back once the search is functional */
+        height: 40px;
+        border: 0;
+        border-radius: 5px;
+        background: $primary-background;
+        vertical-align: middle;
+        width: calc(100vw - calc(#{$header-image-width} + #{$right-menu-width} + #{$search-athlete-margin-side} * 2));
+        max-width: 900px;
+        min-width: calc(#{$search-button-width} + #{$search-athlete-input-min-width});
+
+        input {
+            border: 1px solid #3f8532;
+            border-radius: 5px 0 0 5px;
+            height: 40px;
+            width: calc(100vw - calc(#{$header-image-width} + #{$right-menu-width} + #{$search-button-width} + #{$search-athlete-margin-side} * 2));
+            min-width: $search-athlete-input-min-width;
+            max-width: 600px;
+        }
+
+        button {
+            background: $primary-background;
+            border: 0;
+            border-radius: 0 5px 5px 0;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 0;
+            text-transform: uppercase;
+            vertical-align: middle;
+            height: 38px;
+            width: $search-button-width;
+
+            &:hover {
+                background: $primary-background-hover;
+            }
+        }
+
+        img {
+            padding: 0 10px;
+            height: 25px;
+        }
+
+        span {
+            padding: 0 10px;
+        }
+    }
+
+    .right-menu {
+        float: right;
+        width: $right-menu-width;
+        text-align: right;
+        padding-right: 10px;
+
+        .element {
+            display: inline-block;
+            padding: 15px 5px;
+            position: relative;
+
+            img {
+                background: $primary-background;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                cursor: pointer;
+
+                &:hover {
+                    background: $primary-background-hover;
+                }
+            }
+
+            span {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-transform: uppercase;
+                font-weight: bold;
+                font-size: 20px;
+                color: white;
+                cursor: pointer;
+            }
+
+            span:hover + img {
+                background: $primary-background-hover;
+            }
+        }
+    }
+}
+
+.button-logout {
+    a {
+        color: black;
+        svg {
+            background-color: transparent;
+            margin-bottom: 10px;
+            width: 30px;
+            height: 30px;
+            fill: black;
+            opacity: .7;
+        }
+    }
+    
+}
+
+.button-logout:hover {
+    a {
+        color: white;
+        svg {
+            fill: white;
+            opacity: 1;
+        }
+    }
+}
+
+.names-container {
+    padding: 10px;
+    background: #F2F2F2;
+    color: #414042;
+    font-size: 13px;
+
+    .user-name {
+        font-weight: bold;
+    }
+}

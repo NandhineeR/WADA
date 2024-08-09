@@ -1,0 +1,105 @@
+<div
+    appInheritDir
+    appTabFocus
+    *ngIf="showModal"
+    class="modal__wrapper">
+    <div class="modal__header">
+        <div class="modal__title">
+            <span i18n="@@creationMultipleDopingControlForms_uppercase">CREATION OF MULTIPLE DOPING CONTROL FORMS</span>
+        </div>
+        <div class="modal__close" (click)="onCancel()">&times;</div>
+    </div>
+    <div class="modal__body">
+        <app-to-notifications *ngIf="testInWarnings.length > 0" type="warning">
+            <ng-template #warningMessage>
+                <ul class="margin-top">
+                    <li i18n="@@valueForAthleteLevel">A value for Athlete Level</li>
+                    <li i18n="@@mustNotHaveDcfDraftOrCompleteStatus">Must not have a Doping Control Form in draft or completed status</li>
+                    <li i18n="@@mustHaveAtLeast1Analysis">Must have at least 1 analyse(s) associated</li>
+                    <li i18n="@@mustNotHaveCloseSampleNotCollected">Must not have a Closed - sample(s) not collected</li>
+                </ul>
+            </ng-template>
+            <div *ngIf="warningForAll else notAll">
+                <span i18n="@@inOrderToUseMultipleDcfsTestingOrderNeeds">In order to use Multiple Doping Control Forms, the testing order needs:</span>
+                <br>
+                <ul class="margin">
+                    <li i18n="@@testingCountry">Country of Testing</li>
+                    <li i18n="@@selectedAthletes">Selected Athletes</li>
+                </ul>
+                <span i18n="@@athletesInTestingOrderNeed">The Athletes in the testing order need:</span>
+                <ng-container *ngTemplateOutlet="warningMessage"></ng-container>
+            </div>
+            <ng-template #notAll>
+                <span i18n="@@inOrderToUseMultipleDcfsTestingOrderNeeds">In order to use Multiple Doping Control Forms, the testing order needs:</span>
+                <br>
+                <ul class="margin">
+                    <li i18n="@@testingCountry">Country of Testing</li>
+                    <li i18n="@@selectedAthletes">Selected Athletes</li>
+                </ul>
+                <span i18n="@@followingAthletesInTestingOrderNeed">The following Athletes in the testing order need:</span>
+                <ul class="margin">
+                    <li *ngFor="let test of testInWarnings">
+                        {{ test.name }}
+                    </li>
+                </ul>
+                <ng-container *ngTemplateOutlet="warningMessage"></ng-container>
+            </ng-template>
+        </app-to-notifications>
+        <div *ngIf="!warningForAll" class="modal__messages">
+            <div class="primary__message">
+                <span i18n="@@confirmFollowingValuesApplyOnAllAthletes">Confirm that the following values apply for all athletes you have selected.</span>
+            </div>
+            <div class="secondary__message">
+                <div class="margin">
+                    <span i18n="@@usingMultipleDcfsFormConfirmMessage"><span class="bold">If it doesn't apply to all, Cancel</span> and create a Doping Control Form manually for each of them. By using this form, <span class="bold">you acknowledge not filling optional fields.</span></span>
+                </div>
+                
+                <app-view-entry>
+                    <app-view-entry-name i18n="@@testType">Test Type</app-view-entry-name>
+                    <app-view-entry-value>
+                        <span *ngIf="!testType" i18n="@@outOfCompetition">Out of Competition</span>
+                        <span *ngIf="testType" i18n="@@inCompetition">In Competition</span></app-view-entry-value>
+                </app-view-entry>
+                
+                <app-view-entry>
+                    <app-view-entry-name i18n="@@notificationCountry">Country of Notification</app-view-entry-name>
+                    <app-view-entry-value>
+                        <span *ngIf="country">{{ country.name }}</span>
+                    </app-view-entry-value>
+                </app-view-entry>
+                
+                <app-view-entry>
+                    <app-view-entry-name i18n="@@testingAuthority">Testing Authority</app-view-entry-name>
+                    <app-view-entry-value>
+                        <span *ngIf="testingAuthority">{{ testingAuthority.description }}</span>
+                    </app-view-entry-value>
+                </app-view-entry>
+                
+                <app-view-entry>
+                    <app-view-entry-name i18n="@@sampleCollectionAuthority">Sample Collection Authority</app-view-entry-name>
+                    <app-view-entry-value>
+                        <span *ngIf="sampleCollectionAuthority">{{ sampleCollectionAuthority.description }}</span>
+                    </app-view-entry-value>
+                </app-view-entry>
+                
+                <app-view-entry>
+                    <app-view-entry-name i18n="@@resultManagementAuthority">Result Management Authority</app-view-entry-name>
+                    <app-view-entry-value>
+                        <span *ngIf="resultManagementAuthority">{{ resultManagementAuthority.description }}</span>
+                    </app-view-entry-value>
+                </app-view-entry>
+            </div>
+        </div>
+        <div *ngIf="warningForAll else other" class="modal__buttons">
+            <app-button i18n="@@okReturnToForm" type="primary" (click)="onCancel()">OK, Return to Form</app-button>
+        </div>
+        <ng-template #other>
+            <div class="modal__buttons">
+                <app-button focus="true" i18n="@@cancel_uppercase" type="secondary" (click)="onCancel()">CANCEL</app-button>
+                <app-button i18n="@@confirm_uppercase" type="primary" (click)="onConfirm()">CONFIRM</app-button>
+            </div>
+        </ng-template>
+    </div>
+</div>
+
+<div class="modal__overlay" *ngIf="showModal"></div>

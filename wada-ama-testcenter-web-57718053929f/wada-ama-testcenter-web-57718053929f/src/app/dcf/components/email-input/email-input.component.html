@@ -1,0 +1,41 @@
+<ng-container [formGroup]="form">
+<app-form-field [hasAsterisk]="true" columns="30% auto 30% min-content" *ngIf="!editEmailAddress && emailHasValue; else editEmail">
+    <span i18n="@@emailAddress">Email Address</span>
+    <label field-input>{{ email.value }}</label>
+    <button field-input
+            class="text-button"
+            (click)="onEditEmailAddress()"
+            [appDisable]="controls.EMAIL | isInputDisabled:fieldsSecurity:isEditMode">Edit</button>
+</app-form-field>
+
+<ng-template #editEmail>
+    <app-form-field [appDisable]="controls.EMAIL | isInputDisabled:fieldsSecurity:isEditMode:inCreation"
+                    [hasAsterisk]="true"
+                    [hasError]="emailHasErrors">
+        <label for="email" i18n="@@emailAddress">Email Address</label>
+        <input field-input
+               data-qa="emailAddress"
+               type="text"
+               autocomplete="disabled"
+               formControlName="email"
+               id="email"
+               [class.error]="emailHasErrors"
+               [attr.disabled]="emailNotProvidedCheckboxRef.checked ? true : undefined">
+        <span field-info>
+            <div class="checkbox-field">
+                <input #emailNotProvidedCheckboxRef
+                       data-qa="noEmailAddressCheckbox"
+                       type="checkbox"
+                       id="emailNotProvided"
+                       formControlName="emailNotProvided"
+                       (click)="onEmailNotProvided(!emailNotProvided.value)">
+                <label for="emailNotProvided" i18n="@@athleteHasntProvidedAnEmailAddress">Athlete hasn't provided an email address</label>
+            </div>
+        </span>
+        <div field-error *ngIf="emailHasErrors">
+            <span *ngIf="email.errors?.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <span *ngIf="email.errors?.email" i18n="@@respectTheEmailFormat">Enter a valid email address (Example : abc@domain.com)</span>
+        </div>
+    </app-form-field>
+</ng-template>
+</ng-container>

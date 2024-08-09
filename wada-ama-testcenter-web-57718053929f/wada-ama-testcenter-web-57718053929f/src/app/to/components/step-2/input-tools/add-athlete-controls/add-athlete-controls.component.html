@@ -1,0 +1,30 @@
+<div
+    *appLet="{security: fieldsSecurity$ | async, inCreation: inCreation$ | async} as state"
+    class="add-athlete-controls__wrapper">
+    <app-button
+        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.EditTests) || state?.inCreation"
+        dataQA="searchAthleteButton"
+        type="secondary"
+        [routerLink]="[routeState?.urlWithoutBaseHref.split('?')[0], { outlets: { 'modal': ['add-athlete', 'search-athlete'] }}]">
+        <div class="plus">+</div><br/>
+        <span i18n="@@searchAthlete">Search Athlete</span>
+    </app-button>
+    
+    <app-button
+        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.EditTests) || state?.inCreation"
+        dataQA="addAthleteFromGroupButton"
+        type="secondary"
+        [routerLink]="[routeState?.urlWithoutBaseHref.split('?')[0], { outlets: { 'modal': ['add-athlete', 'add-athlete-from-group'] }}]">
+        <div class="plus">+</div><br/>
+        <span i18n="@@addAthleteFromGroup">Add Athlete From Group</span>
+    </app-button>
+    
+    <app-button
+        *ngIf="(state?.security?.actions | isActionAvailable:actionRight.EditTests) || state?.inCreation"
+        dataQA="addPlaceholderButton"
+        type="secondary"
+        [routerLink]="[routeState?.urlWithoutBaseHref.split('?')[0], { outlets: { 'modal': ['add-athlete', 'add-placeholder'] }}]">
+        <div class="plus">+</div><br/>
+        <span i18n="@@addPlaceholder">Add Placeholder</span>
+    </app-button>
+</div>

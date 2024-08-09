@@ -1,0 +1,67 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+$borderRadius: 0px;
+$primaryPadding: 25px;
+$secondaryPadding: 45px;
+
+@mixin sidebar($left, $right, $xunit) {
+    color: white;
+    word-wrap: break-word;
+    display: inline-block;
+    width: $sidebar-width;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    padding-top: $header-height;
+    min-height: $sidebar-min-height;
+
+    .sidebar {
+        height: 100%;
+        min-height: $sidebar-min-height;
+
+        .menu {
+            background: $primary-background;
+            height: 100%;
+
+            .menu-element {
+                width: $menu-element-width;
+                height: $menu-element-height;
+                padding: 10px 0;
+                display: block;
+                cursor: pointer;
+                color: white;
+                text-align: center;
+                font-size: 12px;
+
+                &:hover {
+                    background: $primary-background-hover;
+                    text-decoration: underline;
+                }
+
+                &.active-link {
+                    background: $primary-background-selected;
+                }
+
+                img {
+                    height: 50px;
+                    margin-bottom: 10px;
+                }
+
+                &.not-implemented {
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include sidebar(left, right, -1);
+    }
+
+    @include rtl {
+        @include sidebar(right, left, 1);
+    }
+}

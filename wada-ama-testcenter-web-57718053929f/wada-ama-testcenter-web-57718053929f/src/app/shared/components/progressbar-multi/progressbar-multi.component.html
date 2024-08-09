@@ -1,0 +1,26 @@
+<div class="wrapper" appInheritDir>
+    <div class="stacked-bar-graph">
+        <span
+            *ngFor="let bar of bars"
+            [style.width]="bar.value + '%'"
+            [style.backgroundColor]="bar.color">
+        </span>
+    </div>
+    <div class="scale">
+        <table aria-label="progress-bar-multi-table" aria-hidden="true">
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+        <div class="legend">
+            <div class="left-legend" i18n="@@progressbarMulti_0">0</div>
+            <div class="right-legend" i18n="@@progressbarMulti_100%">100%</div>
+        </div>
+    </div>
+    <div [class.bar]="showBar" [style.marginLeft]="bar + '%'" class="only-ltr"></div>
+    <div [class.bar]="showBar" [style.marginRight]="bar + '%'" class="only-rtl"></div>
+</div>

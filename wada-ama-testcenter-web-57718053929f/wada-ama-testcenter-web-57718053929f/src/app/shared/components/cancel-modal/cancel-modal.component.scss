@@ -1,0 +1,53 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+
+$nameColor: #414042;
+$statusColor: #414042;
+$default-color: #212529;
+$linkColor: #3A782C;
+$errorColor: #952406;
+
+.link__changeStatus {
+    color: $linkColor;
+    font-family: Montserrat, sans-serif;
+    font-size: 13px;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.link__changeStatus:hover {
+    cursor: pointer;
+}
+.popover__title {
+    line-height: 150%;
+}
+
+.green-asterisk {
+    color: $valid-field-star;
+}
+
+.textarea__reason {
+    width: 100%;
+    line-height: 150%;
+
+    &.error {
+        border: 2px solid $incorrect-field-star;
+    }
+}
+
+.primary__message {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 150%;
+}
+
+.secondary__message {
+    font-size: 16px;
+    line-height: 150%;
+}
+
+.div__errorReasonMandatory {
+    margin-left: 10px;
+    color: $errorColor;
+    display: inline-block;
+}

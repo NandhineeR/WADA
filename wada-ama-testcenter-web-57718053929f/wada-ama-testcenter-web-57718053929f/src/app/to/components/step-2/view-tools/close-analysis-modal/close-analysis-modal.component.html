@@ -1,0 +1,83 @@
+<app-modal
+    *ngIf="showModal"
+    [removeMargin]="true"
+    [scrollable]="true"
+    (modalClose)="setShowModal(false)">
+
+    <div modal-header>
+        <span i18n="@@markAsClosed">Mark as Closed</span>
+    </div>
+
+    <div modal-body class="modal__body">
+        <div class="wrapper">
+            <div *ngIf="displayMessages" class="modal__messages">
+                <div class="primary__message">
+                    <span i18n="@@followingAnalysisSampleWillBeClosed">The following analysis sample will be marked as Closed:</span>
+                </div>
+                <div class="secondary__message">
+                    <ul>
+                        <span>{{ displayAnalysisName(analysisToClosed) }}</span>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="notification">
+                <app-notification *ngIf="analysisNotUpdatedWarning.hasWarning()" type="error">
+                    <div *ngIf="analysisNotUpdatedWarning.names.length === 1">
+                        <span i18n="@@followingAnalysisSampleCouldNotBeUpdated">The following analysis sample could not be updated:</span>
+                        <ul>
+                            <li *ngFor="let name of analysisNotUpdatedWarning.names">
+                                <span>{{name}}</span>
+                            </li>
+                        </ul>
+                        <span i18n="@@pleaseRefreshAndTryAgain">Please refresh the page and try again.</span>
+                    </div>
+                </app-notification>
+
+                <app-notification *ngIf="cannotBeClosedWarning.hasWarning()" type="warning">
+                    <div *ngIf="cannotBeClosedWarning.names.length === 1">
+                        <span i18n="@@followingAnalysisSampleCannotBeMarkedAsClosed">The following analysis sample cannot be marked as Closed:</span>
+                        <ul class="cancel-info">
+                            <li *ngFor="let name of cannotBeClosedWarning.names">
+                                <span>{{name}}</span>
+                            </li>
+                        </ul>
+                        <span i18n="@@reasonTestCannotBeMarkedAsClosed">Please contact WADA support to fix this issue.</span>
+                    </div>
+                </app-notification>
+
+                <app-notification *ngIf="alreadyClosedWarning.hasWarning()" type="warning">
+                    <div *ngIf="alreadyClosedWarning.names.length === 1">
+                        <span i18n="@@followingAnalysisSampleAlreadyMarkedAsClosed">The following analysis sample has already been marked as Closed:</span>
+                        <ul>
+                            <li *ngFor="let name of alreadyClosedWarning.names">
+                                <span>{{name}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </app-notification>
+            </div>
+
+            <div class="center-modal-buttons bottom-button-padding">
+                <ng-container>
+                    <app-button
+                        dataQA="closedMarkAsClosedButton"
+                        type="secondary"
+                        (click)="onCloseModal(false)">
+                        <span i18n="@@close">Close</span>
+                    </app-button>
+
+                    <app-button
+                        dataQA="confirmMarkAsClosedButton"
+                        type="primary"
+                        [class.disabled]="!isSaveActive"
+                        [disabled]="!isSaveActive"
+                        (click)="onConfirm()">
+                        <span i18n="@@done">Done</span>
+                    </app-button>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+
+</app-modal>

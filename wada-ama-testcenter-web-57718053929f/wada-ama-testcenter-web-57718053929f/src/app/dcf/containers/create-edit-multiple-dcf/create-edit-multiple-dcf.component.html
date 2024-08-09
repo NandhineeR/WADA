@@ -1,0 +1,125 @@
+<app-dcf-page appInheritDir *appLet="isEditMode" class="wrapper">
+    <div title *ngIf="!isEditMode">
+        <ng-container [ngSwitch]="ids.length">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" i18n="@@createDcf">Create DCF</span>
+            <span *ngSwitchDefault i18n="@@createMultipleDcfs">Create Multiple DCFs</span>
+        </ng-container>
+    </div>
+    <div title *ngIf="isEditMode">
+        <ng-container [ngSwitch]="ids.length">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" i18n="@@editDcf">Edit DCF</span>
+            <span *ngSwitchDefault i18n="@@editMultipleDcfs">Edit Multiple DCFs</span>
+        </ng-container>
+    </div>
+    <div controls *appLet="(loading$ | async) || (error$ | async) || (hasSampleCodeError$ | async) || formHasErrors() as isSaveDisabled">
+        <app-button
+            *ngIf="viewModels?.length > 0"
+            i18n="@@cancel_uppercase"
+            type="secondary"
+            (click)="cancel()">CANCEL</app-button>
+        <app-button
+            *ngIf="viewModels?.length === 1"
+            i18n="@@saveAndReview_uppercase"
+            type="primary"
+            [disabled]="isSaveDisabled"
+            (click)="!isSaveDisabled && saveAndReviewAll()">SAVE AND REVIEW</app-button>
+        <app-button
+            *ngIf="viewModels?.length > 1"
+            i18n="@@saveAndReviewAllAthletes_uppercase"
+            type="primary"
+            [disabled]="isSaveDisabled"
+            (click)="!isSaveDisabled && saveAndReviewAll()">SAVE AND REVIEW ALL ATHLETES</app-button>
+    </div>
+
+    <app-loading-frame
+        [error]="error$ | async"
+        [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+        [loading]="loading$ | async"
+        [saveError]="saveError$ | async"
+        (resetErrors)="returnToFormAfterError()">
+        <accordion [closeOthers]="true">
+            <accordion-group
+                #group
+                *ngFor="let model of viewModels; let mIndex=index; let last=last"
+                closeOthers="true"
+                [isOpen]="model.active"
+                [ngClass]="{'bottom-space': !model.active}">
+                <div accordion-heading (click)="toggleAccordion(model, !last, false)">
+                    <app-view-section-title
+                        [arrowDirection]="model.active ? 'up' : 'down'"
+                        [businessErrors]="model.errorsPerCategory?.Business"
+                        [formatErrors]="model.errorsPerCategory?.Format"
+                        [hasBeenSaved]="displaySaved$ | async"
+                        [inCreation]="isCreationMode"
+                        [inEdit]="isEditMode"
+                        [isActive]="model.active"
+                        [numberErrors]="model.errorsPerCategory?.Mandatory + model.errorsPerCategory?.MandatoryDraft"
+                        [rightControls]="true"
+                        [rightInfo]=""
+                        [rightInfoIcon]="model.errors?.length <= 0 && model.status === DCF_STATUS_COMPLETED"
+                        [sectionNumber]="mIndex+1"
+                        [sectionTitle]="model.title"
+                        [singleForm]="isSingleForm"
+                        [theme]="model.active ? 'accordion-title-active' : 'accordion-title-inactive'"
+                        (delete)="deleteAthlete($event, model)">
+                        <span deleteSectionConfirmationMessage i18n="@@deleteCreationDopingControlFormForXConfirmation">Do you want to delete the creation of the Doping Control Form for {{ model.title }}? All data will be lost.</span>
+                    </app-view-section-title>
+                </div>
+
+                <app-multiple-dcf-form
+                    [athleteId]="model.athleteId"
+                    [bloodCollectionOfficials]="bloodCollectionOfficials$ | async"
+                    [chaperones]="chaperones$ | async"
+                    [coaches]="coaches$ | async"
+                    [conflictException$]="multipleDcfConflictException$"
+                    [countries]="countries$ | async"
+                    [dcf]="model.data"
+                    [dcfStatus]="model.status"
+                    [doctors]="doctors$ | async"
+                    [form]="model.form"
+                    [inCreation]="isCreationMode"
+                    [isEditMode]="isEditMode"
+                    [fieldsSecurity]="model.fieldsSecurity"
+                    [locale]="locale$ | async"
+                    [manufacturers]="manufacturers$ | async"
+                    [proceduralInformation]="model.data.proceduralInformation"
+                    [showErrors]="showErrors"
+                    [sportsDisciplines]="sportsDisciplines$ | async"
+                    [testId]="model.testId"
+                    [timezones]="timezones$ | async"
+                    [urineSampleBoundaries]="urineSampleBoundaries$ | async"
+                    [witnessChaperones]="witnessChaperones$ | async"
+                    (executeSampleCodeValidation)="executeSampleCodeValidation($event)">
+                </app-multiple-dcf-form>
+            </accordion-group>
+        </accordion>
+    </app-loading-frame>
+
+    <app-confirm-leave #cancelCreateModalRef (confirm)="redirectOnConfirm($event)">
+        <div primary-message>
+            <span *ngIf="!isEditMode" i18n="@@cancelCreationMultipleDcfsConfirmation">Are you sure you want to cancel the creation of multiple DCFs?</span>
+            <span *ngIf="isEditMode" i18n="@@cancelYourChangesMultipleDcfsConfirmation">Are you sure you want to cancel your changes for your multiple DCFs?</span>
+        </div>
+        <div secondary-message>
+            <span *ngIf="!isEditMode" i18n="@@allDataEnteredWillBeLost">All data you have entered will be lost.</span>
+            <span *ngIf="isEditMode" i18n="@@dcfsWillRevertBack">The DCFs will revert back to their last saved form.</span>
+        </div>
+    </app-confirm-leave>
+
+    <app-confirm-leave #confirmLeaveModalRef>
+        <div primary-message>
+            <span i18n="@@youAreAboutToLeave">You are about to leave this page.</span>
+            <span>&nbsp;</span>
+            <span *ngIf="!isEditMode" i18n="@@cancelCreationMultipleDopingControlFormConfirmation">Are you sure you want to cancel the creation of multiple DCFs?</span>
+            <span *ngIf="isEditMode" i18n="@@cancelYourChangesConfirmation">Are you sure you want to cancel your changes?</span>
+        </div>
+        <div secondary-message>
+            <span *ngIf="!isEditMode" i18n="@@allDataEnteredWillBeLost">All data you have entered will be lost.</span>
+            <span *ngIf="isEditMode" i18n="@@dcfsWillRevertBack">The DCFs will revert back to their last saved form.</span>
+        </div>
+    </app-confirm-leave>
+</app-dcf-page>
+
+<div class="footer"></div>

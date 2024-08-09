@@ -1,0 +1,276 @@
+<div
+    appInheritDir
+    class="wrapper"
+    [@fadeInOut]
+    [formGroup]="form">
+    <app-form-field
+        [appDisable]="controls.PARTIAL_SAMPLE | isInputDisabled:fieldsSecurity:isEditMode"
+        [hidden]="isMultipleDCF">
+        <label for="partial{{sampleIndex}}" i18n="@@partialSample">Partial Sample</label>
+        <div appRadioArrowFocus field-input>
+            <label class="radio-container">
+                <input
+                    #partialTrue
+                    appRadioOnFocus
+                    data-qa="partialSampleRadio"
+                    formControlName="partial"
+                    id="partial{{sampleIndex}}"
+                    type="radio"   
+                    [value]="true"
+                    (click)="handleCheckChange(true)">
+                <span class="checkmark"></span>
+                <span i18n="@@yes" class="radio-label">Yes</span>
+            </label>
+            <label class="radio-container">
+                <input
+                    appRadioOnFocus
+                    data-qa="partialSampleRadio"
+                    formControlName="partial"
+                    type="radio"
+                    [value]="false"
+                    (click)="handleCheckChange(false)">
+                <span class="checkmark"></span>
+                <span i18n="@@no" class="radio-label">No</span>
+            </label>
+        </div>
+    </app-form-field>
+    
+    <app-form-field
+        class="wrapper"
+        columns="30% 30% 30% 30%"
+        [hasAsterisk]="true"
+        [hasError]="collectionDateHasErrors"
+        [ngClass]="{ 'topSpace': isMultipleDCF }">
+
+        <label for="collectionDate{{sampleIndex}}" i18n="@@collectionDate">Collection Date</label>
+        <span field-top-label i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h)</span>
+        <app-datetime-picker
+            field-input
+            dataQA="collectionDateUrine"
+            formControlName="collectionDate"
+            fieldId="collectionDate{{sampleIndex}}"
+            [appDisable]="isCollectionDateDisabled() || (controls.COLLECTION_DATE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [disabled]="isCollectionDateDisabled() || (controls.COLLECTION_DATE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [hasError]="collectionDateHasErrors"
+            [locale]="locale"
+            (selected)="onSelectedCollectionDate()">
+        </app-datetime-picker>
+        <div field-info *ngIf="collectionDateHasErrors" class="error-message">
+            <span *ngIf="collectionDate.errors.validateEmptyCollectionDate?.error?.invalid"
+                i18n="@@provideCollectionDateWithSampleCode">The collection date must be provided when the sample code is set.</span>
+            <span *ngIf="collectionDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <span *ngIf="collectionDate.errors.validateDatetimeFormat?.error?.invalid" i18n="@@datetimeMustBeValidFormat">Date time must be in a valid format.</span>
+        </div>
+
+        <span field-top-label-2 i18n="@@timeZone" id="timezone{{sampleIndex}}">Time Zone</span>
+        <app-dropdown
+            field-input-2
+            class="timezone"
+            dataQA="timeZoneDropdownUrine"
+            formControlName="timezone"
+            i18n-placeholder="@@timezone"
+            id="timezone{{sampleIndex}}"
+            placeholder="Time Zone"
+            property="id"
+            style="width: 100%"
+            type="text"
+            [appDisable]="isCollectionDateDisabled() || (controls.TIMEZONE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [hasError]="timezoneHasErrors"
+            [isDisabled]="isCollectionDateDisabled() || (controls.TIMEZONE | isInputDisabled:fieldsSecurity:isEditMode)"
+            (selected)="onSelectedTimezone()">
+            <ng-container *ngFor="let item of timezones; let i = index">
+                <div [appDropdownElement]="item" class="dropdown-item" data-qa="timeZoneDropdownOptionUrine" [attr.data-qa-precision]="i">{{ item.shortName }}</div>
+            </ng-container>
+        </app-dropdown>
+        <div field-info-2 *ngIf="timezoneHasErrors" class="error-message" >
+            <span *ngIf="timezone.errors.validateEmptyTimezone?.error?.invalid"
+                i18n="@@provideTimezoneWithSampleCodeOrCollectionDate">The time zone must be provided when either the sample code or the collection date is set.</span>
+            <span *ngIf="timezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="!partialTrue.checked" [@fadeInOut] [hasAsterisk]="true" [hasError]="sampleCodeHasErrors">
+        <label i18n="@@sampleCode">Sample Code</label>
+        <input
+            field-input
+            data-qa="sampleCodeUrine"
+            formControlName="sampleCode"
+            id="sampleCode{{sampleIndex}}"
+            type="text"
+            [appDisable]="isMatchingResultType3or2or1 || (controls.SAMPLE_CODE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [class.error]="sampleCodeHasErrors || hasDuplicateException"
+            [ngClass]="{'sampleCode': !hasDuplicateException}"
+            [readonly]="readonly"
+            (focusout)="onChangeSampleCode($event.target.value)">
+        <div field-error *ngIf="sampleCodeHasErrors">
+            <span *ngIf="sampleCode.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+        <div field-warning *ngIf="sampleCode && sampleCode.errors && sampleCode.errors.invalid">
+            <span i18n="@@urineSampleCodeXWarning">Urine sample {{ sampleCode.value }} already exists in ADAMS. Make sure these values are correct.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="partialTrue.checked" [@fadeInOut] [hasAsterisk]="true" [hasError]="sampleCodeHasErrors">
+        <label i18n="@@partialSampleCode">Partial Sample Code</label>
+        <input
+            field-input
+            class="sampleCode"
+            formControlName="sampleCode"
+            id="sampleCode{{sampleIndex}}"
+            type="text"
+            [appDisable]="isMatchingResultType3or2or1 || (controls.SAMPLE_CODE | isInputDisabled:fieldsSecurity:isEditMode)"
+            [class.error]="sampleCodeHasErrors"
+            [readonly]="readonly"
+            (focusout)="onChangeSampleCode($event.target.value)">
+        <div field-error *ngIf="sampleCodeHasErrors">
+            <span *ngIf="sampleCode.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+        <div field-warning *ngIf="sampleCode && sampleCode.errors && sampleCode.errors.invalid">
+            <span i18n="@@urineSampleCodeXWarning">Urine sample {{ sampleCode.value }} already exists in ADAMS. Make sure these values are correct.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field [hasAsterisk]="true" [hasError]="manufacturerHasErrors">
+        <label for="manufacturer{{sampleIndex}}" i18n="@@manufacturer">Manufacturer</label>
+        <app-typeahead
+            field-input
+            dataQA="manufacturerUrineTypeahead"
+            fieldId="manufacturer{{sampleIndex}}"
+            formControlName="manufacturer"
+            suggestionField="description"
+            [appDisable]="controls.MANUFACTURER | isInputDisabled:fieldsSecurity:isEditMode"
+            [hasError]="manufacturerHasErrors  || hasDuplicateException"
+            [suggestions]="manufacturersSuggestions"
+            (selected)="onSelectedManufacturer($event)">
+        </app-typeahead>
+        <div field-error *ngIf="manufacturerHasErrors">
+            <span *ngIf="manufacturer.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field
+        *ngIf="!isMultipleDCF && !partialTrue.checked"
+        [@fadeInOut]
+        [hasAsterisk]="true"
+        [hasError]="laboratoryHasErrors">
+        <label for="laboratory{{sampleIndex}}" i18n="@@laboratory">Laboratory</label>
+        <app-typeahead
+            field-input
+            dataQA="laboratoryUrineTypeahead"
+            fieldId="laboratory{{sampleIndex}}"
+            formControlName="laboratory"
+            suggestionField="displayDescriptionName"
+            [hasError]="laboratoryHasErrors || hasDuplicateException"
+            [isDisabled]="isMatchingResultType3or2or1 || (controls.LABORATORY | isInputDisabled:fieldsSecurity:isEditMode)"
+            [suggestions]="laboratorySuggestions"
+            (selected)="onSelectedLaboratory($event)">
+        </app-typeahead>
+        <div field-error *ngIf="laboratoryHasErrors">
+            <span *ngIf="laboratory.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="!partialTrue.checked" [@fadeInOut] [hasAsterisk]="true" [hasError]="volumeHasErrors">
+        <label for="volume{{sampleIndex}}" i18n="@@volumeMl">Volume (ml)</label>
+        <input
+            field-input
+            appRestrictToPattern="^[0-9]*$"
+            autocomplete="disabled"
+            data-qa="volume"
+            formControlName="volume"
+            id="volume{{sampleIndex}}"
+            maxlength=5
+            type="text"
+            [appDisable]="controls.VOLUME | isInputDisabled:fieldsSecurity:isEditMode"
+            [class.error]="volumeHasErrors"
+            (change)="onVolumeChange($event.target.value)">
+        <div field-error *ngIf="volumeHasErrors">
+            <span *ngIf="volume.errors.invalid && minimumVolume" i18n="@@respectVolumeMinRange">Volume must be equal to or greater than {{ this.boundaries.minimumVolumeThreshold0 }} ml.</span>
+            <span *ngIf="volume.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="partialTrue.checked" [@fadeInOut] [hasAsterisk]="true" [hasError]="partialVolumeHasErrors">
+        <label i18n="@@partialVolumeMl">Partial Volume (ml)</label>
+        <input
+            field-input
+            appRestrictToPattern="^[0-9]*$"
+            autocomplete="disabled"
+            formControlName="partialVolume"
+            id="partialVolume{{sampleIndex}}"
+            maxlength=5
+            type="text"
+            [appDisable]="controls.VOLUME | isInputDisabled:fieldsSecurity:isEditMode"
+            [class.error]="partialVolumeHasErrors">
+        <div field-error *ngIf="partialVolumeHasErrors">
+            <span *ngIf="partialVolume.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="!partialTrue.checked && isVolumeBelowMinimumReasonField()"
+        [@fadeInOut]
+        [hasAsterisk]="true"
+        [hasError]="volumeBelowMinimumReasonHasErrors">
+        <label i18n="@@volumeBelowMinimumXReason">Reason for volume below {{ boundaries.minimumVolumeThreshold1 }} ml.</label>
+        <textarea
+            field-input
+            formControlName="volumeBelowMinimumReason"
+            id="volumeBelowMinimumReason{{sampleIndex}}"
+            maxlength="255"
+            rows="3"
+            style="width: 60%"
+            type="text"
+            [appDisable]="controls.VOLUME_BELOW_MINIMUM_REASON | isInputDisabled:fieldsSecurity:isEditMode"
+            [class.error]="volumeBelowMinimumReasonHasErrors">
+        </textarea>
+        <div field-error *ngIf="volumeBelowMinimumReasonHasErrors">
+            <span *ngIf="volumeBelowMinimumReason.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        </div>
+    </app-form-field>
+
+    <app-form-field *ngIf="!partialTrue.checked" [@fadeInOut] [hasAsterisk]="true" [hasError]="specificGravityHasErrors">
+        <label for="specificGravity{{sampleIndex}}" i18n="@@specificGravity">Specific Gravity</label>
+        <ng-container field-input>
+            <span>1.0</span>
+            <input
+                appRestrictToPattern="^\d{0,2}$"
+                autocomplete="disabled"
+                class="specificGravity"
+                data-qa="specificGravity"
+                formControlName="specificGravity"
+                id="specificGravity{{sampleIndex}}"
+                maxlength="2"
+                type="text"
+                [appDisable]="controls.SPECIFIC_GRAVITY | isInputDisabled:fieldsSecurity:isEditMode"
+                [class.error]="specificGravityHasErrors"
+                [class.warning]="specificGravityHasWarnings">
+        </ng-container>
+        <div field-error *ngIf="specificGravityHasErrors">
+            <span *ngIf="specificGravity.errors.required && !partialTrue.checked" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            <div field-warning *ngIf="specificGravity.errors.diluted && !partialTrue.checked">
+                <span *ngIf="isFirstThresholdOrBelow" i18n="@@dcf_respectSpecificGravityFirstThreshold">The specific gravity must be above {{ minimumSpecificGravity }} when the volume is between {{ minimumVolume }} ml and {{ upperThreshold }} ml. This sample will be considered as dilute.</span>
+                <span *ngIf="!isFirstThresholdOrBelow" i18n="@@dcf_respectSpecificGravitySecondThreshold">The specific gravity must be above {{ minimumSpecificGravity }} when the volume is equal to or above {{ minimumVolume }} ml. This sample will be considered as dilute.</span>
+            </div>
+        </div>
+    </app-form-field>
+
+    <app-participant-input
+        #witnessChaperoneParticipantInput
+        field-input
+        *ngIf="witnessChaperones"
+        dataQAFirstName="witnessChaperoneFirstName"
+        dataQALastName="witnessChaperoneLastName"
+        firstNameId="firstName{{sampleIndex}}"
+        formControlName="witnessChaperone"
+        lastNameId="lastName{{sampleIndex}}"
+        [appDisable]="controls.WITNESS_CHAPERONE | isInputDisabled:fieldsSecurity:isEditMode"
+        [hasAsterisk]="true"
+        [hasError]="witnessChaperoneHasErrors"
+        [hasFirstNameError]="witnessChaperoneHasFirstNameErrors"
+        [hasLastNameError]="witnessChaperoneHasLastNameErrors"
+        [participants]="witnessChaperones">
+        <label i18n="@@witnessChaperone">Witness Chaperone</label>
+        <span last-name-errors *ngIf="witnessChaperoneHasErrors && witnessChaperone.errors?.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+        <span first-name-errors *ngIf="witnessChaperoneHasErrors && witnessChaperone.errors?.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+    </app-participant-input>
+</div>

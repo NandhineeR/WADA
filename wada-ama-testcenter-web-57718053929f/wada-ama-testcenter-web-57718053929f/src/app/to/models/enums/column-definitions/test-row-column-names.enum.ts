@@ -1,0 +1,17 @@
+export enum TestRowColumnNames {
+    AGE = 'age',
+    ATHLETE_ID = 'athleteId',
+    ANALYSES = 'analyses',
+    ATHLETE_LEVEL = 'athleteLevel',
+    DATE_OF_BIRTH = 'dateOfBirth',
+    DISABILITIES = 'disabilities',
+    LABORATORIES = 'laboratories',
+    NAME = 'name',
+    PLACEHOLDER = 'placeholder',
+    RESULTS = 'results',
+    SEX = 'sex',
+    SPORT_DISCIPLINE = 'sportDiscipline',
+    SPORT_NATIONALITY = 'sportNationality',
+    STATUS = 'status',
+    TEAM = 'team',
+}

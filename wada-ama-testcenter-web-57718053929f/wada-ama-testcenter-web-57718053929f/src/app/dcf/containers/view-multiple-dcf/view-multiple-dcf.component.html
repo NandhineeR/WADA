@@ -1,0 +1,103 @@
+<app-dcf-page appInheritDir>
+    <div title>
+        <ng-container [ngSwitch]="ids.length">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" i18n="@@viewDopingControlForm">View Doping Control Form</span>
+            <span *ngSwitchDefault i18n="@@viewMultipleDopingControlForms">View Multiple Doping Control Forms</span>
+        </ng-container>
+    </div>
+    <app-notification
+        *ngIf="!(loading$ | async) && !(error$ | async)"
+        id="notificationsDCF"
+        type="success">
+        <span i18n="@@followingDopingControlFormHaveBeen">The following Doping Control Forms have been:</span>
+        <div class="success-issue">
+            <div class="row">
+                <div
+                    *ngIf="completedDcfs.length > 0"
+                    class="column">
+                    <div class="title strong" i18n="@@savedAndComplete">Saved and Completed</div>
+                    <ul
+                        *ngFor="let model of completedDcfs"
+                        class="margin-bottom">
+                        <li>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="scroll(model.dcfId)">{{ model.title }}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div
+                    *ngIf="draftedDcfs.length > 0"
+                    class="column">
+                    <div class="title strong" i18n="@@savedAsDraft">Saved as Draft</div>
+                    <ul
+                        *ngFor="let model of draftedDcfs"
+                        class="margin-bottom">
+                        <li>
+                            <a
+                                href="javascript:void(0)"
+                                (click)="scroll(model.dcfId)">{{ model.title }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="title strong" i18n="@@whatsNext">What's next?</div>
+            <div>
+                <ul>
+                    <li *ngIf="toId">
+                        <a i18n="@@goBackToTestingOrder" [routerLink]="['/', 'to', 'view', toId]">Go back to Testing Order</a>
+                    </li>
+                    <li *ngIf="!toId">
+                        <a i18n="@@goBackToTestingOrder">Go back to Testing Order</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </app-notification>
+    <app-loading-frame
+        [error]="error$ | async"
+        [errorDescription]="translations$ | getErrorMessage:(errorMsgKey$ |async) | async"
+        [loading]="loading$ | async">
+        <accordion [closeOthers]="true">
+            <accordion-group
+                #group
+                *ngFor="let model of viewModels; let mIndex = index; let last = last"
+                class="margin"
+                [isOpen]="false">
+                <div accordion-heading (click)="toggleAccordion(model.dcfId)">
+                    <app-view-section-title
+                        [arrowDirection]="showModel(model.dcfId) ? 'up' : 'down'"
+                        [formatErrors]=""
+                        [hasBeenSaved]="true"
+                        [id]="model.dcfId"
+                        [inView]="inView"
+                        [isActive]="isModelSelected(model.dcfId)"
+                        [link]="['/', 'dcf', 'multiple', 'edit']"
+                        [numberErrors]="model.errors?.size + model.sampleErrors"
+                        [queryParams]="{ id: ids.toString(), active: model.dcfId }"
+                        [rightControls]="true"
+                        [rightInfo]="translations$ | getDCFStatus:model.status | async"
+                        [rightInfoIcon]="model.errors?.size <= 0 && model.status === 'Completed'"
+                        [sectionNumber]="mIndex+1"
+                        [sectionTitle]="model.title"
+                        [singleForm]="viewModels.length === 1"
+                        [theme]="isModelSelected(model.dcfId) ? 'accordion-title-active' : 'accordion-title-inactive'">
+                        {{model.dcfId}}
+                    </app-view-section-title>
+                </div>
+                <app-dcf-view-section
+                    [dcf]="model.data"
+                    [errors]="model.errors"
+                    [fieldsSecurity]="model.fieldsSecurity"
+                    [locale]="locale$ | async"
+                    [showErrors]="showErrors"
+                    [urineSampleBoundaries]="urineSampleBoundaries$ | async"
+                    (errorCount)="model.sampleErrors = $event">
+                </app-dcf-view-section>
+            </accordion-group>
+        </accordion>
+    </app-loading-frame>
+</app-dcf-page>
+
+<div class="footer"></div>

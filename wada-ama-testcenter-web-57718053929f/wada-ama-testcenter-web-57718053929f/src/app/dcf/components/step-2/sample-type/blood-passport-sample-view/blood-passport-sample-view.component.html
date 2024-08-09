@@ -1,0 +1,405 @@
+<app-view-section-content
+    appHideControl
+    *ngIf="sample"
+    [permissions]="whiteList">
+    <ng-container *ngIf="!isMultipleDCF">
+        <ng-container *ngFor="let result of sample.results">
+            <app-view-entry *ngIf="result.finding?.type && canReadLabResults()" id="finding">
+                <app-view-entry-name i18n="@@analyticalResult">Analytical result</app-view-entry-name>
+                <app-view-entry-value>
+                    <span *ngIf="result.finding?.type === finding.AAF" i18n="@@adverseAnalyticalFinding">Adverse Analytical Finding (AAF)</span>
+                    <span *ngIf="result.finding?.type === finding.ATF" i18n="@@atypicalResultFinding">Atypical Result Finding (ATF)</span>
+                    <span *ngIf="result.finding?.type === finding.Negative" i18n="@@negativeResultFinding">Negative</span>
+                    <br *ngIf="result.finding?.status?.description">
+                    <span>{{ result.finding?.status?.description }}</span>
+                </app-view-entry-value>
+                <app-view-entry-link *ngIf="actions | isActionAvailable:actionRight.ViewMatchingResult">
+                    <a
+                        appOpenObjectInClassic
+                        href=""
+                        [athleteId]="athleteId"
+                        [objectId]="result.finding?.id"
+                        [targetObject]="result.finding?.type">
+                        <span *ngIf="result.finding?.type === finding.AAF" i18n="@@viewAAF">View AAF</span>
+                        <span *ngIf="result.finding?.type === finding.ATF" i18n="@@viewATF">View ATF</span>
+                    </a>
+                </app-view-entry-link>
+            </app-view-entry>
+            
+            <app-view-entry
+                *ngIf="result.matchingResultStatus?.specificCode === status.ConfirmedByUser"
+                id="matchingResultStatus">
+                <app-view-entry-name i18n="@@match">Match</app-view-entry-name>
+                <app-view-entry-value i18n="@@confirmedByUser">Confirmed by User</app-view-entry-value>
+                <app-view-entry-link *ngIf="isUserCorrector && isSampleConfirmedWithoutAdrv && (actions | isActionAvailable:actionRight.EditMatchingResult)">
+                    <app-popover-sample-correction
+                        [currentSampleCode]="sample.sampleCode"
+                        [currentSampleType]="sample.sampleTypeSpecificCode"
+                        [dcfRetentionPeriod]="dcfRetentionPeriod"
+                        [dcfToBeDeleted]="dcfToBeDeleted"
+                        [hasAdverseResult]="hasAdverseResult"
+                        [isLastMatchedSample]="isLastMatchedSample"
+                        [sampleId]="sample.id"
+                        [sampleJarCode]="result?.sampleJarCode"
+                        [sampleTargetField]="sampleTargetFieldEnum.MATCH_TYPE"
+                        (changeSampleEmitter)="changeSample($event)">
+                </app-popover-sample-correction>
+                </app-view-entry-link>
+            </app-view-entry>
+
+            <app-view-entry
+                *ngIf="result.matchingResultStatus?.specificCode !== status.ConfirmedByUser"
+                id="matchingResultStatus">
+                <app-view-entry-name i18n="@@matchType">Match Type</app-view-entry-name>
+                <app-view-entry-value>{{ result.matchingResultStatus?.description }}</app-view-entry-value>
+                <app-view-entry-link *ngIf="(actions | isActionAvailable:actionRight.ViewMatchingResult)">
+                    <a
+                        i18n="@@viewMatch"
+                        [routerLink]="['/', 'dcf', 'result', dcfId,'sample', _sample.id,'matching-result', result.id]">View Match</a>
+                </app-view-entry-link>
+            </app-view-entry>
+
+            <app-view-entry
+                *ngIf="canReadLabResults()"
+                id="labResultId"
+                [showEntryValue]="false">
+                <app-view-entry-name i18n="@@laboratoryResults">Laboratory Results</app-view-entry-name>
+                <app-view-entry-link>
+                    <a
+                        appOpenObjectInClassic
+                        href=""
+                        targetObject="LabResult"
+                        [objectId]="result?.labResultId"
+                        [type]="sample.sampleTypeSpecificCode">
+                        <span i18n="@@viewBiologicalPassport">View Biological Passport</span>
+                    </a>
+                </app-view-entry-link>
+            </app-view-entry>
+        </ng-container>
+    </ng-container>
+    <app-view-entry *ngIf="sample.results?.length > 0 && !isMultipleDCF" id="valid">
+        <app-view-entry-name i18n="@@sampleValidity">Sample Validity</app-view-entry-name>
+        <app-view-entry-value>
+            <span *ngIf="sample.valid" i18n="@@valid">Valid</span>
+            <span *ngIf="!sample.valid" i18n="@@invalid">Invalid</span>
+        </app-view-entry-value>
+        <app-view-entry-link *ngIf="canUpdate('valid')">
+            <app-popover-sample-correction
+                [currentSampleCode]="sample.sampleCode"
+                [currentSampleType]="sample.sampleTypeSpecificCode"
+                [currentValidity]="sample.valid"
+                [hasAdverseResult]="hasAdverseResult"
+                [sampleId]="sample.id"
+                [sampleTargetField]="sampleTargetFieldEnum.VALIDITY"
+                (changeSampleEmitter)="changeSample($event)">
+            </app-popover-sample-correction>
+        </app-view-entry-link>
+    </app-view-entry>
+
+    <app-view-entry *ngIf="!isMultipleDCF" id="chainOfCustodyId">
+        <app-view-entry-name i18n="@@chainOfCustody">Chain of Custody</app-view-entry-name>
+        <app-view-entry-value>
+            <span *ngIf="sample.chainOfCustody" i18n="@@created">Created</span>
+            <span *ngIf="!sample.chainOfCustody" i18n="@@none">None</span>
+        </app-view-entry-value>
+        <app-view-entry-link>
+            <ng-container *ngIf="!sample.chainOfCustody && (actions | isActionAvailable:actionRight.CreateChainOfCustody)">
+                <a
+                    appOpenObjectInClassic
+                    href=""
+                    targetObject="ChainOfCustody">
+                    <span i18n="@@create">Create</span>
+                </a>
+            </ng-container>
+
+            <ng-container *ngIf="sample.chainOfCustody && (actions | isActionAvailable:actionRight.ViewChainOfCustody)">
+                <a
+                    appOpenObjectInClassic
+                    href=""
+                    targetObject="ChainOfCustody"
+                    [objectId]="sample?.chainOfCustody">
+                    <span i18n="@@view">View</span>
+                </a>
+            </ng-container>
+        </app-view-entry-link>
+    </app-view-entry>
+
+    <app-view-entry *ngIf="!isMultipleDCF" id="sampleType">
+        <app-view-entry-name i18n="@@sampleType" [invalid]="missingFields | setHas:fields.SampleType" [required]="required">Sample Type</app-view-entry-name>
+        <app-view-entry-value>
+            <span i18n="bloodPassport">Blood Passport</span>
+        </app-view-entry-value>
+        <app-view-entry-link *ngIf="aafOrAtfIsConfirmedByUser() && canUpdate('type')">
+            <app-popover-sample-correction
+                [currentSampleCode]="sample.sampleCode"
+                [currentSampleType]="sample.sampleTypeSpecificCode"
+                [hasSampleResults]="sample.results.length > 0"
+                [sampleId]="sample.id"
+                [sampleTargetField]="sampleTargetFieldEnum.SAMPLE_TYPE"
+                [sampleTypes]="sampleTypes"
+                (changeSampleEmitter)="changeSample($event)">
+            </app-popover-sample-correction>
+        </app-view-entry-link>
+    </app-view-entry>
+
+    <app-multiple-field-row-view
+        dataQA="collectionDate"
+        id="collectionDate"
+        [items]="[sample.timezone?.shortName]"
+        [mainItem]="sample.collectionDate | formatDatetime | uppercase">
+        <app-view-entry-name
+            i18n="@@collectionDate"
+            role="mainField"
+            [invalid]="missingFields | setHas:fields.CollectionDate"
+            [required]="required">Collection Date</app-view-entry-name>
+        <app-view-entry-name
+            i18n="@@timeZone"
+            role="field-0"
+            [invalid]="missingFields | setHas:fields.Timezone"
+            [required]="isSampleTimezoneRequired$ | async">Time Zone</app-view-entry-name>
+    </app-multiple-field-row-view>
+
+    <app-view-entry id="code">
+        <app-view-entry-name [required]="required" [invalid]="missingFields | setHas:fields.SampleCode" i18n="@@sampleCode">Sample Code</app-view-entry-name>
+        <app-view-entry-value>{{ sample.sampleCode }}</app-view-entry-value>
+        <app-view-entry-link *ngIf="aafOrAtfIsConfirmedByUser() && canUpdate('code')">
+            <app-popover-sample-correction 
+                [currentSampleCode]="sample.sampleCode"
+                [hasSampleResults]="sample.results.length > 0"
+                [sampleId]="sample.id"
+                [sampleTargetField]="'sampleTargetFieldEnum.SAMPLE_CODE'"
+                (changeSampleEmitter)="changeSample($event)">
+        </app-popover-sample-correction>
+        </app-view-entry-link>
+    </app-view-entry>
+
+    <app-view-entry id="manufacturer" >
+        <app-view-entry-name
+            i18n="@@manufacturer"
+            [invalid]="missingFields | setHas:fields.Manufacturer"
+            [required]="required">Manufacturer</app-view-entry-name>
+        <app-view-entry-value>{{ sample.manufacturer?.description }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="tempLoggerId">
+        <app-view-entry-name i18n="@@tempLoggerId">Temp Logger ID</app-view-entry-name>
+        <app-view-entry-value>{{ sample.tempLoggerId }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="tempLoggerStatus">
+        <app-view-entry-name i18n="@@tempLoggerStatus">Temp Logger Status</app-view-entry-name>
+        <app-view-entry-value>{{ sample.tempLoggerStatus?.description }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry *ngIf="!isMultipleDCF" id="laboratory">
+        <app-view-entry-name
+            i18n="@@laboratory"
+            [invalid]="missingFields | setHas:fields.Laboratory"
+            [required]="required">Laboratory</app-view-entry-name>
+        <app-view-entry-value>{{ sample.laboratory?.name }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="bloodCollectionOfficial">
+        <app-view-entry-name
+            i18n="@@bloodCollectionOfficial"
+            [invalid]="missingFields | setHas:fields.BloodCollectionOfficial"
+            [required]="required">Blood Collection Official</app-view-entry-name>
+        <app-view-entry-value>{{ sample.displayBloodCollectionOfficialDescriptionName }}</app-view-entry-value>
+    </app-view-entry>
+    <span class="abp-supplementary-report-form-label">
+        <a
+            appOpenObjectInClassic
+            *ngIf="(actions | isActionAvailable:actionRight.DownloadABPReportForm); else noDownloadABPReportForm"
+            href=""
+            i18n="@@abpSupplementaryForm"
+            [athleteId]="athleteId"
+            [sampleId]="sample.id"
+            [targetObject]="'BloodPassportSample'">ABP Supplementary Report Form (SRF)</a>
+        <ng-template #noDownloadABPReportForm i18n="@@abpSupplementaryForm">ABP Supplementary Report Form (SRF)</ng-template>
+    </span>
+    <app-view-subsubsection>
+        <app-view-entry id="seated">
+            <app-view-entry-name i18n="@@athleteSeatedTenMinutes_bpView" [invalid]="missingFields | setHas:fields.Seated" [required]="required">Has the athlete been <strong>seated for ten minutes</strong> prior to blood collection?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.seated"></app-view-entry-yes-no>
+        </app-view-entry>
+        
+        <app-view-entry id="collectedAfter3Days">
+            <app-view-entry-name
+                i18n="@@sampleCollectedLast3Days_bpView"
+                [invalid]="missingFields | setHas:fields.CollectedAfter3Days"
+                [required]="required">Was the sample <strong>collected</strong> immediately following <strong>at least three consecutive days</strong> of competition (hemodilution expected)?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.collectedAfter3Days"></app-view-entry-yes-no>
+        </app-view-entry>
+        
+        <app-view-entry id="hasHadTraining">
+            <app-view-entry-name
+                i18n="@@athleteHadTrainingLastTwoHours_bpView"
+                [required]="required"
+                [invalid]="missingFields | setHas:fields.HasHadTrainingSession">Has the athlete had a <strong>training</strong> session or <strong>competition in the past two hours</strong>?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.hasHadTrainingSession"></app-view-entry-yes-no>
+        </app-view-entry>
+        
+        <ng-container *ngIf="sample.hasHadTrainingSession">
+            <app-view-entry id="trainingType">
+                <app-view-entry-name
+                    i18n="@@trainingSessionOrCompetitionType"
+                    [invalid]="missingFields | setHas:fields.TrainingType"
+                    [required]="required">Type of training session or competition</app-view-entry-name>
+                <app-view-entry-value>{{ sample.trainingType }}</app-view-entry-value>
+            </app-view-entry>
+        </ng-container>
+        
+        <app-view-entry id="hasHighAltitudeTraining">
+            <app-view-entry-name
+                i18n="@@athleteTrainedAtAltitudeGreaterThan1500M_bpView"
+                [invalid]="missingFields | setHas:'hasHighAltitudeTraining'"
+                [required]="required">Has the athlete trained, competed or resided at an <strong>altitude greater than 1500 meters</strong> within the previous two weeks?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.hasHighAltitudeTraining"></app-view-entry-yes-no>
+        </app-view-entry>
+        
+        <ng-container *ngIf="sample.hasHighAltitudeTraining">
+            <app-view-entry id="highAltitudeTraining">
+                <app-view-entry-name
+                    i18n="@@nameAndlocation"
+                    [invalid]="missingFields | setHas:'altitudeTraining.location'"
+                    [required]="required">Name and Location</app-view-entry-name>
+                <app-view-entry-value>{{ sample.altitudeTraining?.location }}</app-view-entry-value>
+            </app-view-entry>
+            
+            <app-view-entry id="highAltitudeTraining">
+                <app-view-entry-name
+                i18n="@@altitudeM"
+                [invalid]="missingFields | setHas:'altitudeTraining.altitude'"
+                [required]="required">Altitude (m)</app-view-entry-name>
+                <app-view-entry-value>{{ sample.altitudeTraining?.altitude }}</app-view-entry-value>
+            </app-view-entry>
+            
+            <app-view-entry id="highAltitudeTraining">
+                <app-view-entry-name
+                    i18n="@@from"
+                    [invalid]="missingFields | setHas:'altitudeTraining.start'"
+                    [required]="required">From</app-view-entry-name>
+                <app-view-entry-value>{{ sample.altitudeTraining?.start | date:'dd-MMM-yyyy':'-0000' | uppercase }}</app-view-entry-value>
+            </app-view-entry>
+            
+            <app-view-entry id="highAltitudeTraining">
+                <app-view-entry-name
+                    i18n="@@to"
+                    [invalid]="missingFields | setHas:'altitudeTraining.end'"
+                    [required]="required">To</app-view-entry-name>
+                <app-view-entry-value>{{ sample.altitudeTraining?.end | date:'dd-MMM-yyyy':'-0000' | uppercase }}</app-view-entry-value>
+            </app-view-entry>
+            
+            <app-view-entry id="highAltitudeTraining">
+                <app-view-entry-name i18n="@@stayDuration">Duration of Stay</app-view-entry-name>
+                <app-view-entry-value *appLet="(sample.altitudeTraining?.start | duration:sample.altitudeTraining?.end) as duration">
+                    <ng-container *ngIf="duration !== null" >
+                        <ng-container [ngSwitch]="duration">
+                            <span *ngSwitchCase="1" i18n="@@xDay">{{duration}} day</span>
+                            <span *ngSwitchDefault i18n="@@xDays">{{duration}} days</span>
+                        </ng-container>
+                    </ng-container>
+                </app-view-entry-value>
+            </app-view-entry>
+        </ng-container>
+        
+        <app-view-entry id="hasHighAltitudeSimulation">
+            <app-view-entry-name
+                i18n="@@athleteUsedAltitudeSimulation_bpView"
+                [invalid]="missingFields | setHas:'hasHighAltitudeSimulation'"
+                [required]="required">Has the athlete used any form of <strong>altitude simulation</strong>, such as a hypoxic tent, mask, etc during the <strong>previous two weeks</strong>?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.hasHighAltitudeSimulation"></app-view-entry-yes-no>
+        </app-view-entry>
+        
+        <ng-container *ngIf="sample.hasHighAltitudeSimulation">
+            <app-view-entry id="highAltitudeSimulation">
+                <app-view-entry-name
+                    i18n="@@deviceType"
+                    [invalid]="missingFields | setHas:'altitudeSimulation.deviceType'"
+                    [required]="required">Type of Device</app-view-entry-name>
+                <app-view-entry-value>{{ sample.altitudeSimulation?.deviceType }}</app-view-entry-value>
+            </app-view-entry>
+            
+            <app-view-entry id="highAltitudeSimulation">
+                <app-view-entry-name
+                    i18n="@@useManner"
+                    [invalid]="missingFields | setHas:'altitudeSimulation.useManner'"
+                    [required]="required">Manner of use (frequency, duration, intensity, etc)</app-view-entry-name>
+                <app-view-entry-value>{{ sample.altitudeSimulation?.useManner }}</app-view-entry-value>
+            </app-view-entry>
+        </ng-container>
+        
+        <app-view-entry id="hasBloodLoss">
+            <app-view-entry-name
+                i18n="@@athleteDonatedBloodLossOrLostBlood_bpView"
+                [invalid]="missingFields | setHas:'hasBloodLoss'"
+                [required]="required">Has the athlete <strong>donated blood or lost blood</strong> as a result of medical or emergency condition during the <strong>previous three months</strong>?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.hasBloodLoss"></app-view-entry-yes-no>
+        </app-view-entry>
+        
+        <ng-container *ngIf="sample.hasBloodLoss">
+            <app-view-entry id="bloodLoss">
+                <app-view-entry-name
+                    i18n="@@when"
+                    [invalid]="missingFields | setHas:'bloodDonationOrLoss.timeBloodLoss'"
+                    [required]="required">When</app-view-entry-name>
+                <app-view-entry-value>{{ sample.bloodDonationOrLoss?.timeBloodLoss }}</app-view-entry-value>
+            </app-view-entry>
+            
+            <app-view-entry id="bloodLoss">
+                <app-view-entry-name
+                    i18n="@@bloodLossCause"
+                    [invalid]="missingFields | setHas:'bloodDonationOrLoss.cause'"
+                    [required]="required">Cause of the Blood Loss</app-view-entry-name>
+                <app-view-entry-value>{{ sample.bloodDonationOrLoss?.cause }}</app-view-entry-value>
+            </app-view-entry>
+           
+            <app-view-entry id="bloodLoss">
+                <app-view-entry-name
+                    i18n="@@estimatedBloodVolume"
+                    [invalid]="missingFields | setHas:'bloodDonationOrLoss.volumeBloodLoss'"
+                    [required]="required">Estimated Volume of Blood (ml)</app-view-entry-name>
+                <app-view-entry-value>{{ sample.bloodDonationOrLoss?.volumeBloodLoss }}</app-view-entry-value>
+            </app-view-entry>
+        </ng-container>
+        
+        <app-view-entry id="hasBloodTransfusion">
+            <app-view-entry-name
+                i18n="@@athleteHadBloodTransfusionLastThreeMonths_bpView"
+                [invalid]="missingFields | setHas:'hasBloodTransfusion'"
+                [required]="required">Has the athlete <strong>given or received any blood</strong> transfusion(s) during the <strong>previous three months</strong>?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.hasBloodTransfusion"></app-view-entry-yes-no>
+        </app-view-entry>
+        
+        <ng-container *ngIf="sample.hasBloodTransfusion">
+            <app-view-entry id="transfusion">
+                <app-view-entry-name
+                    i18n="@@when"
+                    [invalid]="missingFields | setHas:'bloodTransfusion.timeBloodTransfusion'"
+                    [required]="required">When</app-view-entry-name>
+                <app-view-entry-value>{{ sample.bloodTransfusion?.timeBloodTransfusion }}</app-view-entry-value>
+            </app-view-entry>
+            
+            <app-view-entry id="transfusion">
+                <app-view-entry-name
+                    i18n="@@estimatedBloodVolume"
+                    [invalid]="missingFields | setHas:'bloodTransfusion.volumeBloodTransfusion'"
+                    [required]="required">Estimated Volume of Blood (ml)</app-view-entry-name>
+                <app-view-entry-value>{{ sample.bloodTransfusion?.volumeBloodTransfusion }}</app-view-entry-value>
+            </app-view-entry>
+        </ng-container>
+        
+        <app-view-entry id="exposedToExtremeConditions">
+            <app-view-entry-name
+                i18n="@@athleteExposedToExtremeEnvironmentLastTwoHours_bpView"
+                [invalid]="missingFields | setHas:fields.ExtremeEnvironment"
+                [required]="required">Has the Athlete been exposed to <strong>any extreme environmental conditions</strong> in the <strong>2 hours</strong> prior to blood sample collection?</app-view-entry-name>
+            <app-view-entry-yes-no [yes]="sample.extremeEnvironment"></app-view-entry-yes-no>
+        </app-view-entry>
+    </app-view-subsubsection>
+
+    <app-sample-management-view
+        [hasSampleManagementReader]="hasSampleManagementReader"
+        [sampleManagementSamplesInfo]="sampleManagementSamplesInfo">
+    </app-sample-management-view>
+</app-view-section-content>

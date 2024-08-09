@@ -1,0 +1,83 @@
+<app-popover
+    appInheritDir
+    wantedPlacement="bottom"
+    (closePopover)="onClose()"
+    (openPopover)="onOpen()">
+
+    <ng-container>
+        <div class="link__changeStatus fake-link" i18n="@@change">Change</div>
+    </ng-container>
+
+    <div popover-title class="popover__title">
+        <span i18n="@@changeTestingOrderNumber_uppercase">CHANGE TESTING ORDER NUMBER</span>
+    </div>
+
+    <div popover-body class="popover-body">
+        <label class="primary__message" i18n="@@changeTestingOrderNumberXQuestion">
+            Are you sure you want to change Testing Order number {{currentTestingOrderId}}?
+        </label>
+        <form appInheritDir *ngIf="isPopoverActive" [formGroup]="form">
+            <app-modal-field [columns]="columns" [hasAsterisk]="true">
+                <label class="secondary__message" for="testingOrder" i18n="@@newTestingOrderNumber">New Testing Order Number</label>
+                <div field-input>
+                    <app-to-typeahead
+                        appRandomizeInput
+                        appRestrictToPattern="^[0-9]*$"
+                        dataQA="newTestingOrderNumberTypeahead"
+                        fieldId="testingOrderNumber"
+                        formControlName="testingOrder"
+                        suggestionField="testingOrderNumber"
+                        [isStartingFocus] = true
+                        [tos]="testingOrders$"
+                        (inputFocus)="setTOWarning($event, true)"
+                        (keyup)="setTOWarning($event.target.value, true)"
+                        (selected)="selectedTOItem($event)">
+                    </app-to-typeahead>
+                    <span *ngIf="loadingTOs$ | async" class="loading-animation">
+                        <img alt="Loading Icon" class="loading-img" i18n-alt="@@loadingIcon" src="assets/loading.png">
+                    </span>
+                </div>
+                <span
+                    field-warning
+                    *ngIf="showTOWarning"
+                    i18n="@@changeTestingOrderNumberOverrideWarning">
+                    Assigning this Doping Control Form to a Testing Order will override some DCF fields with the values from the Testing Order.
+                </span>
+            </app-modal-field>
+            
+            <label>
+                <span i18n="@@reason" class="secondary__message">Reason</span><span class="field-asterisk" [class.error]="textareaReasonHasErrors">*</span>
+            </label>
+            
+            <div field-error *ngIf="textareaReasonHasErrors" class="div__errorReasonMandatory" i18n="@@pleaseEnterAValue">Please enter a value.</div>
+            
+            <textarea
+                #textareaReason
+                field-input
+                class="textarea__reason"
+                fieldId="reason"
+                formControlName="reason"
+                maxlength="4000"
+                rows="8"
+                [class.error]="textareaReasonHasErrors">
+            </textarea>
+        </form>
+
+        <div correction-form-buttons class="popover-buttons">
+            <app-button
+                class="button"
+                type="primary"
+                [class.disabled]="!isTextAreaActive || isReasonEmpty"
+                [disabled]="!isTextAreaActive || isReasonEmpty"
+                (click)="bindDCFToTestingOrder()">
+                <span i18n="@@yesChangeTestingOrder_uppercase">YES, CHANGE TESTING ORDER</span>
+            </app-button>
+            <app-button
+                class="button"
+                type="secondary"
+                (click)="requestClose()">
+                <span i18n="@@cancel_uppercase">CANCEL</span>
+            </app-button>
+        </div>
+    </div>
+</app-popover>

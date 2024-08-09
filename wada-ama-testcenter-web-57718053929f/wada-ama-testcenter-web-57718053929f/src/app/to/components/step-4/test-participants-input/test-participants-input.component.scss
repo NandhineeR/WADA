@@ -1,0 +1,56 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/lime-pie-bar';
+$error-color: #AA1A1A;
+
+.mat-header-row:first-of-type {
+    background: inherit !important;
+}
+
+input.firstName, app-typeahead.lastName {
+    width: 120px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.field-info {
+    font-size: 0.9rem;
+    display: block;
+}
+
+.marginTop {
+    margin-top: 20px;
+}
+
+.doubleMarginTop {
+    margin-top: 40px;
+}
+
+.message {
+    margin-top: 25px
+}
+
+textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 20px;
+    resize: both;
+}
+
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.error {
+    border: 2px solid $error-color;
+}
+
+.no-pointer-events {
+    pointer-events: none;
+}

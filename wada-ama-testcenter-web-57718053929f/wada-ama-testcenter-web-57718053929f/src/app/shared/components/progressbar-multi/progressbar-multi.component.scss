@@ -1,0 +1,76 @@
+@import '~sass/mixins';
+
+:host {
+    display: block;
+}
+
+@mixin progressbar($left, $right) {
+    margin: 10px;
+
+    .stacked-bar-graph {
+        height: 15px;
+        overflow: hidden;
+        border: 1px solid black;
+        background-color: white;
+
+        span {
+            box-sizing: border-box;
+            float: $left;
+            height: 100%;
+        }
+    }
+
+    .scale {
+        td {
+            height: 4px;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+        }
+        table {
+            position: relative;
+            width: 100%;
+            margin-top: -3px;
+        }
+    }
+
+    .legend {
+        .left-legend {
+            font-size: 7.5px;
+            color: #414041;
+            float: $left;
+        }
+
+        .right-legend {
+            font-size: 7.5px;
+            color: #414041;
+            float: $right;
+        }
+    }
+
+    .bar {
+        position: relative;
+        background-color: #3f8532;
+        border: 1px solid white;
+        width: 4px;
+        height: 24px;
+        margin-top: -20px;
+        #{$left}: -2px;
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include progressbar(left, right);
+
+        .only-rtl {
+            display: none;
+        }
+    }
+    @include rtl {
+        @include progressbar(right, left);
+
+        .only-ltr {
+            display: none;
+        }
+    }
+}

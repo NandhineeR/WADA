@@ -1,0 +1,32 @@
+<div appInheritDir class="wrapper">
+    <input
+        #inputRef
+        autocomplete="disabled"
+        type="text"
+        [attr.data-qa]="dataQA"
+        [class.error]="hasError"
+        [id]="fieldId"
+        [ngModel]="dateDisplayed"
+        (blur)="onBlur($event)"
+        (focus)="onFocus($event)"
+        (keydown.enter)="onEnterKeydown()"
+        (click)="onClickInput()"/>
+    <div
+        #calendarDiv
+        class="div-calendar">
+        <app-calendar
+            #calendar
+            appClickOutside
+            *ngIf="showCalendar || inline"
+            id="calendar"
+            [class.error]="hasError"
+            [date]="selectedDate || today"
+            [locale]="locale"
+            [maxDate]="maxDate"
+            [minDate]="minDate"
+            [verifyClickCoordinates]="true"
+            (clickOutside)="closeCalendar()"
+            (selectedDate)="selectDate($event)">
+        </app-calendar>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+<div
+    appInheritDir
+    class="wrapper"
+    [@fadeInOut]
+    [formGroup]="formGroup">
+    <div class="titleColor non-conformity-header">
+        <label i18n="@@nonConformityX">Non-Conformity&nbsp;{{ nonConformityIndex + 1 }}</label>
+        <div class="delete-non-conformity-wrapper" (click)="onDeleteNonConformity()">
+            <img
+                #deleteNonConformity
+                alt="Delete Non-Conformity"
+                class="delete-non-conformity"
+                i18n-alt="@@deleteNonConformity"
+                src="assets/delete.svg"
+                tabindex="0"
+                (keydown.enter)="onDeleteNonConformity()"/>
+        </div>
+    </div>
+    <app-form-field [hasAsterisk]="true" [hasError]="categoryOfNonConformityHasErrors">
+        <label for="category" i18n="@@nonConformityCategory">Category of Non-Conformity</label>
+        <div field-input class="dropdown">
+            <app-dropdown
+                field-input
+                dataQA="nonConformityCategoryDropdown"
+                formControlName="category"
+                i18n-placeholder="@@nonConformityCategory"
+                id="category{{nonConformityIndex}}"
+                placeholder="Category of Non-Conformity"
+                property="id"
+                type="text"
+                [appDisable]="controls.NON_CONFORMITIES | isInputDisabled:fieldsSecurity:isEditMode"
+                [class.error]="categoryOfNonConformityHasErrors"
+                [isDisabled]="controls.NON_CONFORMITIES | isInputDisabled:fieldsSecurity:isEditMode">
+                <div
+                    *ngFor="let item of nonConformityCategories; let i = index"
+                    class="dropdown-item"
+                    data-qa="nonConformityCategoryDropdownOption"
+                    [appDropdownElement]="item"
+                    [attr.data-qa-precision]="i">
+                    {{ item.description }}
+                </div>
+            </app-dropdown>
+        </div>
+    </app-form-field>
+    <app-form-field>
+        <label i18n="@@nonConformityDescription">Description of Non-Conformity</label>
+        <textarea
+            field-input
+            formControlName="description"
+            id="nonConformityDescription{{nonConformityIndex}}"
+            maxlength="4000"
+            [appDisable]="controls.NON_CONFORMITIES | isInputDisabled:fieldsSecurity:isEditMode">
+        </textarea>
+    </app-form-field>
+</div>

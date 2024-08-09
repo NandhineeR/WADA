@@ -1,0 +1,18 @@
+<div [class.error-field-name]="invalid">
+    <ng-content></ng-content>
+
+    <ng-container *ngIf="hasCheck; else requiredCheck">
+        <span *ngIf="!hasError" class="complete">
+            <img src="assets/saved.svg" alt="saved">
+        </span>
+        <span *ngIf="hasError" class="missing-field">
+            <span class="inner-circle">
+                <img src="assets/error.svg" alt="error">
+            </span>
+        </span>
+    </ng-container>
+
+    <ng-template #requiredCheck>
+        <span *ngIf="required !== false" [class.error-field]="invalid !== false" [class.valid-field]="!invalid"> *</span>
+    </ng-template>
+</div>

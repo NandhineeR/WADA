@@ -1,0 +1,42 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/lime-pie-bar';
+
+$border-color: #999;
+
+@mixin step($left, $right) {
+    .limePieHeader {
+        @include bar($left, $right);
+
+        margin-top: 20px;
+
+        .remove-margin {
+            margin-bottom: 0px !important;
+        } 
+    }
+} 
+
+.wrapper {
+    @include step(left, right);
+
+    .notifications {
+        margin: 20px;
+    }
+
+    accordion {
+        margin: 20px;
+    }
+}
+
+::ng-deep .card-header {
+    padding: 0em;
+}
+
+::ng-deep .card-body {
+    padding: 0 0 1.25rem 0;
+}
+
+::ng-deep .modal__messages {
+    margin-left: 0px !important;
+}

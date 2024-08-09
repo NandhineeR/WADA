@@ -1,0 +1,31 @@
+$table-border-width: 3px;
+$table-border-color: #c0c0c0;
+
+.add-placeholder-table__wrapper {
+    width: 1500px;
+    .link {
+        text-decoration: underline;
+        margin-left: 15px;
+        cursor: pointer;
+    }
+
+    .columnStyle {
+        width: 300px;
+        display: inline-block;
+    }
+
+    .margin-right {
+        margin-right: 30px;
+    }
+}
+
+.input-placeholder {
+    border: 1px solid #757575;
+    color: #414042;
+    border-radius: 5px;
+    padding: 0 6px;
+}
+
+::ng-deep .table-container {
+    margin: 20px !important;
+}

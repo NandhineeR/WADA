@@ -1,0 +1,85 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/components/notification/mixins';
+@import '~~app/shared/styles/radio';
+
+$green: #3F8532;
+$error-color: #AA1A1A;
+
+@mixin step($left, $right) {
+    .error-link-list {
+        @include notification-error-list($left, $right);
+    }
+
+    input.error {
+        border: 2px solid $error-color;
+    }
+
+    app-participant-input {
+        margin-bottom: 12px;
+    }
+
+    app-form-field {
+        margin-bottom: 12px;
+
+        &:first-of-type {
+            margin-top: 20px;
+        }
+    }
+
+    .field-info {
+        font-size: 0.9rem;
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    input[type="text"] {
+        width: 60%;
+    }
+
+    app-typeahead,
+    app-dropdown,
+    app-date-input {
+        width: 60%;
+        display: block;
+    }
+
+    .lastName {
+        width: 100%;
+    }
+
+    input.firstName {
+        width: 100%;
+    }
+
+    .radio-container {
+        @include radio($left, $right);
+    }
+
+    .button-placement {
+        padding-left: 35px;
+    }
+
+    .text-padding {
+        padding-bottom: 20px;
+    }
+
+    .note {
+        width: 100%;
+        max-width: 100%;
+        max-height: 30%;
+    }
+}
+
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+
+    @include rtl {
+        @include step(right, left);
+    }
+}

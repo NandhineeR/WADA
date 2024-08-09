@@ -1,0 +1,159 @@
+<div class="wrapper" *appLet="isFilterCollapsed$ | async as isFilterCollapsed" [class.expanded]="!isFilterCollapsed" appInheritDir>
+    <app-collapse-button
+        dataQA="filtersAppCollapseButton"
+        [collapsed]="isFilterCollapsed"
+        (click)="toggleCollapse()">
+        <span class="expand-text" i18n="@@filters">Filters</span>
+    </app-collapse-button>
+    <div *ngIf="isFilterCollapsed">
+        <div class="container table-row">
+            <div class="row">
+                <div class="col-sm-2">
+                    <span class="minimal-info minimal-info-label" i18n="@@dateOfRange">Date of Range</span>
+                </div>
+                <div class="col-sm-4">
+                    &lrm;<span class="minimal-info">{{ displayDate(daterange.value.from) }} <span i18n="@@to_lowercase">to</span> {{ displayDate(daterange.value.to) }}</span>&lrm;
+                    <span *ngIf="!isYearMode">
+                        <ng-container [ngSwitch]="daterange.value.quickFilter">
+                            <span *ngSwitchCase="'custom'" i18n="@@custom_parentheses" class="minimal-info">(Custom)</span>
+                            <span *ngSwitchCase="'yearToDate'" i18n="@@yearToDate_parentheses" class="minimal-info">(Year to Date)</span>
+                            <span *ngSwitchDefault></span>
+                        </ng-container>
+                    </span>
+                    <span class="minimal-info" *ngIf="isYearMode" i18n="@@x_parentheses">({{ daterange.value.quickFilter.displayName }})</span>&lrm;
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <span class="minimal-info minimal-info-label" i18n="@@athleteLevel">Athlete Level</span>
+                </div>
+                <div class="col-sm-4">
+                    <span *ngIf="athleteInternational.value" class="minimal-info" i18n="@@international">International</span>
+                    <span *ngIf="athleteInternational.value && (athleteNational.value || athleteOther.value)" class="minimal-info" i18n="@@tdssa_commaSpace">, </span>
+                    <span *ngIf="athleteNational.value" class="minimal-info" i18n="@@national">National</span>
+                    <span *ngIf="athleteNational.value && athleteOther.value" class="minimal-info" i18n="@@tdssa_commaSpace">, </span>
+                    <span *ngIf="athleteOther.value" class="minimal-info" i18n="@@other">Other</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <span class="minimal-info minimal-info-label" i18n="@@testType">Test Type</span>
+                </div>
+                <div class="col-sm-4">
+                    <span *ngIf="testTypeInCompetition.value" class="minimal-info" i18n="@@inCompetition">In Competition</span>
+                    <span *ngIf="testTypeInCompetition.value && testTypeOutCompetition.value" class="minimal-info" i18n="@@tdssa_commaSpace">, </span>
+                    <span *ngIf="testTypeOutCompetition.value" class="minimal-info" i18n="@@outOfCompetition">Out of Competition</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <span class="minimal-info minimal-info-label" i18n="@@sportNationality">Sport Nationality</span>
+                </div>
+                <div class="col-sm-4">
+                    <span *ngFor="let item of sportNationality?.value; let i = 'index + 1'" class="minimal-info">{{ item.name }}<span *ngIf="i < sportNationality.value?.length" i18n="@@tdssa_commaSpace">, </span>
+                    </span>
+                    <span *ngIf="sportNationality.value?.length === 0" class="minimal-info" i18n="@@all">All</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!isFilterCollapsed">
+        <form
+            id="tdssaFiltersForm"
+            novalidate
+            [formGroup]="form">
+            <div class="form-group">
+                <div class="filter-group">
+                    <app-daterange
+                        id="daterange"
+                        type="text"
+                        class="form-control"
+                        formControlName="daterange"
+                        [dateFormat]="dateFormat"
+                        [hasError]="daterange.invalid"
+                        (valueChanged)=onDateRangeSelected($event)>
+                    </app-daterange>
+                    <div class="invalid-feedback">
+                        <span *ngIf="daterange.errors?.required" i18n="@@pleaseProvideADaterange">Please provide a date range.</span>
+                        <span *ngIf="daterange.errors?.fromRequired" i18n="@@pleaseProvideADateForFrom">Please provide a date for from.</span>
+                        <span *ngIf="daterange.errors?.toRequired" i18n="@@pleaseProvideADateForTo">Please provide a date for to.</span>
+                    </div>
+                </div>
+
+                <div class="checkbox-group filter-group">
+                    <h6 class="group-title" i18n="@@athleteLevel">Athlete Level</h6>
+                    <div>
+                        <input
+                            id="athlete-international"
+                            type="checkbox"
+                            formControlName="athleteInternational"
+                            [hasError]="athleteInternational.invalid"
+                            (ngModelChange)="onAthleteInternationalSelected($event)"
+                        />
+                        <label for="athlete-international" data-qa="internationalAthLevelCheckbox" i18n="@@international">International</label>
+                    </div>
+                    <div>
+                        <input
+                            id="athlete-national"
+                            type="checkbox"
+                            formControlName="athleteNational"
+                            [hasError]="athleteNational.invalid"
+                            (ngModelChange)="onAthleteNationalSelected($event)"
+                        />
+                        <label for="athlete-national" data-qa="nationalAthLevelCheckbox" i18n="@@national">National</label>
+                    </div>
+                    <div>
+                        <input
+                            id="athlete-other"
+                            type="checkbox"
+                            formControlName="athleteOther"
+                            [hasError]="athleteOther.invalid"
+                            (ngModelChange)="onAthleteOtherSelected($event)"
+                        />
+                        <label for="athlete-other" data-qa="otherAthLevelCheckbox" i18n="@@other">Other</label>
+                    </div>
+                </div>
+                <div class="checkbox-group filter-group">
+                    <h6 class="group-title" i18n="@@testType">Test Type</h6>
+                    <div>
+                        <input
+                            id="test-type-in-competition"
+                            type="checkbox"
+                            formControlName="testTypeInCompetition"
+                            [hasError]="testTypeInCompetition.invalid"
+                            (ngModelChange)="onTestTypeInCompetitionSelected($event)"
+                        />
+                        <label for="test-type-in-competition" data-qa="inCompetitionTestTypeCheckbox" i18n="@@testType_inCompetition">In Competition</label>
+                    </div>
+                    <div>
+                        <input
+                            id="test-type-out-competition"
+                            type="checkbox"
+                            formControlName="testTypeOutCompetition"
+                            [hasError]="testTypeOutCompetition.invalid"
+                            (ngModelChange)="onTestTypeOutCompetitionSelected($event)"
+                        />
+                        <label for="test-type-out-competition" data-qa="outOfCompetitionTestTypeCheckbox" i18n="@@outOfCompetition">Out of Competition</label>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h6 class="group-title" i18n="@@sportNationality">Sport Nationality</h6>
+                    <app-multi-typeahead
+                        id="multi-state"
+                        class="standard-field"
+                        suggestionField="name"
+                        placeholder="Nationality"
+                        dataQA="sportNationalityTypeahead"
+                        [preSelectedItem]="sportNationality.value"
+                        [suggestions]="loadSuggestions"
+                        [itemTemplate]="Country"
+                        [maxTags]=10
+                        formControlName="sportNationality"
+                        [hasError]="sportNationality.invalid"
+                        (selected)=onSportNationalitySelected($event)>
+                    </app-multi-typeahead>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

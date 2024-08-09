@@ -1,0 +1,87 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+
+$text-color: #414042;
+$arrow-size: 20px;
+$border-width: 2px;
+$popup-background: white;
+
+// The tooltip styles
+.tooltip__content {
+    position: fixed;
+    display: block;
+    z-index: 10000000;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    white-space: normal;
+    color: $text-color;
+    max-width: 400px;
+    border: $border-width solid $primary-background;
+
+    @include ltr {
+        text-align: left;
+    }
+    @include rtl {
+        text-align: right;
+    }
+
+    // White background over rotated square (arrow)
+    .tooltip__content-inner {
+        width: 100%;
+        height: 100%;
+        padding: 15px 20px;
+        margin: 0;
+        border-radius: 5px;
+        border: 0px;
+        background: $popup-background;
+    }
+
+    // Rotated square (arrow)
+    &:before {
+        content: '';
+        position: absolute;
+        width: $arrow-size;
+        height: $arrow-size;
+        border: $border-width solid $primary-background;
+        background: $popup-background;
+        z-index: -1; // just below white background but over tooltip__content
+    }
+
+    &.tooltip__top {
+        z-index: 1000000;
+        transform: translateX(-50%) translateY(calc(#{-$arrow-size / 1.4} - 100%));
+        &:before {
+            left: 50%;
+            top: 100%;
+            transform: translateX(-50%) translateY(-$arrow-size / 2.1) rotate(45deg);
+        }
+    }
+
+    &.tooltip__bottom {
+        transform: translateX(-50%) translateY($arrow-size / 1.4);
+        &:before {
+            left: 50%;
+            bottom: 100%;
+            transform: translateX(-50%) translateY($arrow-size / 2.1) rotate(45deg);
+        }
+    }
+
+    &.tooltip__left {
+        transform: translateX(calc(-100% - #{$arrow-size / 1.4})) translateY(-50%);
+        &:before {
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%) translateX(-$arrow-size / 2.1) rotate(45deg)
+        }
+    }
+
+    &.tooltip__right {
+        transform: translateX($arrow-size / 1.4) translateY(-50%);
+        &:before {
+            top: 50%;
+            right: 100%;
+            transform: translateY(-50%) translateX($arrow-size / 2.1) rotate(45deg)
+        }
+    }
+}

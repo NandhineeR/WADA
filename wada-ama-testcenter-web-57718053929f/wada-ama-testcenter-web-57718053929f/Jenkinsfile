@@ -1,0 +1,612 @@
+import groovy.json.JsonOutput
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Random
+import java.util.regex.Pattern
+import java.util.regex.Matcher
+
+/*
+ * initialize the pipeline
+ */
+def environmentType = (env.TARGET_ENVIRONMENT == 'prod') ? 'production' : 'testing'
+def targetEnv = "${params.TARGET_ENV}" != "null" ? "${params.TARGET_ENV}" : "none";
+def isEnableSourceMap = params.ENABLE_SOURCE_MAP;
+def randomNumber = new Random().nextInt(10*100)
+def namespace = (env.TARGET_ENV == 'prod') ? 'testcenter' : "${params.TARGET_ENV}" //prod isn't using 'prod' as namespace :\
+
+def KUBE_CONFIG_FILE = "bcd41025-efbd-4c83-8af2-46f640af07c4"
+def STYRA_SYSTEM_ID = "a5697d91caf84840bff7a2ccddc0fd09"
+def NEXUS_VERSION = ""
+
+switch (targetEnv) {
+     case 'tc-int':
+     case 'tc-qa2':
+     case 'tc-qa1':
+        KUBE_CONFIG_FILE = "bcd41025-efbd-4c83-8af2-46f640af07c4" //aws eks cluster kube config file
+        STYRA_SYSTEM_ID = "d67bd77586bc4dc4b19de4391d63d67c"
+        AWS_CONFIG = "4dbaa28f-3f24-4d08-a26e-7febed0ffe88"
+        isEnableSourceMap = true
+        break;
+     case 'prod':
+        KUBE_CONFIG_FILE = "6c5a4738-b1e2-42e0-b5c0-a93454e4db10" //aws eks cluster kube config file
+        STYRA_SYSTEM_ID = "dd732460e56c45d0bca0e0ad1152a0f6"
+        AWS_CONFIG = "5dcab29f-7f21-9a08-b27f-8eab0d1dfe99"
+        isEnableSourceMap = false
+        break;
+    default:
+        KUBE_CONFIG_FILE = "bcd41025-efbd-4c83-8af2-46f640af07c4"
+}
+
+pipeline {
+    agent {
+        label 'deployment'
+    }
+    options {
+        timeout(time: 75, unit: 'MINUTES')
+        timestamps()
+    }
+    parameters {
+        choice(name: 'TARGET_ENV', choices: ['none', 'tc-qa1', 'tc-qa2', 'tc-int', 'prod'], description: 'Pick an environment (if deployment desired)')
+        booleanParam(name: 'ENABLE_SOURCE_MAP', defaultValue: false, description: 'Enable Source Map & Redux if the environment is none?')
+        booleanParam(name: 'SONAR_SCAN', defaultValue: true, description: 'Perform Sonar scan on build?')
+        booleanParam(name: 'SONAR_GATE', defaultValue: true, description: 'Fail build if Sonar Quality Gate fails?')
+        booleanParam(name: 'UI_TESTS', defaultValue: false, description: 'Perform Selenium UI tests on deployment?')
+    }
+
+     environment {
+        AWS_REGISTRY_URL = '814043437137.dkr.ecr.ca-central-1.amazonaws.com'
+        JIRA_SITE = 'wada-ama.atlassian.net'
+        NEXUS_CREDS = credentials('nexus-server')
+        STYRA_ORGANIZATION_ID = 'wada.svc.styra.com'
+        STYRA_TOKEN = credentials('styra-das')
+        ARTIFACT_GROUP = "com.cgi"
+        ARTIFACT_ID = "testcenter-webserver"
+        GIT_PROJECT = "ADAMS-NG"
+        GIT_REPOSITORY = "testcenter-web"
+        RANDOM_BUILD_NUMBER = VersionNumber([
+            versionNumberString : '${BUILD_DATE_FORMATTED,"yyDDD"}${BUILDS_TODAY,XX}',
+            projectStartDate : '1969-12-31',
+            versionPrefix: "${randomNumber}",
+            worstResultForIncrement: 'NOT_BUILT'
+          ])
+    }
+    stages {
+
+        stage('Version') {
+            when {
+                not { buildingTag() }
+            }
+            steps {
+                script{
+                    if (env.BRANCH_NAME || env.CHANGE_BRANCH) {
+                        env.SOURCE_NAME = (env.CHANGE_BRANCH) ? env.CHANGE_BRANCH : env.BRANCH_NAME
+
+                        if(SOURCE_NAME.startsWith("release/") || SOURCE_NAME.startsWith("master")) {
+                            env.REPOSITORY = 'ADAMS-Releases'
+                        } else {
+                            env.REPOSITORY = 'ADAMS-Snapshots'
+                        }
+
+                        env.SOURCE_URL = ""
+                        Pattern pattern = Pattern.compile("ADAPI-[0-9]*", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(SOURCE_NAME);
+                        if(matcher.find()){
+                            env.SOURCE_NAME = matcher.group();
+                            env.SOURCE_URL = "https://wada-ama.atlassian.net/browse/$SOURCE_NAME"
+                        }
+                    }
+                    nodejs(nodeJSInstallationName: 'Node 14.21.3', configId: 'npmrc-config') {
+                        env.TESTCENTER_WEB_VERSION = sh (script: '''node -p "require('./package.json').version"''', , returnStdout:true).trim()
+                        env.RELEASE_BUILD_NUMBER = env.RANDOM_BUILD_NUMBER
+                        sh "npm --no-git-tag-version version $TESTCENTER_WEB_VERSION-$RELEASE_BUILD_NUMBER"
+                    }
+                    env.BASE_VERSION = (env.REPOSITORY == 'ADAMS-Releases') ? "${env.TESTCENTER_WEB_VERSION}-RELEASE" : "${env.TESTCENTER_WEB_VERSION}-SNAPSHOT"
+                    env.VERSION_BUILD = "$BASE_VERSION-$RELEASE_BUILD_NUMBER"
+                    sh "sed -r \"s/testcenter-web\\:.*/testcenter-web:$VERSION_BUILD/\" -i kubernetes/base/deployment.yaml"
+                }
+            }
+        }
+
+        stage('Version (from Tag)') {
+            when {
+                buildingTag()
+            }
+            steps {
+                script {
+                    nodejs(nodeJSInstallationName: 'Node 14.21.3', configId: 'npmrc-config') {
+                        env.TESTCENTER_WEB_VERSION = sh (script: '''node -p "require('./package.json').version"''', , returnStdout:true).trim()
+                    }
+                    env.BASE_VERSION = gitTagMessage(TAG_NAME, 'BASE_VERSION')
+                    env.RELEASE_BUILD_NUMBER = gitTagMessage(TAG_NAME,'RELEASE_BUILD_NUMBER')
+                    env.VERSION_BUILD = "$BASE_VERSION-$RELEASE_BUILD_NUMBER"
+                    if(env.REPOSITORY == 'ADAMS-Snapshots') {
+                        env.NEXUS_VERSION  = gitTagMessage(TAG_NAME, 'NEXUS_VERSION')
+                    }
+                    env.NEXUS_FILE_PATH = gitTagMessage(TAG_NAME,'NEXUS_FILE_PATH')
+                    env.SOURCE_NAME = TAG_NAME //since now we are building from a Tag
+                    URL_ENCODED_TAG_NAME = java.net.URLEncoder.encode(TAG_NAME, "UTF-8")
+                    env.SOURCE_URL = "https://bitbucket.org/wada-ama/testcenter-web/commits/tag/$URL_ENCODED_TAG_NAME"
+                    sh "sed -r \"s/testcenter-web\\:.*/testcenter-web:$VERSION_BUILD/\" -i kubernetes/base/deployment.yaml"
+                }
+            }
+        }
+
+        stage('NPM Build') {
+            options {
+                timeout(time: 45, unit: 'MINUTES')
+            }
+            when {
+                beforeAgent true
+                not { buildingTag() }
+            }
+            agent {
+                dockerfile {
+                    label 'deployment'
+                    args '--network=host'
+                    additionalBuildArgs  '--network=host --target=agent --memory="5g" --memory-swap="7g"'
+                }
+            }
+            environment {
+                HOME = '.'
+            }
+            steps {
+                script {
+                    def envType = isEnableSourceMap ? 'testing' : 'production';
+
+                    env.BUILD_SCRIPT_COMMAND = "sh build-deploy.sh ${envType}"
+                }
+                nodejs(nodeJSInstallationName: 'Node 14.21.3', configId: 'npmrc-config') {
+                    sh(script: "${env.BUILD_SCRIPT_COMMAND}", label: "NPM Build", returnStatus: "true", returnStdout: "true")
+                }
+                stash name: 'zip', includes: 'server/testcenter-webserver.zip'
+                withCredentials([usernamePassword(credentialsId: 'build_agent_cloud', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    script {
+                        if (env.BRANCH_NAME.equals('develop')) {
+                            echo 'Building develop branch - checking for updates to messages.en.xlf'
+                            def GIT_DIFF = sh(returnStdout: true, script: 'git diff --name-only HEAD src/i18n/messages.en.xlf').trim()
+                            if(GIT_DIFF){
+                                sh "git add src/i18n/messages.en.xlf"
+                                sh "git commit -m 'ADAPI-1198 Proofreading file transformation'"
+                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/wada-ama/testcenter-web.git HEAD:refs/heads/develop"
+                            }
+                        } else {
+                            echo 'Not building develop branch - not checking for updates to messages.en'
+                        }
+                    }
+                }
+            }
+            post {
+                 always {
+                     jiraSendBuildInfo site: "${env.JIRA_SITE}", branch: "${env.BRANCH_NAME}"
+                 }
+
+                failure {
+                    buildDescription "Failed to build version ${TESTCENTER_WEB_VERSION}-${env.RELEASE_BUILD_NUMBER}"
+                }
+                success {
+                    buildDescription "Built version ${TESTCENTER_WEB_VERSION}-${env.RELEASE_BUILD_NUMBER}"
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            agent {
+                docker {
+                    label 'deployment'
+                    image 'sonarsource/sonar-scanner-cli'
+                    args '--network=host'
+                }
+            }
+            when {
+                beforeAgent true
+                allOf {
+                    not { buildingTag() }
+                    equals expected: "true", actual: "${params.SONAR_SCAN}"
+                }
+            }
+            steps {
+                // There are currently no unit tests on this project, so no coverage report.
+                // If unit tests exist, stash the coverage report and unstash it here.
+                //unstash name: 'coverage'
+                withSonarQubeEnv('WADA SonarQube') {
+                    sh "sonar-scanner"
+                }
+            }
+        }
+
+        stage("SonarQube Quality Gate") {
+            agent {
+                docker {
+                    label 'deployment'
+                    image 'sonarsource/sonar-scanner-cli'
+                    args '--network=host'
+                }
+            }
+            when {
+                beforeAgent true
+                allOf {
+                    not { buildingTag() }
+                    equals expected: "true", actual: "${params.SONAR_SCAN}"
+                    equals expected: "true", actual: "${params.SONAR_GATE}"
+                }
+            }
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    // the abortPipeline parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // a value of true = set pipeline to UNSTABLE, false = don't
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Styra DAS - Policy Checks'){
+            agent {
+                dockerfile {
+                    label 'deployment'
+                    dir '.dev/agent'
+                    args '--network=host'
+                    additionalBuildArgs "--network=host --build-arg NEXUS_USERNAME=\${NEXUS_CREDS_USR} --build-arg NEXUS_PASSWORD=\${NEXUS_CREDS_PSW}"
+                    reuseNode true
+                }
+            }
+            when {
+                not { buildingTag() }
+                not { equals expected: "none", actual: targetEnv }
+            }
+            steps {
+                sh "kustomize build kubernetes/$targetEnv > testcenter-web-all.yaml"
+                sh """
+                    echo 'checks:
+                            cluster:
+                              system_id: ${STYRA_SYSTEM_ID}
+                              files:
+                                - testcenter-web-all.yaml' > .styra.yaml
+                   """
+                script {
+                    try {
+                        sh "styra validate check-local -o output.json"
+                    } catch (Exception e) {
+                        sh "cat output.json  | jq .cluster.annotations[].title"
+                        error("Styra DAS left-check failed: "  + e.toString())
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            when {
+                not { buildingTag() }
+            }
+            steps {
+                unstash 'zip'
+                script {
+                    sh script: "docker build --network host --target run -t ${AWS_REGISTRY_URL}/wada/testcenter-web:$VERSION_BUILD .", label: "Docker Build"
+                }
+            }
+            post {
+                always {
+                    jiraSendBuildInfo site: "${env.JIRA_SITE}", branch: "${env.BRANCH_NAME}"
+                }
+            }
+        }
+
+        stage('Ship') {
+            when {
+                not { changeRequest() }
+            }
+            parallel {
+
+                stage('To Nexus') {
+                    when {
+                        not { buildingTag() }
+                    }
+                    environment {
+                        NEXUS_TOKEN = credentials('nexus-token')
+                        NEXUS_URL = "nxrm-aws-resiliency-service.nexusrepo.svc.cluster.local"
+                        NEXUS_CREDENTIALS = 'nexus-server'
+                        NEXUS_INSTANCE = 'nexus-rm'
+                    }
+                    steps {
+                        unstash 'zip'
+                        script {
+                            nexusArtifactUploader(
+                                    nexusVersion: 'nexus3',
+                                    protocol: 'http',
+                                    nexusUrl: "${NEXUS_URL}",
+                                    groupId: "${ARTIFACT_GROUP}",
+                                    version: "${BASE_VERSION}",
+                                    repository: "${env.REPOSITORY}",
+                                    credentialsId: "${NEXUS_CREDENTIALS}",
+                                    artifacts: [
+                                        [
+                                            artifactId: "${ARTIFACT_ID}",
+                                            type: "zip",
+                                            classifier: "",
+                                            file: "server/${ARTIFACT_ID}.zip"
+                                        ]
+                                    ])
+                            if(env.REPOSITORY == "ADAMS-Snapshots") {
+                                withCredentials([usernameColonPassword(credentialsId: 'nexus-server', variable: 'NEXUSCREDS')]) {
+                                    sh script: "curl -XGET 'http://nxrm-aws-resiliency-service.nexusrepo.svc.cluster.local/service/rest/v1/search?q=${env.TESTCENTER_WEB_VERSION}&repository=${env.REPOSITORY}&group=${ARTIFACT_GROUP}&name=${ARTIFACT_ID}&sort=version' -u $NEXUSCREDS  > nexus.json", label: "GET Nexus Version"
+                                    script {
+                                        def nexus = readJSON file: 'nexus.json'
+                                        env.NEXUS_VERSION = nexus['items'][0]['version']
+                                        env.NEXUS_FILE_PATH = (REPOSITORY == 'ADAMS-Releases') ? "${env.BASE_VERSION}/${ARTIFACT_ID}-${env.BASE_VERSION}.zip" : "${env.BASE_VERSION}/${ARTIFACT_ID}-${env.NEXUS_VERSION}.zip"
+
+                                    }
+                                }
+                            } else {
+                                env.NEXUS_VERSION = ""
+                                env.NEXUS_FILE_PATH = "${env.BASE_VERSION}/${ARTIFACT_ID}-${env.BASE_VERSION}.zip"
+                            }
+                        }
+                    }
+                }
+
+                stage('Push to ECR') {
+                    when {
+                        not { buildingTag() }
+                    }
+                    environment {
+                      REGISTRY_CREDS_ID = 'ecr:ca-central-1:AWS'
+                    }
+                    steps {
+                        withDockerRegistry(credentialsId: 'ecr:ca-central-1:AWS', url: "https://${AWS_REGISTRY_URL}") {
+                            sh script: "docker push  ${AWS_REGISTRY_URL}/wada/testcenter-web:$VERSION_BUILD", label: "Docker Push"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy approval') {
+            when {
+                anyOf {
+                    equals expected: "prod", actual: targetEnv;
+                }
+                not { changeRequest() }
+            }
+            steps {
+                script {
+                    timeout(time: 20, unit: 'MINUTES') {
+                        input message: "Should we deploy to ${targetEnv}?", ok: 'Yes', submitter: 'ACL_CDCI_PROD_DEPLOYER'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to EKS') {
+            when {
+                beforeAgent true
+                not { equals expected: "none", actual: targetEnv }
+                not { changeRequest() }
+            }
+            agent {
+                dockerfile {
+                    label 'deployment'
+                    dir '.dev/agent'
+                    args '--network=host --memory="1g" --memory-swap="1g"'
+                    additionalBuildArgs '--network=host'
+                    reuseNode true
+                }
+            }
+            steps {
+                configFileProvider([configFile(fileId: "$KUBE_CONFIG_FILE", targetLocation: 'config', variable: 'KUBE_CONFIG')]) {
+                    withAWS(credentials: "$AWS_CONFIG", region: 'ca-central-1')  {
+                        script {
+                            redisPassword = sh(script: "kubectl get secret -n kong kong-redis -o jsonpath=\"{.data.redis-password}\" --kubeconfig=config  | base64 -d", returnStdout: true)?.trim()
+                            sessionSecret = sh(script: "kubectl get secret openid-secret -n ${namespace} -o jsonpath=\"{.data.session_secret}\" --kubeconfig=config | base64 -d", returnStdout: true)?.trim()
+                            clientSecret  = sh(script: "kubectl get secret openid-secret -n ${namespace} -o jsonpath=\"{.data.client_secret}\" --kubeconfig=config  | base64 -d", returnStdout: true)?.trim()
+    
+                            wrap([$class: "MaskPasswordsBuildWrapper", varPasswordPairs: [[password: redisPassword], [password: clientSecret], [password: sessionSecret]]]) {
+                                sh ("yq e \'select(.config) | .config.session_redis_password = \"${redisPassword}\"\' -i kubernetes/base/openid-connect-plugin.yaml")
+                                sh ("yq e \'select(.config) | .config.session_secret = \"${sessionSecret}\"\' -i kubernetes/base/openid-connect-plugin.yaml")
+                                sh ("yq e \'select(.config) | .config.client_secret[0] = \"${clientSecret}\"\' -i kubernetes/base/openid-connect-plugin.yaml")
+                            }
+                        }
+                        sh "kustomize build kubernetes/$targetEnv | kubectl apply -f - --kubeconfig=config"
+                    }
+                }
+            }
+        }
+        stage('Validate Deployment') {
+            when {
+                beforeAgent true
+                not { equals expected: "none", actual: targetEnv }
+                not { changeRequest() }
+            }
+            agent {
+                dockerfile {
+                    label 'deployment'
+                    dir '.dev/agent'
+                    args '--network=host --memory="1g" --memory-swap="1g"'
+                    additionalBuildArgs '--network=host'
+                    reuseNode true
+                }
+            }
+            steps {
+                configFileProvider([configFile(fileId: "$KUBE_CONFIG_FILE", targetLocation: 'config', variable: 'KUBE_CONFIG')]) {
+                    withAWS(credentials: "$AWS_CONFIG", region: 'ca-central-1')  {
+                        script {
+                            sh "kubectl rollout status deployment testcenter-web-deployment --namespace ${namespace} --timeout=10m --kubeconfig config"
+                        }
+                    }
+                }
+            }
+            post {
+                failure {
+                    configFileProvider([configFile(fileId: "$KUBE_CONFIG_FILE", targetLocation: 'config', variable: 'KUBE_CONFIG')]) {
+                        withAWS(credentials: "$AWS_CONFIG", region: 'ca-central-1')  {
+                            script {
+                                sh "kubectl rollout undo deployment testcenter-web-deployment --namespace ${namespace} --kubeconfig config"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Selenium UI Tests") {
+            when {
+                beforeAgent true
+                allOf {
+                    not { equals expected: "none", actual: targetEnv }
+                    equals expected: "true", actual: "${params.UI_TESTS}"
+                }
+            }
+            agent {
+                dockerfile {
+                    label 'deployment'
+                    dir '.dev/selenium-ui-testrunner'
+                    args '--network=host'
+                    additionalBuildArgs '--network=host'
+                }
+            }
+            steps {
+                sh '/opt/bin/entry_point.sh &'
+                script {
+                    try {
+                        // The following will checkout the Selenium UI test suite and execute it against the ${targetEnv} TC-Web deployment
+
+                        withCredentials([usernamePassword(credentialsId: 'build_agent_cloud', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                            sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/wada-ama/testcenter-automation-tests.git"
+                        }
+                        sh "cd testcenter-automation-tests && git checkout master && mvn -q -Dremote=true -DtargetEnv=${targetEnv} test"
+                    } catch(err) {
+                        // if there are test failures - perform a rollback of the deployment on ${targetEnv}
+                        // the following commands rough-in the rollback logic:
+                        // configFileProvider([configFile(fileId: "$KUBE_CONFIG_FILE", targetLocation: 'config', variable: 'KUBE_CONFIG')]) {
+                        //     kubectl rollout undo deployment.v1.apps/testcenter-web-deployment -n ${targetEnv}
+                        // Note: TC-Web has a strong dependency on TC-API (which in turn relies on ADAMS BAPI)
+                        // This means that the UI tests could fail due to a problem with a down-stream service (TC-API or BAPI)
+                        // Remains to decide whether/how to test for, and react to, this situation
+                    }
+                }
+            }
+        }
+
+        stage("Update JIRA Deployment Info") {
+            when {
+                not { equals expected: "none", actual: targetEnv }
+            }
+            steps {
+                echo "Updating JIRA"
+            }
+            post {
+                always {
+                    script {
+                        jiraSendDeploymentInfo site: "${env.JIRA_SITE}", environmentId: "${params.TARGET_ENV}", environmentName: "${params.TARGET_ENV}", environmentType: "${environmentType}"
+                    }
+                }
+                failure {
+                    buildDescription "Failed to build version ${TESTCENTER_WEB_VERSION}-${env.RELEASE_BUILD_NUMBER} for ${params.TARGET_ENV}"
+                }
+                success {
+                    script {
+                        if(env.TAG_NAME) {
+                            buildDescription "Deploy from tag ${env.TAG_NAME} to ${params.TARGET_ENV}"
+                        } else {
+                            buildDescription "Built version ${TESTCENTER_WEB_VERSION}-${env.RELEASE_BUILD_NUMBER} for ${params.TARGET_ENV}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Update Confluence") {
+            when {
+                not { changeRequest() }
+                not { equals expected: "none", actual: targetEnv }
+            }
+            environment {
+                CONFLUENCE_API_URL = 'https://wada-ama.atlassian.net/wiki/rest/api'
+                CONTENT_ID = '2132082699'
+            }
+             steps {
+
+                withCredentials([usernameColonPassword(credentialsId: 'confluence-edit', variable: 'JIRACREDS')]) {
+                    sh script: "curl -XGET '${CONFLUENCE_API_URL}/content/${CONTENT_ID}?expand=body.storage,version' -u ${JIRACREDS} > confluence.json", label: "GET Confluence Content"
+                    sh script: "curl -XGET '${CONFLUENCE_API_URL}/content/${CONTENT_ID}/property/env' -u ${JIRACREDS} > metadata.json", label: "GET Confluence Metadata"
+
+                    script {
+                        //1 obtain current metadata
+                        def metadata = readJSON file: 'metadata.json'
+                        def metadataVersion = metadata['version']['number'] + 1
+                        def currentMetadata = metadata['value']
+
+                        //2 update specific element metadata
+                        def element = currentMetadata.find { it.env == targetEnv }
+
+                        element.build = RELEASE_BUILD_NUMBER
+                        element.nexus_version = NEXUS_VERSION
+                        element.version = BASE_VERSION
+                        element.image_tag = VERSION_BUILD
+                        element.source_name = SOURCE_NAME
+                        element.source_url = SOURCE_URL
+                        def now = LocalDateTime.now()
+                        element.date = now.format(DateTimeFormatter.ofPattern("EEE., MMM dd, yyyy"))
+                        element.time = now.format(DateTimeFormatter.ofPattern("hh:mm a"))
+
+                        wrap([$class: 'BuildUser']) {
+                            element.deploy_by = BUILD_USER
+                        }
+
+                        //3 - Update Metadata
+                        def metadataObject = [version:[number:metadataVersion], value: currentMetadata ] //confluence's own data format
+                        def metadataJson = JsonOutput.toJson(metadataObject)
+                        sh script: "curl -i -XPUT '${CONFLUENCE_API_URL}/content/${CONTENT_ID}/property/env' -u ${JIRACREDS}  -H 'Content-Type: application/json' -d '${metadataJson}'"
+
+
+                        //4 Generate HTML based on updated metadata
+                        def template = readFile '.dev/confluence/content.template'
+                        def result = renderTemplate(template, currentMetadata)
+
+                        //5 - Update Confluence Content
+                        def content = readJSON file: 'confluence.json'
+                        def version = content['version']['number'] + 1
+                        def current = content['body']['storage']['value']
+
+                        def updatedContent = "${result}"
+                        def payloadObject = [version:[number:version], type:'page', title:'TestCenter Web', body:[storage:[value:updatedContent, representation:'storage']]] //confluence's own data format
+                        def contentJson = JsonOutput.toJson(payloadObject)
+
+                        sh script: "curl -X PUT '${CONFLUENCE_API_URL}/content/${CONTENT_ID}' -u $JIRACREDS -H 'User-Agent: Mozilla/5.0' -H 'Content-Type: application/json' -H 'cache-control: no-cache' -d '${contentJson}'"
+                    }
+                }
+            }
+        }
+
+        stage('GIT Tag') {
+            when {
+                not { changeRequest() }
+                not { buildingTag() }
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'build_agent_cloud', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh "git tag builds/$VERSION_BUILD -m 'BASE_VERSION:$BASE_VERSION,RELEASE_BUILD_NUMBER:$RELEASE_BUILD_NUMBER,NEXUS_VERSION:$NEXUS_VERSION,NEXUS_FILE_PATH:$NEXUS_FILE_PATH,SOURCE_NAME:$SOURCE_NAME'"
+                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/wada-ama/testcenter-web.git builds/$VERSION_BUILD"
+                }
+            }
+        }
+    }
+}
+
+
+def renderTemplate(input, binding) {
+    def engine = new groovy.text.GStringTemplateEngine()
+    def template = engine.createTemplate(input).make([environments: binding])
+    return template.toString()
+}
+
+String gitTagMessage(name, key) {
+    msg = sh(script: "git tag -n10000 -l ${name}", returnStdout: true)?.trim()
+    String[] values = msg.substring(name.size()+1, msg.size()).split(",")
+    for (it in values) {
+        item = it.split(":")
+        if(item[0]==key) {
+            value = item[1]
+            return value
+        }
+    }
+    return null
+}

@@ -1,0 +1,42 @@
+<div class="header" appInheritDir>
+    <div class="status">
+        <span i18n="@@status_colon">Status: </span>
+        <ng-container [ngSwitch]="statusString">
+            <span *ngSwitchCase="'Draft'" i18n="@@draft" [ngClass]="statusClass">Draft</span>
+            <span *ngSwitchCase="'InCreation'" i18n="@@draft" [ngClass]="statusClass">Draft</span>
+            <span *ngSwitchCase="'Issued'" i18n="@@issued" [ngClass]="statusClass">Issued</span>
+            <span *ngSwitchCase="'Completed'" i18n="@@completed" [ngClass]="statusClass">Completed</span>
+            <span *ngSwitchCase="'Cancelled'" i18n="@@cancelled" [ngClass]="statusClass">Cancelled</span>
+            <span *ngSwitchDefault></span>
+        </ng-container>
+        <span class="spacer"></span>
+        <div *ngIf="isCompletable" class="options">
+            <span class="link__changeStatus fake-link" (click)="completeTO()" data-qa="completeTestingOrder">Complete</span>
+            <span *ngIf="isCancellable">&nbsp;or&nbsp;</span>
+        </div>
+        <app-cancel-modal
+            [isCancellable]="isCancellable"
+            (cancelEmitter)="cancelTO($event)"
+            [hasError]="hasDCFComplete">
+            <ng-container notifications>
+
+                <app-notification type="error" *ngIf="hasDCFComplete">
+                    <span i18n="@@dcfHasAlreadyBeenCompletedImpossibleToCancel">A DCF has already been completed for this test so it may not be cancelled.</span>
+                </app-notification>
+
+                <app-notification type="warning" *ngIf="testsWithDCFWarning.hasWarning()">
+                    <ng-container [ngSwitch]="testsWithDCFWarning.names.length">
+                        <span *ngSwitchCase="1" i18n="@@testCannotBeCancelledOpenDcfs">The following test cannot be cancelled because it has an open DCF:</span>
+                        <span *ngSwitchDefault i18n="@@testsCannotBeCancelledOpenDcfs">The following tests cannot be cancelled because they have open DCFs:</span>
+                    </ng-container>
+                    <ul>
+                        <li *ngFor="let name of testsWithDCFWarning.names">
+                            <span>{{name}}</span>
+                        </li>
+                    </ul>
+                </app-notification>
+            </ng-container>
+            <ng-container i18n="@@areYouSureCancelTestingOrder" field-label>Are you sure you want to cancel this Testing Order?</ng-container>
+        </app-cancel-modal>
+    </div>
+</div>

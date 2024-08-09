@@ -1,0 +1,46 @@
+@import '../../../../sass/mixins';
+
+$activeColor: #3f8532;
+$inactiveColor: #757575;
+$thickness: 2px;
+$stepWidth: 150px;
+$circleHeight: 50px;
+$maxNumberOfSteps: 10;
+
+@mixin stepsStyle($left, $right) {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    position: relative;
+
+    @for $i from 1 through $maxNumberOfSteps {
+        .hline-#{$i} {
+            position: absolute;
+            z-index: -1;
+            width: $stepWidth * ($i - 1);
+            top: $circleHeight / 2;
+            #{$left}: $stepWidth / 2;
+            border-top: $thickness solid $inactiveColor;
+        }
+    }
+
+    @for $i from 1 through $maxNumberOfSteps {
+        .hline-active-#{$i} {
+            position: absolute;
+            z-index: -1;
+            width: $stepWidth * ($i - 1);
+            top: $circleHeight / 2;
+            #{$left}: $stepWidth / 2;
+            border-top: $thickness solid $activeColor;
+        }
+    }
+}
+
+.steps {
+    @include ltr {
+        @include stepsStyle(left, right);
+    }
+    @include rtl {
+        @include stepsStyle(right, left);
+    }
+}

@@ -1,0 +1,143 @@
+<app-form-field
+    *ngIf="(
+        !this.editMailingAddress &&
+        (this.address && this.addressId?.value > 0) &&
+        (isMultipleDCF && !isMailingAddressFilled())
+    ); else editAddress"
+    columns="30% auto 30% min-content"
+    [hasAsterisk]="true"
+    [hasError]="countryHasErrors || cityHasErrors">
+    <span i18n="@@athleteMailingAddress">Athlete Mailing Address</span>
+    <app-info-bubble *ngIf="!isEditMode" i18n="@@defaultAddressTooltip">This is the last address on
+        record for the Athlete. This should be updated if the information from the Doping Control Form is more up to
+        date.</app-info-bubble>
+    <label field-input>{{ address.value | formatAddress }}</label>
+    <button
+        appAutofocus
+        field-input
+        *ngIf="!(controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode)"
+        class="text-button"
+        data-qa="editButton"
+        (click)="onEditMailingAddress()">Edit</button>
+</app-form-field>
+
+<ng-template #editAddress>
+    <div [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode" [formGroup]="address">
+
+        <app-form-field>
+            <span class="edit-title" i18n="@@athleteMailingAddress">Athlete Mailing Address</span>
+        </app-form-field>
+
+        <input formControlName="id" type="hidden">
+
+        <app-form-field [hasAsterisk]="true" [hasError]="countryHasErrors">
+            <label for="country" i18n="@@country">Country</label>
+            <app-typeahead
+                field-input
+                dataQA="countryTypeahead"
+                fieldId="country"
+                formControlName="country"
+                suggestionField="name"
+                [hasError]="countryHasErrors"
+                [suggestions]="countrySuggestions"
+                (selected)="selectCountry($event)">
+            </app-typeahead>
+            <div field-error *ngIf="countryHasErrors">
+                <span *ngIf="country?.errors?.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field>
+            <label for="streetAddress1" i18n="@@streetAddress1">Street Address 1</label>
+            <input
+                field-input
+                formControlName="streetAddress1"
+                id="streetAddress1"
+                maxlength=250
+                type="text">
+            <span field-info class="field-info" i18n="@@numberAndStreetPOBox">Number and street, PO Box</span>
+        </app-form-field>
+
+        <app-form-field>
+            <label for="streetAddress2" i18n="@@streetAddress2">Street Address 2</label>
+            <input
+                field-input
+                formControlName="streetAddress2"
+                id="streetAddress2"
+                maxlength=250
+                type="text">
+            <span field-info class="field-info" i18n="@@additionalAddressInfo">Additional address information</span>
+        </app-form-field>
+
+        <app-form-field>
+            <label for="building" i18n="@@building">Building</label>
+            <input
+                field-input
+                data-qa="building"
+                formControlName="building"
+                id="building"
+                type="text">
+        </app-form-field>
+
+        <app-form-field>
+            <label for="floor" i18n="@@floor">Floor</label>
+            <input
+                field-input
+                data-qa="floor"
+                formControlName="floor"
+                id="floor"
+                type="text">
+        </app-form-field>
+
+        <app-form-field>
+            <label for="room" i18n="@@room">Room</label>
+            <input
+                field-input
+                data-qa="room"
+                formControlName="room"
+                id="room"
+            type="text">
+        </app-form-field>
+
+        <app-form-field [hasAsterisk]="true" [hasError]="cityHasErrors">
+            <label for="city" i18n="@@city">City</label>
+            <input
+                field-input
+                data-qa="city"
+                formControlName="city"
+                id="city"
+                type="text"
+                [class.error]="cityHasErrors">
+            <div field-error *ngIf="cityHasErrors">
+                <span *ngIf="city?.errors?.invalid" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field>
+            <label for="region" i18n="@@region">Region</label>
+            <app-typeahead
+                field-input
+                dataQA="regionTypeahead"fieldId="region"
+                formControlName="region"
+                suggestionField="name"
+                [isDisabled]="(!((selectedCountryId$ | async) !== '')) || (controls.STATE | isInputDisabled:state?.security:state?.isEditMode)"
+                [suggestions]="regionSuggestions">
+            </app-typeahead>
+        </app-form-field>
+
+        <app-form-field [hasError]="zipCodeHasErrors">
+            <label for="zipCode" i18n="@@zipCode">Postal Code / ZIP</label>
+            <input
+                field-input
+                data-qa="postalCode"
+                appRestrictToPattern="[0-9a-zA-Z ]"
+                formControlName="zipCode"
+                id="zipCode"
+                type="text"
+                [class.error]="zipCodeHasErrors">
+            <div field-error *ngIf="zipCodeHasErrors">
+                <span *ngIf="zipCode.errors.pattern" i18n="@@onlyAcceptLettersNumbersBlanks">This field only accepts letters, numbers, blank spaces and hyphens.</span>
+            </div>
+        </app-form-field>
+    </div>
+</ng-template>

@@ -1,0 +1,105 @@
+<app-view-section [isLoading]="!notification">
+    <app-view-section-content appHideControl *ngIf="notification" [permissions]="whiteList">
+        <app-view-entry id="testNotification">
+            <app-view-entry-name
+                i18n="@@advanceNotice"
+                [invalid]="missingFields | setHas:fields.AdvanceNotice"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Advance Notice</app-view-entry-name>
+            <app-view-entry-value>
+                <ng-container [ngSwitch]="notification.advanceNotice">
+                    <div *ngSwitchCase="true" i18n="@@yes">Yes</div>
+                    <div *ngSwitchCase="false" i18n="@@no">No</div>
+                    <div *ngSwitchDefault>&nbsp;</div>
+                </ng-container>
+            </app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry *ngIf="notification.advanceNotice" id="testNotification">
+            <app-view-entry-name
+                i18n="@@advanceNoticeReason"
+                [invalid]="missingFields | setHas:fields.AdvanceNoticeReason"
+                [required]="true">Advance Notice Reason</app-view-entry-name>
+            <app-view-entry-value>
+                {{ notification.advanceNoticeReason }}
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="notifyingChaperone">
+            <app-view-entry-name
+                i18n="@@notifyingChaperone"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+                [invalid]="missingFields | setHas:fields.NotifyingChaperone">Notifying Chaperone</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="notification.notifyingChaperone"> {{ notification.notifyingChaperone!.lastName | formatParticipantName:notification.notifyingChaperone!.firstName }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+
+        <app-multiple-field-row-view
+            *ngIf="!isMultipleDCF"
+            dataQA="notificationDate"
+            id="testNotification"
+            [items]="[notification.timezone?.shortName]"
+            [mainItem]="notification.notificationDate | formatDatetime | uppercase">
+            <app-view-entry-name
+                i18n="@@notificationDate"
+                role="mainField"
+                [invalid]="missingFields | setHas:fields.NotificationDate"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Notification Date</app-view-entry-name>
+            <app-view-entry-name
+                i18n="@@timeZone"
+                role="field-0"
+                [invalid]="missingFields | setHas:fields.Timezone"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Time Zone</app-view-entry-name>
+        </app-multiple-field-row-view>
+        
+        <app-view-entry *ngIf="displayTimeSlotLabel()" id="60minTimeSlot">
+            <app-view-entry-name i18n="@@60minTimeSlot">60-min time slot</app-view-entry-name>
+            <app-view-entry-value>
+                <span i18n="@@yes" *ngIf="timeSlot" class="value">Yes</span>
+                <span i18n="@@no" *ngIf="!timeSlot" class="value">No</span>
+            </app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry id="country">
+            <app-view-entry-name i18n="@@country">Country</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="notification.country">{{ notification.country!.name }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry id="state">
+            <app-view-entry-name i18n="@@region">Region</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="notification.region">{{ notification.region!.name }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+
+        <app-view-entry id="city">
+            <app-view-entry-name i18n="@@city">City</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="notification.city">{{ notification.city }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="identificationDocumentInfo">
+            <app-view-entry-name i18n="@@identificationDocument">Identification Document</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="notification.identificationDocument">{{ notification.identificationDocument!.description }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry *ngIf="notification.identificationDocument?.specificCode === 'OTHER'" id="identificationDocumentType">
+            <app-view-entry-name i18n="@@documentType">Document Type</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="notification.identificationDocumentType">{{ notification.identificationDocumentType }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="testNotification">
+            <app-view-entry-name i18n="@@selectionCriteria">Selection Criteria</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="notification.selectionCriteria">{{ notification.selectionCriteria!.description }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+    </app-view-section-content>
+</app-view-section>

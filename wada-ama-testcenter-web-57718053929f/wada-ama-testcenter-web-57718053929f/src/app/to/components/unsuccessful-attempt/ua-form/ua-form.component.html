@@ -1,0 +1,503 @@
+<div
+    appInheritDir
+    appRandomizeInput
+    class="wrapper">
+    <div
+        *ngIf="form && ua"
+        class="form-body"
+        [formGroup]="form">
+        <div class="form-body-content">
+            <app-form-field>
+                <label i18n="@@adamsIdNumber">ADAMS ID Number</label>
+                <label field-input data-qa="adamsIdNumber">{{ ua?.adamsId }}</label>
+            </app-form-field>
+            
+            <app-form-field>
+                <label i18n="@@dateOfBirth">Date of Birth</label>
+                <label
+                    field-input
+                    data-qa="dateOfBirth"
+                    i18n="@@xDateOfBirth">{{ ua?.dateOfBirth | date :'dd MMM yyyy':'-0000' | uppercase }}</label>
+            </app-form-field>
+
+            <app-form-field>
+                <label i18n="@@age">Age</label>
+                <label
+                    field-input
+                    data-qa="age"
+                    i18n="@@xUAAthleteAge">{{ ua?.dateOfBirth | calculateAge }} years old</label>
+            </app-form-field>
+            
+            <app-form-field>
+                <label i18n="@@sportNationality">Sport Nationality</label>
+                <label field-input data-qa="sportNationality">{{ ua.sportNationality?.name || '' }}</label>
+            </app-form-field>
+            
+            <app-form-field>
+                <label i18n="@@sport">Sport</label>
+                <label field-input data-qa="sportDiscipline">{{ ua.test?.sportDiscipline?.displayDescriptionName || '' }}</label>
+            </app-form-field>
+            
+            <app-form-field>
+                <label i18n="@@testingOrderNumber">Testing Order Number</label>
+                <label field-input data-qa="testingOrderNumber">{{ ua.test.toNumber}}</label>
+            </app-form-field>
+            
+            <app-form-field>
+                <label i18n="@@testingAuthority">Testing Authority</label>
+                <label field-input data-qa="testingAuthority">{{ ua.test.testingAuthority?.displayDescriptionName || '' }}</label>
+            </app-form-field>
+            
+            <app-form-field>
+                <label i18n="@@sampleCollectionAuthority">Sample Collection Authority</label>
+                <label field-input data-qa="sampleCollectionAuthority">{{ ua.test.sampleCollectionAuthority?.displayDescriptionName || '' }}</label>
+            </app-form-field>
+            
+            <app-form-field
+                [hasAsterisk]="true"
+                [hasError]="resultManagementAuthorityHasErrors">
+                <label
+                    for="resultManagementAuthority"
+                    i18n="@@resultManagementAuthority">Result Management Authority</label>
+                <app-info-bubble
+                    i18n="@@resultManagementAuthorityTooltip">Please indicate the Anti-Doping Organization that will be responsible for determining whether or not this unsuccessful attempt may be a whereabouts failure.</app-info-bubble>
+                <app-typeahead
+                    field-input
+                    dataQA="resultManagementAuthorityTypeahead"
+                    fieldId="resultManagementAuthority"
+                    formControlName="resultManagementAuthority"
+                    suggestionField="displayDescriptionName"
+                    [hasError]="resultManagementAuthorityHasErrors"
+                    [isDisabled]="controls.TEST_RESULT_MANAGEMENT_AUTHORITY | isInputDisabled:fieldsSecurity:isEditMode"
+                    [suggestions]="resultManagementSuggestions">
+                </app-typeahead>
+                <div field-error *ngIf="resultManagementAuthorityHasErrors">
+                    <span *ngIf="resultManagementAuthority.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+            
+            <app-form-field>
+                <label i18n="@@testCoordinator">Test Coordinator</label>
+                <label field-input data-qa="testCoordinator">{{ ua.test.testCoordinator?.displayDescriptionName || '' }}</label>
+            </app-form-field>
+            
+            <app-form-field class="jump-section">
+                <label i18n="@@testType">Test Type</label>
+                <label field-input>
+                    <span
+                        *ngIf="ua.test.inCompetition"
+                        i18n="@@inCompetition"
+                        data-qa="testTypeInCompetition">In Competition</span>
+                    <span
+                        *ngIf="!ua.test.inCompetition"
+                        i18n="@@outOfCompetition"
+                        data-qa="testTypeOutOfCompetition">Out of Competition</span>
+                </label>
+            
+            </app-form-field>
+
+            <app-form-field
+                [hasAsterisk]="false"
+                [hasError]="whereaboutsLastCheckedDateHasErrors">
+                <label
+                    for="whereaboutsLastCheckedDate"
+                    i18n="@@athleteWhereaboutsLastCheckedDate">Athlete Whereabouts Last Checked Date</label>
+                <app-date-input
+                    field-input
+                    dataQA="athleteWhereaboutsLastCheckedDate"
+                    fieldId="whereaboutsLastCheckedDate"
+                    formControlName="whereaboutsLastCheckedDate"
+                    [appDisable]="controls.WHEREABOUTS_LAST_CHECKED_DATE | isInputDisabled:fieldsSecurity:isEditMode"
+                    [hasError]="whereaboutsLastCheckedDateHasErrors"
+                    [locale]="locale"
+                    (showCalendarEmitter)="isCalendarDisplayed($event)">
+                </app-date-input>
+                <span
+                    field-info
+                    class="field-info"
+                    i18n="@@dateFormat">dd-mm-yyyy</span>
+                <div
+                    field-error
+                    *ngIf="whereaboutsLastCheckedDateHasErrors">
+                    <span
+                        *ngIf="whereaboutsLastCheckedDate.errors.required"
+                        i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span 
+                        ngIf="whereaboutsLastCheckedDate.errors.validateDateFormat?.error?.invalid"
+                        i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field
+                [hasAsterisk]="false"
+                [hasError]="whereaboutsLastCheckedTimeHasErrors">
+                <label for="whereaboutsLastCheckedTime" i18n="@@athleteWhereaboutsLastCheckedTime">Athlete Whereabouts Last Checked Time</label>
+                <input
+                    field-input
+                    appRestrictToPattern="[0-9:]"
+                    autocomplete="disabled"
+                    data-qa="athleteWhereaboutsLastCheckedTime"
+                    formControlName="whereaboutsLastCheckedTime"
+                    id="whereaboutsLastCheckedTime"
+                    maxlength=5
+                    type="text"
+                    [appDisable]="controls.WHEREABOUTS_LAST_CHECKED_TIME_HOUR | isInputDisabled:fieldsSecurity:isEditMode"
+                    [appTimeFormat]="whereaboutsLastCheckedTime"
+                    [class.error]="whereaboutsLastCheckedTimeHasErrors">
+                <span field-info class="field-info" i18n="@@timeFormat">hh:mm (24h)</span>
+                <div field-error *ngIf="whereaboutsLastCheckedTimeHasErrors">
+                    <span *ngIf="whereaboutsLastCheckedTime.errors.timeFormat" i18n="@@respectNotificationTimeFormat">Please enter a valid notification time.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field
+                [hasAsterisk]="false"
+                [hasError]="timeSlotHasErrors">
+                <label for="timeSlot" i18n="@@whenWas60minTimeSlotSupposedToStart">When was the 60-Min Time Slot supposed to start?</label>
+                <input
+                    field-input
+                    appRestrictToPattern="[0-9:]"
+                    autocomplete="disabled"
+                    data-qa="whenWas60minTimeSlotSupposedToStart"
+                    formControlName="timeSlot"
+                    id="timeSlot"
+                    maxlength=5
+                    type="text"
+                    [appDisable]="controls.TIME_SLOT_START_HOUR | isInputDisabled:fieldsSecurity:isEditMode"
+                    [appTimeFormat]="timeSlot"
+                    [class.error]="timeSlotHasErrors">
+                <span field-info class="field-info" i18n="@@timeFormat">hh:mm (24h)</span>
+                <div field-error *ngIf="timeSlotHasErrors">
+                    <span *ngIf="timeSlot.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span *ngIf="timeSlot.errors.timeFormat" i18n="@@respectNotificationTimeFormat">Please enter a valid notification time.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field>
+                <span i18n="@@attemptLocationAddress" ngClass="location-form-label">Attempt Location Address</span>
+            </app-form-field>
+
+            <div formGroupName="address">
+                <input formControlName="id" type="hidden">
+                
+                <app-form-field [hasAsterisk]="true" [hasError]="countryHasErrors">
+                    <label for="country" i18n="@@country">Country</label>
+                    <app-typeahead
+                        field-input
+                        dataQA="countryTypeahead"
+                        fieldId="country"
+                        formControlName="country"
+                        suggestionField="name"
+                        [hasError]="countryHasErrors"
+                        [isDisabled]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode"
+                        [isStartingFocus] = true
+                        [suggestions]="countrySuggestions"
+                        (selected)="selectCountry($event)">
+                    </app-typeahead>
+                    <div field-error *ngIf="countryHasErrors">
+                        <span *ngIf="country.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    </div>
+                </app-form-field>
+                
+                <app-form-field [hasAsterisk]="false" [hasError]="streetAddress1HasErrors">
+                    <label for="streetAddress1" i18n="@@streetAddress1">Street Address 1</label>
+                    <input
+                        field-input
+                        autocomplete="disabled"
+                        data-qa="streetAddress1"
+                        formControlName="streetAddress1"
+                        id="streetAddress1"
+                        maxlength=250
+                        type="text"
+                        [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode">
+                    <span field-info class="field-info" i18n="@@numberAndStreetPOBox">Number and street, PO Box</span>
+                </app-form-field>
+
+                <app-form-field [hasAsterisk]="false" [hasError]="streetAddress2HasErrors">
+                    <label for="streetAddress2" i18n="@@streetAddress2">Street Address 2</label>
+                    <input
+                        field-input
+                        data-qa="streetAddress2"
+                        formControlName="streetAddress2"
+                        id="streetAddress1"
+                        maxlength=250
+                        type="text"
+                        [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode">
+                    <span field-info class="field-info" i18n="@@additionalAddressInfo">Additional address information</span>
+                </app-form-field>
+                
+                <app-form-field>
+                    <label for="building" i18n="@@building">Building</label>
+                    <input
+                        field-input
+                        data-qa="building"
+                        formControlName="building"
+                        id="building"
+                        type="text"
+                        [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode">
+                </app-form-field>
+                
+                <app-form-field>
+                    <label for="floor" i18n="@@floor">Floor</label>
+                    <input
+                        field-input
+                        data-qa="floor"
+                        formControlName="floor"
+                        id="floor"
+                        type="text"
+                        [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode">
+                </app-form-field>
+                
+                <app-form-field>
+                    <label for="room" i18n="@@room">Room</label>
+                    <input
+                        field-input
+                        data-qa="room"
+                        formControlName="room"
+                        id="room"
+                        type="text"
+                        [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode">
+                </app-form-field>
+                
+                <app-form-field [hasAsterisk]="true" [hasError]="cityHasErrors">
+                    <label for="city" i18n="@@city">City</label>
+                    <input
+                        field-input
+                        data-qa="city"
+                        formControlName="city"
+                        id="city"
+                        type="text"
+                        [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode"
+                        [class.error]="cityHasErrors">
+                    <div field-error *ngIf="cityHasErrors">
+                        <span *ngIf="city.errors.invalid" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    </div>
+                </app-form-field>
+                
+                <app-form-field>
+                    <label for="region" i18n="@@region">Region</label>
+                    <app-typeahead
+                        field-input
+                        dataQA="regionTypeahead"
+                        fieldId="region"
+                        formControlName="region"
+                        suggestionField="name"
+                        [isDisabled]="(selectedCountryId === '') || (controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode)"
+                        [suggestions]="regionSuggestions">
+                    </app-typeahead>
+                </app-form-field>
+                <app-form-field [hasError]="zipCodeHasErrors">
+                    <label for="zipCode" i18n="@@zipCode">Postal Code / ZIP</label>
+                    <input
+                        field-input
+                        appRestrictToPattern="[0-9a-zA-Z ]"
+                        data-qa="postalCode"
+                        formControlName="zipCode"
+                        id="zipCode"
+                        type="text"
+                        [appDisable]="controls.ADDRESS | isInputDisabled:fieldsSecurity:isEditMode"
+                        [class.error]="zipCodeHasErrors">
+                    <div field-error *ngIf="zipCodeHasErrors">
+                        <span *ngIf="zipCode.errors.pattern" i18n="@@onlyAcceptLettersNumbersBlanks">This field only accepts letters, numbers, blank spaces and hyphens.</span>
+                    </div>
+                </app-form-field>
+            </div>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="locationHasErrors">
+                <label for="location" i18n="@@locationDescription">Description of Location</label>
+                <div field-input>
+                    <label class="radio-container">
+                        <input
+                            formControlName="location"
+                            id="location"
+                            type="radio"
+                            [appDisable]="controls.LOCATION | isInputDisabled:fieldsSecurity:isEditMode"
+                            [value]="locationEnum.TrainingVenue">
+                        <span class="checkmark" data-qa="trainingVenue"></span>
+                        <span class="radio-label" i18n="@@trainingVenue">Training Venue</span>
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            formControlName="location"
+                            type="radio"
+                            [appDisable]="controls.LOCATION | isInputDisabled:fieldsSecurity:isEditMode"
+                            [value]="locationEnum.AthleteHome">
+                        <span class="checkmark" data-qa="athleteHome"></span>
+                        <span class="radio-label" i18n="@@athleteHome">Athlete's Home</span>
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            formControlName="location"
+                            type="radio"
+                            [appDisable]="controls.LOCATION | isInputDisabled:fieldsSecurity:isEditMode"
+                            [value]="locationEnum.Other">
+                        <span class="checkmark" data="other"></span>
+                        <span i18n="@@other" class="radio-label">Other</span>
+                    </label>
+                </div>
+                <div field-error *ngIf="locationHasErrors">
+                    <span *ngIf="location.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="specifyLocationHasErrors">
+                <label for="specifyLocation" i18n="@@specify">Specify</label>
+                <input
+                    field-input
+                    data-qa="specify"
+                    formControlName="specifyLocation"
+                    id="specifyLocation"
+                    type="text"
+                    [appDisable]="controls.LOCATION_DESCRIPTION | isInputDisabled:fieldsSecurity:isEditMode"
+                    [class.error]="specifyLocationHasErrors">
+                <div field-error *ngIf="specifyLocationHasErrors">
+                    <span *ngIf="specifyLocation.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="attemptDateHasErrors">
+                <label for="attemptDate" i18n="@@attemptDate">Attempt Date</label>
+                <app-date-input
+                    field-input
+                    dataQA="attemptDate"
+                    fieldId="attemptDate"
+                    formControlName="attemptDate"
+                    [appDisable]="controls.ATTEMPT_DATE | isInputDisabled:fieldsSecurity:isEditMode"
+                    [hasError]="attemptDateHasErrors"
+                    [locale]="locale"
+                    (showCalendarEmitter)="isCalendarDisplayed($event)">
+                </app-date-input>
+                <span field-info class="field-info" i18n="@@dateFormat">dd-mm-yyyy</span>
+                <div field-error *ngIf="attemptDateHasErrors">
+                    <span *ngIf="attemptDate.errors.maxDate?.error" i18n="@@respectTheMaxDateRange">Date must be equal to or lower than {{ maxDate.format('DD-MMM-YYYY') }}</span>
+                    <span *ngIf="attemptDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span *ngIf="attemptDate.errors.validateDateFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field
+                [columns]="'30% 10% 10% 50%'"
+                [hasAsterisk]="true"
+                [hasError]="attemptTimeFromHasErrors || attemptTimeToHasErrors">
+                <label for="attemptTimeFrom" i18n="@@attemptTime">Attempt Time</label>
+                <span field-top-label i18n="@@from">From</span>
+                <input
+                    field-input
+                    appRestrictToPattern="[0-9:]"
+                    autocomplete="disabled"
+                    class="attemptTimeFrom"
+                    data-qa="attemptTimeFrom"
+                    formControlName="attemptTimeFrom"
+                    id="attemptTimeFrom"
+                    maxlength=5
+                    type="text"
+                    [appDisable]="controls.ATTEMPT_START_HOUR | isInputDisabled:fieldsSecurity:isEditMode"
+                    [appTimeFormat]="attemptTimeFrom"
+                    [class.error]="attemptTimeFromHasErrors">
+                <span field-info class="field-info" i18n="@@timeFormat">hh:mm (24h)</span>
+                <div field-error *ngIf="attemptTimeFromHasErrors">
+                    <span *ngIf="attemptTimeFrom.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span *ngIf="attemptTimeFrom.errors.timeFormat" i18n="@@respectNotificationTimeFormat">Please enter a valid notification time.</span>
+                </div>
+                <span field-top-label-2 i18n="@@to">To</span>
+                <input
+                    field-input-2
+                    appRestrictToPattern="[0-9:]"
+                    autocomplete="disabled"
+                    class="attemptTimeTo"
+                    data-qa="attemptTimeTo"
+                    formControlName="attemptTimeTo"
+                    id="attemptTimeTo"
+                    maxlength=5
+                    type="text"
+                    [appDisable]="controls.ATTEMPT_END_HOUR | isInputDisabled:fieldsSecurity:isEditMode"
+                    [appTimeFormat]="attemptTimeTo"
+                    [class.error]="attemptTimeToHasErrors">
+                <span field-info-2 class="field-info" i18n="@@timeFormat">hh:mm (24h)</span>
+                <div field-error-2 *ngIf="attemptTimeToHasErrors">
+                    <span *ngIf="attemptTimeTo.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span *ngIf="attemptTimeTo.errors.timeFormat" i18n="@@respectNotificationTimeFormat">Please enter a valid notification time.</span>
+                </div>
+            </app-form-field>
+            
+            <div formGroupName="attemptedContactMethods">
+                <app-form-field [hasAsterisk]="true" [hasError]="attemptedContactMethodHasErrors && contactAttemptIsDirty">
+                    <label i18n="@@howContactWasAttempted">How contact was attempted</label>
+                    <div field-input *ngIf="canDisplayFormGroup">
+                        <div class="checkbox-field" *ngFor="let attempt of _attemptMethods">
+                            <input
+                                formControlName="{{ attempt.method.specificCode }}"
+                                type="checkbox"
+                                [appDisable]="controls.ATTEMPT_METHODS | isInputDisabled:fieldsSecurity:isEditMode"
+                                [attr.data-qa]="'howContactWasAttempted' + attempt.method.specificCode"
+                                [value]="attempt.selected"
+                                (change)="enableIsDirty()">
+                            <label class="checkbox-label" (click)="toggleAttemptSelection(attempt.selected, attempt)">{{ attempt.method.description }}</label>
+                        </div>
+                    </div>
+                    <div field-error *ngIf="attemptedContactMethodHasErrors && contactAttemptIsDirty">
+                        <span i18n="@@pleaseSelectAValue">Please select a value.</span>
+                    </div>
+                </app-form-field>
+            </div>
+
+            <app-form-field [hasAsterisk]="false">
+                <label for="descriptionOfAttempt" i18n="@@attemptDescription">Description of Attempt</label>
+                <app-info-bubble i18n="@@attemptDescriptionTooltip">Provide details such as who was spoken to, how long the attempt was made, and where the athlete was not located.</app-info-bubble>
+                <input
+                    field-input
+                    data-qa="descriptionOfAttempt"
+                    formControlName="descriptionOfAttempt"
+                    id="attemptDescription"
+                    type="text"
+                    [appDisable]="controls.ATTEMPT_DESCRIPTION | isInputDisabled:fieldsSecurity:isEditMode">
+            </app-form-field>
+
+            <app-participant-input 
+                field-input
+                *ngIf="dopingControlOfficer"
+                dataQAFirstName="dcoFirstName"
+                dataQALastName="dcoLastName"
+                firstNameId="dopingControlOfficerFirstName"
+                formControlName="dopingControlOfficer"
+                lastNameId="dopingControlOfficerLastName"
+                [appDisable]="controls.DCO | isInputDisabled:fieldsSecurity:isEditMode"
+                [hasAsterisk]="true"
+                [hasError]="dopingControlOfficerHasErrors"
+                [hasFirstNameError]="dopingControlOfficerHasErrors && dopingControlOfficer.errors.firstNameRequired"
+                [hasLastNameError]="dopingControlOfficerHasErrors && dopingControlOfficer.errors.lastNameRequired"
+                [isDCOParticipant]="true"
+                [participants]="dopingControlOfficers"
+                (inputChange)="updateDCO($event)">
+                <label i18n="@@dopingControlOfficer">Doping Control Officer</label>
+                <span
+                    last-name-errors
+                    *ngIf="dopingControlOfficerHasErrors && dopingControlOfficer.errors.lastNameRequired"
+                    i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span
+                    first-name-errors
+                    *ngIf="dopingControlOfficerHasErrors && dopingControlOfficer.errors.firstNameRequired"
+                    i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </app-participant-input>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="dateOfReportHasErrors">
+                <label for="dateOfReport" i18n="@@reportDate">Date of Report</label>
+                <app-date-input
+                    field-input
+                    dataQA="dateOfReport"
+                    fieldId="dateOfReport"
+                    formControlName="dateOfReport"
+                    [appDisable]="controls.REPORT_DATE | isInputDisabled:fieldsSecurity:isEditMode"
+                    [hasError]="dateOfReportHasErrors"
+                    [locale]="locale"
+                    (showCalendarEmitter)="isCalendarDisplayed($event)">
+                </app-date-input>
+                <span field-info class="field-info" i18n="@@dateFormat">dd-mm-yyyy</span>
+                <div field-error *ngIf="dateOfReportHasErrors">
+                    <span *ngIf="dateOfReport.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span *ngIf="dateOfReport.errors.validateDateFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                </div>
+            </app-form-field>
+        </div>
+    </div>
+</div>

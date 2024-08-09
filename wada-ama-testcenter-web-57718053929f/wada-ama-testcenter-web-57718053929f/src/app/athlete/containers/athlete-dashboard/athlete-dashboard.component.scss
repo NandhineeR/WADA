@@ -1,0 +1,20 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+@import '~app/shared/styles/dashed-line';
+
+@mixin step($left, $right) {
+    height: 100%;
+    padding: 20px;
+    padding-top: 0;
+}
+
+@include dashed-line();
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}

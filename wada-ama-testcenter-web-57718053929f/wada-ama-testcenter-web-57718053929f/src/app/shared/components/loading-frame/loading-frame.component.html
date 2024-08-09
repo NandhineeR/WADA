@@ -1,0 +1,43 @@
+<div *ngIf="!loading && !error else loadingAnimation">
+    <ng-content></ng-content>
+</div>
+
+<ng-template #loadingAnimation>
+    <div *ngIf="loading else errorMessage">
+        <app-loading-animation [isTable]="true"></app-loading-animation>
+    </div>
+</ng-template>
+
+<ng-template #errorMessage>
+    <div class="bottom-message">
+        <span
+            *ngIf="unprocessableEntityError !== null; else getUpdateError"
+            class="loading-error-secondary-message"
+            i18n="@@errorUnprocessableEntity">This {{ translations$ | getTargetObject:targetObject | async }} 
+            is incompatible with NextGen, because the {{ translations$ | getUnprocessableEntityType:unprocessableEntityErrorType | async }} 
+            exceeds the maximum allowed of {{ unprocessableEntityErrorMaximum }}. Please contact support at <a href="mailto:adams@wada-ama.org">adams@wada-ama.org</a> for more assistance.
+        </span>
+
+        <ng-template #getUpdateError>
+            <div *ngIf="(isFromTO$ | async) || (isFromDCF$ | async) || (isFromUA$ | async); else genericError">
+                <span *ngIf="action === 'view'" class="loading-error" i18n="@@errorGet">The {{ translations$ | getTargetObject:targetObject | async }} could not be retrieved</span>
+                <span *ngIf="action === 'edit'" class="loading-error" i18n="@@errorUpdate">The {{ translations$ | getTargetObject:targetObject | async }} could not be updated</span>
+            </div>
+            <span class="loading-error-secondary-message">{{errorDescription}}</span>
+        </ng-template>
+
+        <ng-template #genericError>
+            <span class="loading-error" i18n="@@error">Error</span>
+            <span class="loading-error-secondary-message">{{errorDescription}}</span>
+        </ng-template>
+        
+        <app-button
+            *ngIf="(isFromTO$ | async) && !saveError"
+            class="first-button"
+            dataQA="loadingFrame.GoBackToTestingOrderManagementButton"
+            i18n="@@goBackToTestingOrderManagement_uppercase"
+            routerLink="/tos"
+            type="secondary">GO BACK TO TESTING ORDER MANAGEMENT</app-button>
+        <app-button *ngIf=saveError i18n="@@returnToForm" type="secondary" (click)="callParentComponent()">Return to form</app-button>
+    </div>
+</ng-template>

@@ -1,0 +1,160 @@
+@import '~sass/variables';
+
+$green: #3F8532;
+
+.athletes-and-analyses-table__wrapper {
+    .notification {
+        margin: 0px 20px 20px 20px;
+    }
+
+    .actions-menu {
+        margin-right: auto;
+    }
+
+    .selected-athlete {
+        margin-right: 20px;
+    }
+
+    .btn-left-margin {
+        margin-left: 20px;
+    }
+
+    .fake-link {
+        font-family: Montserrat, sans-serif;
+        color: $link-color;
+        cursor: pointer;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .underline {
+        text-decoration: underline;
+    }
+
+    .table-input {
+        height: auto;
+        min-width: 0;
+    }
+
+    [footer] {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 100%;
+    }
+
+    .padding {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .disable-checkbox {
+        border-color: red !important;
+    }
+
+    .no-link {
+        pointer-events: none;
+        text-decoration: none;
+        color: black;
+    }
+
+    .align-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .margin-left {
+        margin-left: 10px;
+    }
+
+    .margin-top {
+        margin-top: 5px;
+    }
+
+    .table-analysis {
+        border-collapse: collapse;
+        width: 100%;
+        
+        .button-background {
+            background-color: inherit;
+            margin-left: auto;
+            border: none;
+            float: right;
+            padding: 0;
+        }
+
+        .col-button {
+            width: 10%;
+            vertical-align: top;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .col-text {
+            width: 40%;
+            vertical-align: top;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .max-width {
+            max-width: 120px;
+        }
+
+        .padding-left {
+            padding-left: 10px;
+        }
+
+        .section-quick-turn-around, .section-long-term-storage {
+            min-width: 80px;
+            padding-left: 5px;
+            padding-bottom: 15px;
+        }
+    }
+}
+
+::ng-deep .analysis-form-request-tooltip {
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green;
+    padding: 5px 10px;
+    display: inline-flexbox !important;
+    max-width: fit-content !important;
+}
+
+::ng-deep .long-term-storage-tooltip {
+    min-width: 120px;
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green;
+    padding: 5px 10px;
+}
+
+::ng-deep .quick-turn-around-tooltip {
+    min-width: 120px;
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green;
+    padding: 5px 10px;
+}
+
+::ng-deep .refresh-lts-qta-tooltip {
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green;
+    padding: 5px 10px;
+    display: inline-flexbox !important;
+    max-width: fit-content !important;
+}
+
+::ng-deep .set-analysis-as-closed-tooltip {
+    color: black !important;
+    background-color: white;
+    border: solid 2px $green;
+    padding: 5px 10px;
+    display: inline-flexbox !important;
+    max-width: fit-content !important;
+}

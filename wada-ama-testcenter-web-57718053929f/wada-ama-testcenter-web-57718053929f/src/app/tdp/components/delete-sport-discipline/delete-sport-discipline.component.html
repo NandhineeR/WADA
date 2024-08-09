@@ -1,0 +1,25 @@
+<div *ngIf="disabled; else popoverTemplate" class="delete-button-disabled">
+    <img alt="Delete Icon" data-qa="DeletePopupButton" i18n="@@deleteIcon" src="assets/delete.svg" [attr.data-qa-precision]="sportName + '_' + disciplineName"/>
+</div>
+
+<ng-template #popoverTemplate>
+    <app-popover appInheritDir *ngIf="confirmDeletion; else deleteWithoutConfirmation">
+        <div class="delete-button">
+            <img alt="Delete Icon" data-qa="DeletePopupButton" i18n="@@deleteIcon" src="assets/delete.svg" [attr.data-qa-precision]="sportName + '_' + disciplineName"/>
+        </div>
+        <div popover-title i18n="@@delete_uppercase">DELETE</div>
+            <div popover-body class="popover-body">
+                <p i18n="@@doYouWantToDeleteSportXDisciplineX">Do you want to delete {{ sportName }} - {{ disciplineName }} ?</p>
+                <div class="popover-buttons">
+                    <app-button dataQA="CancelButton" i18n="@@cancel_uppercase" type="secondary" [dataQAPrecision]="sportName + '_' + disciplineName" (click)="close()">CANCEL</app-button>
+                    <app-button dataQA="DeleteButton" i18n="@@delete_uppercase" type="primary" [dataQAPrecision]="sportName + '_' + disciplineName" (click)="onDelete()">DELETE</app-button>
+                </div>
+            </div>
+        </app-popover>
+</ng-template>
+
+<ng-template #deleteWithoutConfirmation>
+    <div class="delete-button" (click)="onDelete()">
+        <img alt="Delete Icon" data-qa="DeletePopupButton" i18n="@@deleteIcon" src="assets/delete.svg" [attr.data-qa-precision]="sportName + '_' + disciplineName"/>
+    </div>
+</ng-template>

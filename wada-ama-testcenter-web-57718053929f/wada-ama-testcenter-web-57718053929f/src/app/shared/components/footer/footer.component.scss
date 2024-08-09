@@ -1,0 +1,23 @@
+@import '~sass/variables';
+@import '~sass/mixins';
+
+@mixin footerStyle($dir) {
+    .footer {
+        font-size: 12px;
+        color: #515151;
+    }
+
+    .align {
+        text-align: $dir;
+    }
+}
+
+.wrapper {
+    margin-right: 25px;
+    @include ltr {
+        @include footerStyle(right);
+    }
+    @include rtl {
+        @include footerStyle(left);
+    }
+}

@@ -1,0 +1,327 @@
+<div
+    appInheritDir
+    appRandomizeInput
+    class="wrapper">
+    <app-dcf-notifications
+        *ngIf="sampleDuplicate?.get('sampleType')?.length > 0"
+        id="notifications"
+        type="error"
+        [conflictException]="conflictException"
+        [dcfId]="dcf?.id">
+        <ul links class="error-link-list">
+            <ng-container *ngFor="let item of samples.controls; let i=index">
+                <div *ngFor="let key of item | formControlKeys">
+                    <div *ngIf="(item.controls[key] | controlWarnings) && key === 'sampleCode' && hasCodeValidationWarning">
+                        <span i18n="@@sampleTypeXsampleCodeXWarningNotification">{{ sampleDuplicate.get('sampleType') }} sample {{ sampleDuplicate.get('sampleCode') }} already exists in ADAMS. Make sure these values are correct.</span>
+                    </div>
+                </div>
+            </ng-container>
+        </ul>
+    </app-dcf-notifications>
+
+    <div *ngIf="form" class="form-body" [formGroup]="form">
+        <div class="form-body-content">
+            <input formControlName="id" type="hidden">
+
+            <app-athlete-mailing-address
+                [address]="address"
+                [countries]="countries"
+                [dcfStatus]="dcfStatus"
+                [fieldsSecurity]="fieldsSecurity"
+                [inCreation]="inCreation"
+                [isEditMode]="isEditMode"
+                [isMultipleDCF]="true"
+                [showErrors]="showErrors && !inCreation">
+            </app-athlete-mailing-address>
+
+            <app-email-input 
+                [dcfStatus]="dcfStatus"
+                [fieldsSecurity]="fieldsSecurity"
+                [form]="form"
+                [inCreation]="inCreation"
+                [isMultipleDCF]="true"
+                [showErrors]="showErrors && !inCreation">
+            </app-email-input>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="sportDisciplineHasErrors">
+                <label for="sportDiscipline" i18n="@@sportDiscipline_slash">Sport / Discipline</label>
+                <app-typeahead
+                    field-input
+                    dataQA="sportDisciplineTypeahead"
+                    fieldId="sportDiscipline"
+                    formControlName="sportDiscipline"
+                    suggestionField="displayDescriptionName"
+                    [hasError]="sportDisciplineHasErrors"
+                    [isDisabled]="controls.SPORT_DISCIPLINE | isInputDisabled:fieldsSecurity:isEditMode"
+                    [suggestions]="sportDisciplineSuggestions">
+                </app-typeahead>
+                <div field-error *ngIf="sportDisciplineHasErrors">
+                    <span *ngIf="sportDiscipline.errors.required"
+                        i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field
+                class="wrapper"
+                columns="30% 30% 30% 30%"    
+                [hasAsterisk]="true"
+                [hasError]="notificationDateHasErrors"
+                [ngClass]="{ 'topSpace': isMultipleDCF }">
+
+                <label for="notificationDate" i18n="@@notificationDate">Notification Date</label>
+                <span field-top-label i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h)</span>
+                <app-datetime-picker
+                    field-input
+                    dataQA="notificationDate"
+                    fieldId="notificationDate"
+                    formControlName="notificationDate"
+                    [appDisable]="controls.TEST_NOTIFICATION | isInputDisabled:fieldsSecurity:isEditMode"
+                    [disabled]="controls.TEST_NOTIFICATION | isInputDisabled:fieldsSecurity:isEditMode"
+                    [hasError]="notificationDateHasErrors"
+                    [locale]="locale">
+                </app-datetime-picker>
+                <div field-info *ngIf="notificationDateHasErrors" class="error-message">
+                    <span *ngIf="notificationDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span *ngIf="notificationDate.errors.validateDateFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                    <span *ngIf="notificationDate.errors.dateIsRemoved?.error?.invalid" i18n="@@notificationDateCantBeRemoved">The notification date can be updated but cannot be removed.</span>
+                </div>
+
+                <div field-top-label-2>
+                    <span id="notificationTimezone" i18n="@@timeZone">Time Zone</span>
+                    <span *ngIf="!(controls.TEST_NOTIFICATION | isInputDisabled:fieldsSecurity:isEditMode)">
+                        <button
+                            class="btn-link-timezone"
+                            matTooltipClass="help-timezone-tooltip"
+                            matTooltipPosition="above"
+                            [matTooltip]="helpTimezoneFormTooltip?.innerText"
+                            (click)="openLinkTimezone()">
+                            <mat-icon>help_outline</mat-icon>
+                        </button>
+                        <span #helpTimezoneFormTooltip i18n="@@helpTimezoneFormTooltip" style="display: none">Gather information about time zones</span>
+                    </span>
+                </div>
+                <app-dropdown
+                    field-input-2
+                    dataQA="timeZoneDropdownNotificationDate"
+                    formControlName="notificationTimezone"
+                    i18n-placeholder="@@timezone"
+                    id="notificationTimezone"
+                    placeholder="Time Zone"
+                    property="id"
+                    style="width: 100%"
+                    type="text"
+                    [appDisable]="controls.TEST_NOTIFICATION | isInputDisabled:fieldsSecurity:isEditMode"
+                    [hasError]="notificationTimezoneHasErrors"
+                    [isDisabled]="controls.TEST_NOTIFICATION | isInputDisabled:fieldsSecurity:isEditMode">
+                    <ng-container *ngFor="let item of timezones; let i = index">
+                        <div
+                            class="dropdown-item"
+                            data-qa="timeZoneDropdownOptionNotificationDate"
+                            [appDropdownElement]="item"
+                            [attr.data-qa-precision]="i"
+                            (click)="showSetTimezoneDefaultModal(item)">{{ item.shortName }}</div>
+                    </ng-container>
+                </app-dropdown>
+                <div field-info-2 *ngIf="notificationTimezoneHasErrors" class="error-message" >
+                    <span
+                        *ngIf="notificationTimezone.errors.validateEmptyTimezone?.error?.invalid"
+                        i18n="@@provideTimezoneWithNotificationDate">The time zone must be provided when the notification date is set.</span>
+                    <span *ngIf="notificationTimezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <input formControlName="advanceNotice" type="hidden">
+            <input formControlName="feeForService" type="hidden">
+
+            <app-participant-input
+                field-input
+                dataQAFirstName="witnessChaperoneFirstName"
+                dataQALastName="notifyingChaperoneLastName"
+                firstNameId="firstName"
+                formControlName="notifyingChaperone"
+                lastNameId="lastName"
+                [appDisable]="controls.NOTIFYING_CHAPERONE | isInputDisabled:fieldsSecurity:isEditMode"
+                [hasAsterisk]="true"
+                [hasError]="notifyingChaperoneHasErrors"
+                [hasFirstNameError]="notifyingChaperoneHasErrors && notifyingChaperone.errors.firstNameRequired"
+                [hasLastNameError]="notifyingChaperoneHasErrors && notifyingChaperone.errors.lastNameRequired"
+                [participants]="chaperones">
+                <label i18n="@@notifyingChaperone">Notifying Chaperone</label>
+                <span last-name-errors
+                    *ngIf="notifyingChaperoneHasErrors && notifyingChaperone.errors.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span first-name-errors
+                    *ngIf="notifyingChaperoneHasErrors && notifyingChaperone.errors.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </app-participant-input>
+
+            <app-participant-input
+                field-input
+                dataQALastName="coachLastName"
+                dataQAFirstName="coachFirstName"
+                firstNameId="coachFirstName"
+                formControlName="coach"
+                lastNameId="coachLastName"
+                [appDisable]="controls.COACH | isInputDisabled:fieldsSecurity:isEditMode"
+                [hasAsterisk]="true"
+                [hasError]="coachHasErrors"
+                [hasFirstNameError]="coachHasErrors && coach.errors.firstNameRequired"
+                [hasLastNameError]="coachHasErrors && coach.errors.lastNameRequired"
+                [isDisabled]="coachNotApplicable.value"
+                [participants]="coachesForAthlete">
+                <label i18n="@@coach">Coach</label>
+                <div class="checkbox-field">
+                    <input id="coachNotApplicable"
+                        formControlName="coachNotApplicable"
+                        type="checkbox"
+                        (click)="toggleFieldNotApplicable('coachNotApplicable', coachNotApplicable.value)">
+                        <label class="checkbox-label" for="coachNotApplicable" i18n="@@notApplicable">Not Applicable</label>
+                </div>
+
+                <span
+                    last-name-errors
+                    *ngIf="coachHasErrors && coach.errors.lastNameRequired"
+                    i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span
+                    first-name-errors
+                    *ngIf="coachHasErrors && coach.errors.firstNameRequired"
+                    i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </app-participant-input>
+
+            <app-participant-input
+                field-input
+                dataQAFirstName="doctorFirstName"
+                dataQALastName="doctorLastName"
+                firstNameId="doctorFirstName"
+                formControlName="doctor"
+                lastNameId="doctorLastName"
+                [appDisable]="controls.DOCTOR | isInputDisabled:fieldsSecurity:isEditMode"
+                [hasAsterisk]="true"
+                [hasError]="doctorHasErrors"
+                [hasFirstNameError]="doctorHasErrors && doctor.errors.firstNameRequired"
+                [hasLastNameError]="doctorHasErrors && doctor.errors.lastNameRequired"
+                [isDisabled]="doctorNotApplicable.value"
+                [participants]="doctorsForAthlete">
+                <label i18n="@@doctor">Doctor</label>
+                <div class="checkbox-field">
+                    <input
+                        formControlName="doctorNotApplicable"
+                        id="doctorNotApplicable"
+                        type="checkbox"
+                        (click)="toggleFieldNotApplicable('doctorNotApplicable', doctorNotApplicable.value)">
+                        <label class="checkbox-label" for="doctorNotApplicable" i18n="@@notApplicable">Not Applicable</label>
+                </div>
+                <span
+                    last-name-errors
+                    *ngIf="doctorHasErrors && doctor.errors.lastNameRequired"
+                    i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span
+                    first-name-errors
+                    *ngIf="doctorHasErrors && doctor.errors.firstNameRequired"
+                    i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </app-participant-input>
+
+            <app-form-field
+                class="wrapper"
+                columns="30% 30% 30% 30%"    
+                [hasAsterisk]="true"
+                [hasError]="arrivalDateHasErrors"
+                [ngClass]="{ 'topSpace': isMultipleDCF }">
+
+                <label for="arrivalDate" i18n="@@arrivalDate">Arrival Date</label>
+                <span field-info class="field-info" i18n="@@datetimeFormat">dd-mm-yyyy hh:mm (24h)</span>
+                <app-datetime-picker
+                    field-input
+                    dataQA="arrivalDate"
+                    fieldId="arrivalDate"
+                    formControlName="arrivalDate"
+                    [appDisable]="controls.ARRIVAL_DATE | isInputDisabled:fieldsSecurity:isEditMode"
+                    [disabled]="controls.ARRIVAL_DATE | isInputDisabled:fieldsSecurity:isEditMode"
+                    [hasError]="arrivalDateHasErrors"
+                    [locale]="locale">
+                </app-datetime-picker>
+                <app-info-bubble>
+                    <span i18n="@@arrivalDateDopingControlStation">Date of Arrival to the Doping Control Station.</span><br>
+                </app-info-bubble>
+                <div field-info *ngIf="arrivalDateHasErrors" class="error-message">
+                    <span *ngIf="arrivalDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                    <span *ngIf="arrivalDate.errors.validateDateFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+                    <span *ngIf="arrivalDate.errors.dateIsRemoved?.error?.invalid" i18n="@@arrivalDateCantBeRemoved">The arrival date can be updated but cannot be removed.</span>
+                </div>
+
+                <span field-top-label-2 i18n="@@timeZone" id="arrivalTimezone">Time Zone</span>
+                <app-dropdown 
+                    field-input-2
+                    dataQA="timeZoneDropdownArrivalDate"
+                    formControlName="arrivalTimezone"
+                    i18n-placeholder="@@timezone"
+                    id="arrivalTimezone"
+                    placeholder="Time Zone"
+                    property="id"
+                    style="width: 100%"
+                    type="text"
+                    [appDisable]="controls.ARRIVAL_DATE | isInputDisabled:fieldsSecurity:isEditMode"
+                    [hasError]="arrivalTimezoneHasErrors"
+                    [isDisabled]="controls.ARRIVAL_DATE | isInputDisabled:fieldsSecurity:isEditMode">
+                    <ng-container *ngFor="let item of timezones; let i = index">
+                        <div [appDropdownElement]="item" class="dropdown-item" data-qa="timeZoneDropdownOptionArrivalDate" [attr.data-qa-precision]="i">{{ item.shortName }}</div>
+                    </ng-container>
+                </app-dropdown>
+                <div field-info-2 *ngIf="arrivalTimezoneHasErrors" class="error-message">
+                    <span
+                        *ngIf="arrivalTimezone.errors.validateEmptyTimezone?.error?.invalid"
+                        i18n="@@provideTimezoneWithArrivalDate">The time zone must be provided when the arrival date is set.</span>
+                    <span *ngIf="arrivalTimezone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <div formArrayName="samples">
+                <div>
+                    <app-sample-input
+                        *ngFor="let item of samples.controls; let i=index"
+                        [bloodCollectionOfficials]="bloodCollectionOfficials"
+                        [dcfStatus]="dcfStatus"
+                        [fieldsSecurity]="fieldsSecurity"
+                        [formGroup]="item"
+                        [inCreation]="inCreation"
+                        [isEditMode]="isEditMode"
+                        [isMultipleDCF]="true"
+                        [locale]="locale"
+                        [manufacturers]="manufacturers"
+                        [sampleDuplicateException]="sampleDuplicate"
+                        [sampleIndex]="i"
+                        [samples]="initialSamples"
+                        [showDelete]="samples.length > 1"
+                        [showErrors]="showErrors"
+                        [timezones]="timezones"
+                        [urineSampleBoundaries]="urineSampleBoundaries"
+                        [witnessChaperones]="witnessChaperones"
+                        (delete)="deleteSample(i)"
+                        (sampleValuesOnChange)="updateSamples()"
+                        (validateSampleCodeDuplicate)="dispatchSampleCodeValidation($event)">
+                    </app-sample-input>
+                </div>
+            </div>
+            <br>
+
+            <app-procedural-information-input
+                [arrivalDate]="arrivalDate.value"
+                [autoCompletes]="sectionProceduralAutoCompletes$ | async"
+                [dcfStatus]="dcfStatusAsEnum"
+                [fieldsSecurity]="fieldsSecurity"
+                [inCreation]="inCreation"
+                [isEditMode]="isEditMode"
+                [isMultipleDCF]="true"
+                [locale]="locale"
+                [proceduralInformation]="proceduralInformation"
+                [showErrors]="showErrors"
+                (submitStep)="updateProceduralInformation($event)">
+            </app-procedural-information-input>
+        </div>
+    </div>
+    
+    <app-set-timezone-default-modal
+        #setTimezoneDefaultModalRef
+        [filledTimezones]="filledTimezones"
+        [isModalClosable]="false"
+        (overwriteTimezonesEmitter)="setTimezoneDefaultByAthlete($event)">
+    </app-set-timezone-default-modal>
+</div>

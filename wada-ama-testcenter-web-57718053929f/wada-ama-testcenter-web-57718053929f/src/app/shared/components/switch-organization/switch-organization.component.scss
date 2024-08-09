@@ -1,0 +1,79 @@
+@import '~sass/mixins';
+
+$link-color: #3A782C;
+$org-name: #1e5623;
+
+@mixin popover($left, $right) {
+    .org-name {
+        font-size: 13px;
+        padding-#{$right}: 15px;
+        font-weight: 600;
+
+        span {
+            color: $org-name;
+        }
+    }
+
+    img {
+        height: 15px;
+        padding-#{$right}: 5px;
+    }
+
+    a {
+        font-size: 13px;
+        color: $link-color;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    a:hover {
+        color: $link-color;
+        text-decoration: underline;
+    }
+
+    .popover-body {
+
+        @include ltr {
+            text-align: $left;
+        }
+        @include rtl {
+            text-align: $right;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: -2px;
+        }
+
+        ::ng-deep input[type="text"] {
+            width: 100%;
+            height: 25px;
+        }
+
+        .green-asterisk {
+            color: #008000;
+            font-size: 13px;
+        }
+
+        app-typeahead {
+            width: 540px;
+        }
+
+        .popover-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: row;
+            justify-items: flex-start;
+        }
+    }
+}
+
+app-popover {
+    @include ltr {
+        @include popover(left, right);
+    }
+    @include rtl {
+        @include popover(right, left);
+    }
+}

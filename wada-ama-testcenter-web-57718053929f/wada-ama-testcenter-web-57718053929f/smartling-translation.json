@@ -1,0 +1,172 @@
+{
+  // Locales array defines which languages are requested for translation. These locales must already exist in the Smartling project.
+  // You can have one or more locales, but smartling locale name must be unique
+  // Each locale has two required attributes
+  //    smartling   - the locale name in Smartling, available from the API settings in the Smartling project
+  //    application - the corresponding locale name in your system. This value is used in the translation commit message
+    "locales": [
+        {
+            "smartling" : "am-ET",
+            "application" : "am"
+        },
+        {
+            "smartling" : "ar",
+            "application" : "ar"
+        },
+        {
+            "smartling" : "az-AZ",
+            "application" : "az"
+        },
+        {
+            "smartling" : "bg-BG",
+            "application" : "bg"
+        },
+        {
+            "smartling" : "cs",
+            "application" : "cs"
+        },
+        {
+            "smartling" : "de-DE",
+            "application" : "de"
+        },
+        {
+            "smartling" : "es",
+            "application" : "es"
+        },
+        {
+            "smartling" : "et-EE",
+            "application" : "et"
+        },
+        {
+            "smartling" : "fa-IR",
+            "application" : "fa_IR"
+        },
+        {
+            "smartling" : "fi-FI",
+            "application" : "fi"
+        },
+        {
+            "smartling" : "fr-FR",
+            "application" : "fr"
+        },
+        {
+            "smartling" : "hu-HU",
+            "application" : "hu"
+        },
+        {
+            "smartling" : "it-IT",
+            "application" : "it"
+        },
+        {
+            "smartling" : "ja-JP",
+            "application" : "ja"
+        },
+        {
+            "smartling" : "ko",
+            "application" : "ko"
+        },
+        {
+            "smartling" : "lv-LV",
+            "application" : "lv"
+        },
+        {
+            "smartling" : "nl-BE",
+            "application" : "nl"
+        },
+        {
+            "smartling" : "nl-NL",
+            "application" : "nl-NL"
+        },
+        {
+            "smartling" : "om-ET",
+            "application" : "om"
+        },
+        {
+            "smartling" : "pl",
+            "application" : "pl"
+        },
+        {
+            "smartling" : "pt-BR",
+            "application" : "pt"
+        },
+        {
+            "smartling" : "pt-PT",
+            "application" : "pt-PT"
+        },
+        {
+            "smartling" : "ru",
+            "application" : "ru"
+        },
+        {
+            "smartling" : "ro-RO",
+            "application" : "ro"
+        },
+        {
+            "smartling" : "sk-SK",
+            "application" : "sk"
+        },
+        {
+            "smartling" : "sr-RS",
+            "application" : "sr"
+        },
+        {
+            "smartling" : "sw",
+            "application" : "sw"
+        },
+        {
+            "smartling" : "ti-ET",
+            "application" : "ti"
+        },
+        {
+            "smartling" : "tr",
+            "application" : "tr"
+        },
+        {
+            "smartling" : "uk-UA",
+            "application" : "uk_UA"
+        },
+        {
+            "smartling" : "zh-CN",
+            "application" : "zh-CH"
+        },
+        {
+            "smartling" : "zh-TW",
+            "application" : "zh"
+        }
+    ],
+
+  // Resource sets that are uploaded to Smartling. You can have one or more resource sets defined by file type.
+  // Each set has following attributes
+  //    type             - defines Smartling type for the resources. It is required attribute.
+  //                       See supported types https://docs.smartling.com/display/docs/Supported+File+Types
+  //                       If you have resources of several types you need to create several resource sets:
+  //                       one or more for each of the type
+  //    authorizeContent - defines whether uploaded content will automatically be authorized for translation.
+  //                       Possible values: "true" or "false". Default value is "true".
+  //    pathRegex        - regular expression that filters resources to send to Smartling. It is required attribute.
+  //                       Expression has groovy (Java 7) format. See http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+  //                       Regex is applied to file paths relative to repository root. An example, you have file
+  //                       https://github.com/user/test-repo/master/messages/test.properties. Regex will be applied
+  //                       to "messages/test.properties".
+  //                       Due to regex is located in JSON some special symbols must be double escaped. An example:
+  //                       - "." must be double escaped "\\." (first slash is regex escaping, second slash is JSON escaping)
+  //                       - "/" must be double escaped "\\/" (first slash is regex escaping, second slash is JSON escaping)
+  //    translationPathExpression - groovy expression that is used to create a file path and name for translated files.
+  //                                If this parameter is empty or undefined translated files won't be pushed back from Smartling to repository.
+  //                                See https://docs.smartling.com/display/docs/Repository+Connector+-+Configure+your+Code+Repository for the details
+  //    translationCommitMessage  - groovy expression that defining a translation commit message. If it is empty or undefined default message will be used
+  //    smartlingDirectives       - string array with additional Smartling directives. Allowed directives depend on resource type.
+  //                                See https://docs.smartling.com/display/docs/Supported+File+Types#SupportedFileTypes-java
+     "resourceSets": [
+         {
+            "type"      : "xliff",
+            "pathRegex" : "src\\/i18n\\/messages\\.en\\.xlf",
+            "authorizeContent" : "true",
+            "translationPathExpression" : "src/i18n/messages.${locale}.${originalFile.extension}",
+            "translationCommitMessage" : "ADAPI-1198 Smartling translation to ${locale}",
+            "smartlingDirectives" : [ "smartling.placeholder_format_custom = \\{\\{.+?\\}\\}",
+                                      "smartling.string_format=txt"
+                                    ]
+         }
+     ]
+}

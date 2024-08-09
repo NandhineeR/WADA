@@ -1,0 +1,16 @@
+div {
+    font-weight: 100;
+
+    & > * {
+        min-height: 18px;
+        white-space: pre-wrap;
+    }
+
+    ::ng-deep a {
+        color: #3A782C;
+        font-family: Montserrat, sans-serif;
+        font-size: 13px;
+        text-decoration: underline;
+        margin-left: 7px;
+    }
+}

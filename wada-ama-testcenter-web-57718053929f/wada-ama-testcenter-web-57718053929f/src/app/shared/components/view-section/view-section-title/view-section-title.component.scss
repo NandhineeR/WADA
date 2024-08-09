@@ -1,0 +1,247 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+@import '~app/shared/components/notification/mixins';
+
+$titleWidth: 100%;
+$titleHeight: 60px;
+$titleLineHeight: 40px;
+$circleSize: 40px;
+$thickness: 2px;
+
+@mixin sectionTitle($left, $right, $fontSize, $titleBorderRadius, $translateTitle, $scaleTitle, $sectionColor, $titleBgColor, $circleBgColor) {
+    width: $titleWidth;
+    height: $titleHeight;
+    line-height: $titleLineHeight;
+    border-radius: $titleBorderRadius;
+    background: $titleBgColor;
+    transform: $translateTitle $scaleTitle;
+    cursor: pointer !important;
+
+    .delete-edit {
+        display: inline-block;
+    }
+
+    .edit {
+        margin-#{$left}: 15px;
+        display: inline-block;
+    }
+
+    .frame-arrow {
+        content: " ";
+        position: absolute;
+        margin-#{$left}: 50px;
+        border-width: 8px;
+        border-style: solid;
+        border-color: transparent;
+        border-top-color: $titleBgColor;
+    }
+
+    .image {
+        width: 30px;
+        height: 30px;
+        display: inline-block;
+        vertical-align: bottom;
+        margin-#{left}: 15px;
+    }
+
+    span, h2 {
+        display: inline-block;
+        height: $titleHeight;
+        line-height: normal;
+
+        &.chevron {
+            display: inline-block;
+            margin-#{$left}: 10px;
+            width: $circleSize;
+            height: $circleSize;
+            line-height: $circleSize;
+            border-radius: $circleSize;
+            font-size: 40px;
+            text-align: center;
+            font-weight: bold;
+
+            color: $sectionColor;
+            background-color: $circleBgColor;
+
+            a {
+                img {
+                    width: 18px;
+                    height: 30px;
+
+                    &.up {
+                        margin-top: -7px;
+                        transform: none;
+                    }
+
+                    &.down {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+        }
+
+        &.complete {
+            margin-#{$left}: 20px;
+            width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: $sectionColor;
+            background-color: $sectionColor;
+
+            img {
+                width: 18px;
+                height: 30px;
+                transform: translateY(-5px);
+            }
+        }
+
+        &.link {
+            cursor: pointer;
+            float: $right;
+            vertical-align: middle;
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            background-color: #ffffff;
+            margin-#{$right}: 10px;
+            margin-top: 15px;
+
+            img {
+                width: 30px;
+                height: 35px;
+                transform: translateY(-2.5px)
+            }
+        }
+
+        &.missing-field {
+            vertical-align: middle;
+            margin-#{$left}: 20px;
+            height: 16px;
+            border-radius: 35px 35px 35px 35px;
+            background: $sectionColor;
+
+            .inner-circle {
+                vertical-align: middle;
+                width: 20px;
+                height: 20px;
+                border-radius: 20px;
+                text-align: center;
+                font-weight: bold;
+                transform: translateY(-22px) translateX(-2px);
+                color: $sectionColor;
+                background-color: $sectionColor;
+
+                img {
+                    width: 18px;
+                    height: 30px;
+                    transform: translateY(-5px);
+                }
+            }
+
+            .label-error {
+                vertical-align: middle;
+                color: $incorrect-field-star;
+                font-weight: bold;
+                font-size: 13px;
+                margin-#{right}: 5px;
+            }
+
+            .label-error * {
+                vertical-align: top;
+            }
+        }
+
+        &.number {
+            margin-#{$left}: 10px;
+            width: $circleSize;
+            height: $circleSize;
+            line-height: $circleSize;
+            border-radius: $circleSize;
+            font-size: $fontSize;
+            text-align: center;
+            font-weight: bold;
+
+            color: $sectionColor;
+            background-color: $circleBgColor;
+        }
+
+        &.right-control {
+            float: $right;
+            line-height: 60px;
+            align-items: center;
+            display: inline-flex;
+            width: auto;
+            margin-#{right}: 15px;
+        }
+
+        &.right-field {
+            vertical-align: middle;
+            margin-#{$left}: 20px;
+
+            height: 16px;
+            border-radius: 35px 35px 35px 35px;
+            background: #757575;
+
+            .inner-circle {
+                vertical-align: middle;
+                width: 20px;
+                height: 20px;
+                border-radius: 20px;
+                text-align: center;
+                font-weight: bold;
+                transform: translateY(-22px) translateX(-2px);
+                color: $sectionColor;
+                background-color: $sectionColor;
+
+                img {
+                    width: 18px;
+                    height: 30px;
+                    transform: translateY(-5px);
+                }
+            }
+
+            .right-info {
+                margin: 0 15px 0 15px;
+                vertical-align: middle;
+                color: #fff;
+                font-size: 13px;
+            }
+        }
+
+        &.title {
+            margin-#{$left}: 25px;
+            text-align: center;
+            font-size: $fontSize;
+            font-weight: bold;
+            color: $sectionColor;
+            line-height: 60px;
+        }
+    }
+}
+
+.accordion-title-active {
+    @include ltr { @include sectionTitle(left, right, 26px, 35px 0px 0px 35px, translateX(-0.5%), scaleX(1.010), #ffffff, #3f8532, #1e5623); }
+    @include rtl { @include sectionTitle(right, left, 26px, 0px 35px 35px 0px, translateX(0.5%), scaleX(1.010), #ffffff, #3f8532, #1e5623); }
+}
+
+.accordion-title-inactive {
+    @include ltr { @include sectionTitle(left, right, 26px, 35px 0px 0px 35px, translateX(-0.5%), scaleX(1.010), #ffffff, #909090, #757575); }
+    @include rtl { @include sectionTitle(right, left, 26px, 0px 35px 35px 0px, translateX(0.5%), scaleX(1.010), #ffffff, #909090, #757575); }
+}
+
+.default {
+    @include ltr { @include sectionTitle(left, right, 26px, 35px 0px 0px 35px, translateX(-0.5%), scaleX(1.010), $section-color, $section-title-background, $section-title-circle-background); }
+    @include rtl { @include sectionTitle(right, left, 26px, 0px 35px 35px 0px, translateX(0.5%), scaleX(1.010), $section-color, $section-title-background, $section-title-circle-background); }
+}
+
+.modal-accordion-title-active {
+    @include ltr { @include sectionTitle(left, right, 18px, 0px, translateX(0%), scaleX(1), #ffffff, #3f8532, #1e5623); }
+    @include rtl { @include sectionTitle(right, left, 18px, 0px, translateX(0%), scaleX(1), #ffffff, #3f8532, #1e5623); }
+}
+
+.modal-accordion-title-inactive {
+    @include ltr { @include sectionTitle(left, right, 18px, 0px, translateX(0%), scaleX(1), #ffffff, #909090, #757575); }
+    @include rtl { @include sectionTitle(right, left, 18px, 0px, translateX(0%), scaleX(1), #ffffff, #909090, #757575); }
+}

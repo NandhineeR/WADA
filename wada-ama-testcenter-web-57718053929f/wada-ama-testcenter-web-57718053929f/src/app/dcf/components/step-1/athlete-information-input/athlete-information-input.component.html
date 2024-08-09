@@ -1,0 +1,229 @@
+<div
+    appInheritDir
+    appRandomizeInput
+    *ngIf="autoCompletes$ | async as autoComplete"
+    #root="appRandomizeInput"
+    class="wrapper">
+    <app-dcf-notifications
+        *ngIf="(
+            (form | formErrors:showErrors:dcfStatus) ||
+            (hasSaveConflict && hasOptimisticLockException) ||
+            (saveError && !(hasSaveConflict && hasOptimisticLockException))
+        )"
+        id="dcf-notifications"
+        type="error"
+        [conflictException]="conflictException"
+        [dcfId]="dcfId$ | async"
+        [saveError]="saveError">
+        
+        <span
+            *ngIf="!conflictException && !saveError"
+            i18n="@@errorsDetectedInFollowingFields">Some error(s) were detected in the following fields:</span>
+        <ul links class="error-link-list">
+            <li *ngIf="countryHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('country') }}" i18n="@@country">Country</a>
+            </li>
+            <li *ngIf="cityHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('city') }}" i18n="@@city">City</a>
+            </li>
+            <li *ngIf="zipCodeHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('zipCode') }}" i18n="@@zipCode">Postal Code / ZIP</a>
+            </li>
+            <li *ngIf="emailHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('email') }}" i18n="@@emailAddress">Email Address</a>
+            </li>
+            <li *ngIf="phoneHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('phone') }}" i18n="@@phoneNumber">Phone Number</a>
+            </li>
+            <li *ngIf="sportDisciplineHasErrors">
+                <a href="{{ route$ | async }}#{{ root.getId('sportDiscipline') }}" i18n="@@sportDiscipline_slash">Sport / Discipline</a>
+            </li>
+            <li *ngIf="athleteLevelHasErrors">
+                <a href="{{ route$ | async }}#athleteLevel" i18n="@@athleteLevel">Athlete Level</a>
+            </li>
+            <li *ngIf="coachHasErrors && coach.errors?.lastNameRequired">
+                <a href="{{ route$ | async }}#{{ root.getId('coachLastName') }}" i18n="@@coachLastName">Coach Last Name</a>
+            </li>
+            <li *ngIf="coachHasErrors && coach.errors?.firstNameRequired">
+                <a href="{{ route$ | async }}#{{ root.getId('coachFirstName') }}" i18n="@@coachFirstName">Coach First Name</a>
+            </li>
+            <li *ngIf="doctorHasErrors && doctor.errors?.lastNameRequired">
+                <a href="{{ route$ | async }}#{{ root.getId('doctorLastName') }}" i18n="@@doctorLastName">Doctor Last Name</a>
+            </li>
+            <li *ngIf="doctorHasErrors && doctor.errors?.firstNameRequired">
+                <a href="{{ route$ | async }}#{{ root.getId('doctorFirstName') }}" i18n="@@doctorFirstName">Doctor First Name</a>
+            </li>
+        </ul>
+    </app-dcf-notifications>
+
+    <app-notification *ngIf="hasSampleCodeValidationError$ | async" type="warning">
+        <span i18n="@@sportDisciplineAffectedDampleValidation">The sample code validation detected some duplication using this sport / discipline. Go to step 2 for more details.</span>
+    </app-notification>
+
+    <form *appLet="athlete$ | async as athlete" [formGroup]="form">
+        <ng-container
+            *appLet="{
+                security: fieldsSecurity$ | async,
+                isEditMode: isEditMode$ | async
+            } as state">
+            <input formControlName="id" type="hidden">
+
+            <app-athlete-mailing-address
+                [address]="address"
+                [countries]="countriesWithRegions$ | async"
+                [dcfStatus]="dcfStatus"
+                [fieldsSecurity]="state?.security"
+                [inCreation]="inCreation"
+                [isEditMode]="state?.isEditMode"
+                [showErrors]="showErrors"
+                (selectedCountryIdEmitter)="selectCountry($event)">
+            </app-athlete-mailing-address>
+
+            <app-email-input
+                [dcfStatus]="dcfStatus"
+                [fieldsSecurity]="state?.security"
+                [form]="form"
+                [inCreation]="inCreation"
+                [isEditMode]="state?.isEditMode"
+                [showErrors]="showErrors">
+            </app-email-input>
+
+            <app-phone-input
+                field-input
+                formControlName="phone"
+                phoneNumberFieldId="phone"
+                [countries]="countriesWithRegions$ | async"
+                [defaultCountrySpecificCode]="selectedCountryCode$ | async"
+                [defaultPhone]="defaultPhone$ | async"
+                [hasError]="phoneHasErrors"
+                [isDisabled]="controls.PHONE | isInputDisabled:state?.security:state?.isEditMode"
+                [newPhoneNumber]="(isNewPhone$ | async)"
+                [phones]="phones$ | async">
+                <label i18n="@@phoneNumber">Phone Number</label>
+                <div phone-errors *ngIf="phoneHasErrors">
+                    <span *ngIf="phone.errors.invalid" i18n="@@dcf_pleaseEnterAValidPhoneNumber">Please enter a valid phone number.</span>
+                    <span *ngIf="phone.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-phone-input>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="sportDisciplineHasErrors">
+                <label for="sportDiscipline" i18n="@@sportDiscipline_slash">Sport / Discipline</label>
+                <app-typeahead
+                    field-input
+                    dataQA="sportDisciplineTypeahead"
+                    fieldId="sportDiscipline"
+                    formControlName="sportDiscipline"
+                    suggestionField="displayDescriptionName"
+                    [hasError]="sportDisciplineHasErrors"
+                    [isDisabled]="(isMatchingResultType3or2or1$ | async) || (controls.SPORT_DISCIPLINE | isInputDisabled:state?.security:state?.isEditMode)"
+                    [suggestions]="sportDisciplineSuggestions"
+                    (selected)="dispatchSampleCodeValidation()">
+                </app-typeahead>
+                <div field-error *ngIf="sportDisciplineHasErrors">
+                    <span *ngIf="sportDiscipline.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="athleteLevelHasErrors">
+                <label for="athleteLevel" i18n="@@athleteLevel">Athlete Level</label>
+                <app-info-bubble i18n="@@athleteLevelDcfTooltip">
+                    In order to record that TDSSA calculations should apply to this athlete, please select 'National' or 'International' as applicable.
+                </app-info-bubble>
+                <div field-input [appDisable]="controls.ATHLETE_LEVEL | isInputDisabled:state?.security:state?.isEditMode">
+                    <label class="radio-container">
+                        <input
+                            data-qa="athleteLevelInternational"
+                            formControlName="athleteLevel"
+                            id="athleteLevel"
+                            name="athleteLevel"
+                            type="radio"
+                            value="International">
+                        <span class="checkmark"></span>
+                        <span class="radio-label" i18n="@@international">International</span>
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            data-qa="athleteLevelNational"
+                            formControlName="athleteLevel"
+                            name="athleteLevel"
+                            type="radio"
+                            value="National">
+                        <span class="checkmark"></span>
+                        <span class="radio-label" i18n="@@national">National</span>
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            data-qa="athleteLevelOther"
+                            formControlName="athleteLevel"
+                            name="athleteLevel"
+                            type="radio"
+                            value="Other">
+                        <span class="checkmark"></span>
+                        <span i18n="@@other" class="radio-label">Other</span>
+                    </label>
+                </div>
+                <div field-error *ngIf="athleteLevelHasErrors">
+                    <span *ngIf="athleteLevel.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-participant-input
+                #coachParticipantInput
+                field-input
+                dataQAFirstName="coachFirstName"
+                dataQALastName="coachLastName"
+                firstNameId="coachFirstName"
+                formControlName="coach"
+                lastNameId="coachLastName"
+                [appDisable]="controls.COACH | isInputDisabled:state?.security:state?.isEditMode"
+                [hasAsterisk]="true"
+                [hasError]="coachHasErrors"
+                [hasFirstNameError]="coachHasFirstNameErrors"
+                [hasLastNameError]="coachHasLastNameErrors"
+                [isDisabled]="coachDisabled"
+                [participants]="coaches$ | async">
+                <label i18n="@@coach">Coach</label>
+                <div class="checkbox-field">
+                    <input
+                        data-qa="coachNotApplicableCheckbox"
+                        id="coachNotApplicable"
+                        formControlName="coachNotApplicable"
+                        type="checkbox"
+                        (click)="toggleCoachNotApplicable()">
+                    <label class="checkbox-label" for="coachNotApplicable" i18n="@@notApplicable">Not Applicable</label>
+                </div>
+                <span last-name-errors *ngIf="coachHasErrors && coach.errors?.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span first-name-errors *ngIf="coachHasErrors && coach.errors?.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </app-participant-input>
+
+            <app-participant-input
+                #doctorParticipantInput
+                field-input
+                dataQAFirstName="doctorFirstName"
+                dataQALastName="doctorLastName"
+                firstNameId="doctorFirstName"
+                formControlName="doctor"
+                lastNameId="doctorLastName"
+                [appDisable]="controls.DOCTOR | isInputDisabled:state?.security:state?.isEditMode"
+                [hasAsterisk]="true"
+                [hasError]="doctorHasErrors"
+                [hasFirstNameError]="doctorHasFirstNameErrors"
+                [hasLastNameError]="doctorHasLastNameErrors"
+                [isDisabled]="doctorDisabled"
+                [participants]="doctors$ | async">
+                <label i18n="@@doctor">Doctor</label>
+                <div class="checkbox-field">
+                    <input
+                        data-qa="doctorNotApplicableCheckbox"
+                        formControlName="doctorNotApplicable"
+                        id="doctorNotApplicable"
+                        type="checkbox"
+                        (click)="toggleDoctorNotApplicable()">
+                    <label class="checkbox-label" for="doctorNotApplicable" i18n="@@notApplicable">Not Applicable</label>
+                </div>
+                <span last-name-errors *ngIf="doctorHasErrors && doctor.errors?.lastNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span first-name-errors *ngIf="doctorHasErrors && doctor.errors?.firstNameRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+            </app-participant-input>
+        </ng-container>
+    </form>
+</div>

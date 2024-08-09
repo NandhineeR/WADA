@@ -1,0 +1,46 @@
+<div class="wrapper" appInheritDir *appLet="{security: fieldsSecurity$ | async, isEditMode: isEditMode$ | async} as state">
+    <app-to-notifications *ngIf="exceedsMaxTestThreshold()" type="warning" id="dcf-notifications">
+        <span i18n="@@warningTestExceedsThreshold">This Testing Order has a number of tests that exceeds 100 tests. This may result in slower saving and loading of the Testing Order View.</span>
+    </app-to-notifications>
+    <app-to-notifications *ngIf="(hasSaveConflict) || (saveError && !(hasSaveConflict && hasOptimisticLockException))" type="error" id="dcf-notifications" [saveError]="saveError" [conflictException]="conflictException">
+        <span i18n="@@errorsDetectedInFollowingFields" *ngIf="!conflictException && !saveError">Some error(s) were detected in the following fields:</span>
+    </app-to-notifications>
+    <div *ngIf="testRows && testRows.length === 0" class="button-placement">
+        <div class="text-padding">
+            <span i18n="@@continueAddingAthleteOrPlaceholder">Continue by adding an athlete or a placeholder to your Testing Order</span>
+        </div>
+        <app-add-athlete-controls [route]="route"></app-add-athlete-controls>
+    </div>
+    <app-athletes-and-analyses-input
+        *ngIf="testRows.length > 0"
+        [changing]="changingValue"
+        [currentUrl]="route?.urlWithoutBaseHref"
+        [tests]="testRows"
+        [autoComplete]="autoCompletes$ | async"
+        [fieldsSecurity]="state?.security"
+        (submitData)="submitData($event)">
+    </app-athletes-and-analyses-input>
+    <router-outlet name="modal"></router-outlet>
+
+    <div>
+        <ng-container *ngFor="let labNote of laboratoryNotes; let first = first">
+            <app-instructions-box [isFirstBox]="first" [isSameBoxSize]="false">
+                <label instructions-label>
+                    <span i18n="@@analysisInstructionsFor">Analysis Instructions for</span>
+                    <br>
+                    <span> {{ labNote?.laboratory?.displayDescriptionName }} </span>
+                </label>
+                <textarea instructions-textarea
+                          class="note"
+                          maxlength="4000"
+                          rows="5"
+                          data-qa="instructionsForLab"
+                          [attr.data-qa-precision]="i"
+                          [appDisable]="controls.LABORATORY_NOTES | isInputDisabled:state?.security:state?.isEditMode"
+                          [(ngModel)]="labNote.note">
+                </textarea>
+              </app-instructions-box>
+        </ng-container>
+    </div>
+</div>
+

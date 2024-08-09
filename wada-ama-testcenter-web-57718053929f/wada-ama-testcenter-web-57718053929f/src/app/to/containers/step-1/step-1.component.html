@@ -1,0 +1,382 @@
+<div 
+    appInheritDir
+    appRandomizeInput
+    #root="appRandomizeInput"
+    class="wrapper">
+    <app-to-notifications
+        *ngIf="(hasSaveConflict) || (saveError && !(hasSaveConflict && hasOptimisticLockException))"
+        id="dcf-notifications"
+        type="error"
+        [conflictException]="conflictException"
+        [saveError]="saveError">
+        <span *ngIf="!conflictException && !saveError" i18n="@@errorsDetectedInFollowingFields">Some error(s) were detected in the following fields:</span>
+    </app-to-notifications>
+    <app-to-notifications *ngIf="hasTestingOrderTests" type="informative">
+        <span i18n="@@checkTestingOrderTests" >The Testing Authority, Result Management Authority & Test Coordinator cannot be updated once tests have been added to the testing order. Please remove the tests before editing these fields.</span>
+    </app-to-notifications>
+    <form
+        *appLet="{security: fieldsSecurity$ | async, isEditMode: isEditMode$ | async, behalfOfSCA: behalfOfSCA$ | async} as state"
+        [formGroup]="form">
+        <app-form-field [hasAsterisk]="true">
+            <label i18n="@@testType">Test Type</label>
+            <div field-input>
+                <label class="radio-container">
+                    <input
+                        #firstFormElement
+                        #inCompetition
+                        formControlName="testType"
+                        type="radio"
+                        [appDisable]="controls.TEST_TYPE | isInputDisabled:state?.security:state?.isEditMode"
+                        [value]="true" 
+                        (change)="selectedTestType(inCompetition.checked)">
+                    <span class="checkmark" data-qa="testTypeInCompetition"></span>
+                    <span i18n="@@inCompetition">In Competition</span>
+                </label>
+                <label class="radio-container">
+                    <input
+                        formControlName="testType"
+                        type="radio"
+                        [appDisable]="controls.TEST_TYPE | isInputDisabled:state?.security:state?.isEditMode"
+                        [value]="false"
+                        (change)="selectedTestType(inCompetition.checked)">
+                    <span class="checkmark" data-qa="testTypeOutCompetition"></span>
+                    <span i18n="@@outOfCompetition">Out of Competition</span>
+                </label>
+            </div>
+        </app-form-field>
+
+        <app-form-field [hasAsterisk]="true" [hasError]="startDateHasErrors">
+            <label for="startDate" i18n="@@startDate">Start Date</label>
+            <app-date-input
+                field-input
+                dataQA="startDate"
+                fieldId="startDate"
+                formControlName="startDate"
+                [appDisable]="controls.START_DATE | isInputDisabled:state?.security:state?.isEditMode"
+                [hasError]="startDateHasErrors"
+                [locale]="locale$ | async"
+                [maxDate]="maxStartDate"
+                (showCalendarEmitter)="isCalendarDisplayed($event)">
+            </app-date-input>
+            <span field-info class="field-info" i18n="@@dateFormat">dd-mm-yyyy</span>
+            <div field-error *ngIf="startDateHasErrors">
+                <span *ngIf="startDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span *ngIf="startDate.errors.maxDate" i18n="@@respectTheMaxDateRange">Date must be equal to or lower than {{ maxStartDate.format('DD-MMM-YYYY') }}</span>
+                <span *ngIf="startDate.errors.validateDateFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field [hasAsterisk]="true" [hasError]="endDateHasErrors">
+            <label for="endDate" i18n="@@endDate">End Date</label>
+            <app-date-input
+                field-input
+                dataQA="endDate"
+                fieldId="endDate"
+                formControlName="endDate"
+                [appDisable]="controls.END_DATE | isInputDisabled:state?.security:state?.isEditMode"
+                [hasError]="endDateHasErrors"
+                [locale]="locale$ | async"
+                [minDate]="minEndDate">
+            </app-date-input>
+            <span field-info class="field-info" i18n="@@dateFormat">dd-mm-yyyy</span>
+            <div field-error *ngIf="endDateHasErrors">
+                <span *ngIf="endDate.errors.required" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                <span *ngIf="endDate.errors.minDate" i18n="@@respectTheMinDateRange">Date must be equal to or greater than {{ minEndDate.format('DD-MMM-YYYY') }}</span>
+                <span *ngIf="endDate.errors.validateDateFormat?.error?.invalid" i18n="@@dateMustBeValidFormat">Date must be in a valid format.</span>
+            </div>
+        </app-form-field>
+
+        <app-form-field *ngIf="inCompetition.checked" columns="30% auto auto auto">
+            <label for="majorEvent" i18n="@@majorEvent">Major Event</label>
+            <app-dropdown
+                field-input
+                dataQA="majorEventDropdown"
+                formControlName="majorEvent"
+                i18n-placeholder="@@majorEvent"
+                id="majorEvent"
+                placeholder="Major Event"
+                property="id"
+                type="text"
+                [appDisable]="controls.MAJOR_GAME_EVENT | isInputDisabled:state?.security:state?.isEditMode"
+                [disableMouseOver]="true"
+                [isDisabled]="controls.MAJOR_GAME_EVENT | isInputDisabled:state?.security:state?.isEditMode"
+                (selectedItem)="selectedMajorEvent($event)">
+                <div class="dropdown-item" i18n="@@select" [appDropdownElement]="null">Select</div>
+                <ng-container *ngFor="let item of majorEvents$ | async; let i = index">
+                    <div [appDropdownElement]="item" class="dropdown-item" data-qa="majorEventDropdownOption" [attr.data-qa-precision]="i">{{ item.description }}</div>
+                </ng-container>
+            </app-dropdown>
+            <a
+                appOpenObjectInClassic
+                field-input-2
+                *ngIf="majorEvent?.value?.id !== null"
+                href=""
+                i18n="@@viewMajorEvent" 
+                [objectId]="majorEvent?.value?.id"
+                [targetObject]="'MajorGame'">View Major Event</a>
+        </app-form-field>
+
+        <app-form-field *ngIf="inCompetition.checked && majorEvent?.value?.id !== null" [hasAsterisk]="true" [hasError]="testTimingHasErrors">
+                <label i18n="@@testTiming">Test Timing</label>
+                <div field-input>
+                    <label class="radio-container">
+                        <input 
+                            formControlName="testTiming"id="testTiming"
+                            type="radio"
+                            [appDisable]="controls.TEST_TIMING | isInputDisabled:state?.security:state?.isEditMode"
+                            [value]="testTimingEnum.PreCompetition">
+                        <span class="checkmark" data-qa="testTimingpreCompetition"></span>
+                        <span i18n="@@preCompetition">Pre-Competition</span>
+                    </label>
+                    <label class="radio-container"> 
+                        <input
+                            formControlName="testTiming"
+                            type="radio"
+                            [appDisable]="controls.TEST_TIMING | isInputDisabled:state?.security:state?.isEditMode"
+                            [value]="testTimingEnum.PostCompetition">
+                        <span class="checkmark" data-qa="testTimingpostCompetition"></span>
+                        <span i18n="@@postCompetition">Post-Competition</span>
+                    </label>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="false">
+                <label for="competitionCategory" i18n="@@competitionCategory">Competition Category</label>
+                <app-typeahead
+                    field-input
+                    dataQA="competitionCategoryTypeahead"
+                    fieldId="competitionCategory"
+                    formControlName="competitionCategory"
+                    suggestionField="description"
+                    [isDisabled]="controls.COMPETITION_CATEGORY | isInputDisabled:state?.security:state?.isEditMode"
+                    [suggestions]="competitionCategorySuggestions">
+                </app-typeahead>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="false">
+                <label for="competitionName" i18n="@@competitionNameTrainingSession">Name of Competition / Training Session</label>
+                <input
+                    field-input
+                    data-qa="competitionName"
+                    formControlName="competitionName"
+                    id="competitionName"
+                    type="text"
+                    [appDisable]="controls.COMPETITION_NAME | isInputDisabled:state?.security:state?.isEditMode">
+            </app-form-field>
+
+            <app-form-field>
+                <label for="country" i18n="@@testingCountry">Country of Testing</label>
+                <app-typeahead
+                    field-input
+                    dataQA="countryOfTestingTypeahead"
+                    fieldId="country"
+                    formControlName="country"
+                    suggestionField="name"
+                    [isDisabled]="controls.TESTING_COUNTRY | isInputDisabled:state?.security:state?.isEditMode"
+                    [suggestions]="countrySuggestions"
+                    (selected)="selectCountry($event)">
+                </app-typeahead>
+            </app-form-field>
+
+            <app-form-field>
+                <label for="region" i18n="@@testingRegion">Region of Testing</label>
+                <app-typeahead
+                    field-input
+                    dataQA="regionOfTestingTypeahead"
+                    fieldId="region"
+                    formControlName="region"
+                    suggestionField="name"
+                    [isDisabled]="((selectedCountryId$ | async) === '')  || (controls.TESTING_REGION | isInputDisabled:state?.security:state?.isEditMode)"
+                    [suggestions]="regionSuggestions">
+                </app-typeahead>
+            </app-form-field>
+
+            <app-form-field>
+                <label for="city" i18n="@@testingCity">City of Testing</label>
+                <input
+                    field-input
+                    autocomplete="disabled"
+                    data-qa="cityOfTesting"
+                    formControlName="city"
+                    id="city"
+                    type="text"
+                    [appDisable]="controls.TESTING_CITY | isInputDisabled:state?.security:state?.isEditMode">
+            </app-form-field>
+
+            <app-form-field>
+                <label for="adoReferenceNumber" i18n="@@adoReferenceNumber">ADO Reference Number</label>
+                <input
+                    field-input
+                    data-qa="adoReferenceNumber"
+                    formControlName="adoReferenceNumber"
+                    id="adoReferenceNumber"
+                    type="text"
+                    [appDisable]="controls.ADO_REFERENCE_NUMBER | isInputDisabled:state?.security:state?.isEditMode">
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="testingAuthorityHasErrors">
+                <label for="testingAuthority" i18n="@@testingAuthority">Testing Authority</label>
+                <app-typeahead
+                    field-input
+                    dataQA="testingAuthorityTypeahead"
+                    fieldId="testingAuthority"
+                    formControlName="testingAuthority"
+                    suggestionField="displayDescriptionName"
+                    [hasError]="testingAuthorityHasErrors"
+                    [hasWarning]="testingAuthorityHasWarnings"
+                    [isDisabled]="(hasTestingOrderTests) || (controls.TEST_AUTHORITY | isInputDisabled:state?.security:state?.isEditMode)"
+                    [isInvalid]="testingAuthorityHasErrors"
+                    [suggestions]="testingAuthoritySuggestions"
+                    (ngModelChange)="validateAuthorityFields()">
+                </app-typeahead>
+                <div field-error *ngIf="testingAuthorityHasErrors">
+                    <span *ngIf="testingAuthority.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+                <div field-warning *ngIf="testingAuthorityHasWarnings">
+                    <span *ngIf="testingAuthority.errors.isNotCreator; else checkProviderOrSharingRules" i18n="@@aboutToLoseAccessAsTestingAuthority">You are about to lose your access as a Testing Authority to this Testing Order.</span>
+                    <ng-template #checkProviderOrSharingRules>
+                        <span *ngIf="testingAuthority.errors.isNotServiceProvider; else checkSharingRules" i18n="@@contractWithTestingAuthorityIsAbsent">Your contract with the Testing Authority is absent. You will lose Testing Authority access to this Testing Order</span>
+                    <ng-template #checkSharingRules>
+                        <span *ngIf="testingAuthority.errors.isNotSharingTARules" i18n="@@sharingRuleAbsent">Sharing rule with is absent. You will lose Testing Authority access to this Testing Order.</span>
+                    </ng-template>
+                    </ng-template>
+                </div>
+            </app-form-field>
+
+            <app-form-field>
+                <label i18n="@@feeForServiceTest">Fee for Service Test</label>
+                <div field-input >
+                    <label class="radio-container">
+                        <input
+                            formControlName="feeForService"
+                            type="radio"
+                            [appDisable]="controls.FEE_FOR_SERVICE | isInputDisabled:state?.security:state?.isEditMode"
+                            [value]="true">
+                        <span class="checkmark" data-qa="feeForServiceYes"></span>
+                        <span i18n="@@yes">Yes</span>
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            formControlName="feeForService"
+                            type="radio"
+                            [appDisable]="controls.FEE_FOR_SERVICE | isInputDisabled:state?.security:state?.isEditMode"
+                            [value]="false">
+                        <span class="checkmark" data-qa="feeForServiceNo"></span>
+                        <span i18n="@@no">No</span>
+                    </label>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="sampleCollectionAuthorityHasErrors">
+                <label for="sampleCollectionAuthority" i18n="@@sampleCollectionAuthority">Sample Collection Authority</label>
+                <app-typeahead
+                    field-input
+                    dataQA="sampleCollectionAuthorityTypeahead"
+                    fieldId="sampleCollectionAuthority"
+                    formControlName="sampleCollectionAuthority"
+                    suggestionField="displayDescriptionName"
+                    [hasError]="sampleCollectionAuthorityHasErrors"
+                    [isDisabled]="(isIssued$ | async) || (hasDCFs$ | async) || (controls.SAMPLE_COLLECTION_AUTHORITY | isInputDisabled:state?.security:state?.isEditMode)"
+                    [isInvalid]="sampleCollectionAuthorityHasErrors"
+                    [suggestions]="sampleCollectionSuggestions"
+                    (ngModelChange)="validateAuthorityFields()">
+                </app-typeahead>
+                <div field-info *ngIf="(isEditMode$ | async) && (behalfOfSCA$ | async)" class="field-info">
+                    <span i18n="@@actingOnBehalfOf">Acting on behalf of {{ state.behalfOfSCA?.name }}</span>
+                </div>
+                <div field-error *ngIf="sampleCollectionAuthorityHasErrors">
+                    <span *ngIf="sampleCollectionAuthority.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+            <app-form-field
+                *ngIf="(sampleCollectionAuthority?.value?.id !== testingAuthority?.value?.id) || (sampleCollectionAuthority?.value?.id !== toCreator?.id)"
+                [hasAsterisk]="true"
+                [hasError]="grantSCAWriteAccessHasErrors">
+                <label i18n="@@grantAccessToSampleCollectionAuthority">Grant access to Sample Collection Authority</label>
+                <div field-input>
+                    <label class="radio-container">
+                        <input
+                            formControlName="grantSCAWriteAccess"
+                            type="radio"
+                            [appDisable]="controls.GRANT_SCA_WRITE_ACCESS | isInputDisabled:state?.security:state?.isEditMode"
+                            [value]="true">
+                        <span class="checkmark" data-qa="grantAccessToSCAYes"></span>
+                        <span i18n="@@yes">Yes</span>
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            formControlName="grantSCAWriteAccess"
+                            type="radio"
+                            [appDisable]="controls.GRANT_SCA_WRITE_ACCESS | isInputDisabled:state?.security:state?.isEditMode"                            
+                            [value]="false">
+                        <span class="checkmark" data-qa="grantAccessToSCANo"></span>
+                        <span i18n="@@no">No</span>
+                    </label>
+                </div>
+            </app-form-field>
+
+            <app-form-field [hasAsterisk]="true" [hasError]="resultManagementAuthorityHasErrors">
+                <label for="resultManagementAuthority" i18n="@@resultManagementAuthority">Result Management Authority</label>
+                <app-typeahead
+                    field-input
+                    dataQA="resultManagementAuthorityTypeahead"
+                    fieldId="resultManagementAuthority"
+                    formControlName="resultManagementAuthority"
+                    suggestionField="displayDescriptionName"
+                    [hasError]="resultManagementAuthorityHasErrors"
+                    [isDisabled]="(hasTestingOrderTests) || (controls.RESULT_MANAGEMENT_AUTHORITY | isInputDisabled:state?.security:state?.isEditMode)"
+                    [isInvalid]="resultManagementAuthorityHasErrors"
+                    [suggestions]="resultManagementSuggestions"
+                    (ngModelChange)="validateAuthorityFields()">
+                </app-typeahead>
+                <div field-error *ngIf="resultManagementAuthorityHasErrors">
+                    <span *ngIf="resultManagementAuthority.errors.descriptionRequired" i18n="@@pleaseEnterAValue">Please enter a value.</span>
+                </div>
+            </app-form-field>
+
+            <app-form-field>
+                <label for="testCoordinator" i18n="@@testCoordinator">Test Coordinator</label>
+                <app-typeahead
+                    field-input
+                    dataQA="testCoordinatorTypeahead"
+                    fieldId="testCoordinator"
+                    formControlName="testCoordinator"
+                    suggestionField="displayDescriptionName"
+                    [appDisable]="hasTestingOrderTests"
+                    [isDisabled]="(hasTestingOrderTests) || (controls.TEST_COORDINATOR | isInputDisabled:state?.security:state?.isEditMode)"
+                    [suggestions]="testCoordinatorSuggestions">
+                </app-typeahead>
+            </app-form-field>
+
+            <app-form-field>
+                <label for="notificationTo" i18n="@@sendNotificationTo">Send Notification of Results to</label>
+                <app-info-bubble i18n="@@notificationToTooltip" [infoBubbleSource]="infoBubbleSource">The Testing Authority and the Result Management Authority will automatically receive notice of results. If there are other ADOs you wish to receive results from these tests, please enter them here.</app-info-bubble>
+                <app-multi-typeahead
+                    field-input
+                    class="standard-field"
+                    dataQA="sendNotificationTypeahead"
+                    fieldId="notificationTo"
+                    id="notificationTo"
+                    suggestionField="description"
+                    [isDisabled]="controls.NOTIFIED_ADOS | isInputDisabled:state?.security:state?.isEditMode"
+                    [maxTags]="maxNumberAdos$ | async"
+                    [preSelectedItem]="sendToItems"
+                    [removeItem]="removeItem"
+                    [suggestions]="notificationToSuggestions"
+                    (selected)=onNotificationToSelected($event)>
+                </app-multi-typeahead>
+            </app-form-field>
+
+            <app-form-field>
+                <label i18n="@@testingDescription">Description of Testing</label>
+                <textarea
+                    field-input
+                    data-qa="descriptionOfTesting"
+                    formControlName="descriptionOfTesting"
+                    maxlength="2000"
+                    [appDisable]="controls.TESTING_DESCRIPTION | isInputDisabled:state?.security:state?.isEditMode">
+                </textarea>
+            </app-form-field>
+
+    </form>
+</div>

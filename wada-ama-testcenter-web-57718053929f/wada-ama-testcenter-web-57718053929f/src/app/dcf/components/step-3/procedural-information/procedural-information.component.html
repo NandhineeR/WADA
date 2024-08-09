@@ -1,0 +1,133 @@
+<app-view-section [isLoading]="!proceduralInformation">
+    <app-view-section-title
+        sectionNumber=3
+        sectionTitle='Procedural Information'
+        [canWrite]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled"
+        [link]="['/', 'dcf', 'edit', dcfId, 'step', 3]"
+        [numberErrors]="missingFields.size">
+    </app-view-section-title>
+    
+    <app-view-section-content
+        appHideControl
+        *ngIf="proceduralInformation"
+        [permissions]="whiteList">
+        <app-view-entry id="athleteRepresentative">
+            <app-view-entry-name i18n="@@athleteRepresentative">Athlete Representative</app-view-entry-name>
+            <app-view-entry-value>
+                <div
+                    *ngIf="proceduralInformation.athleteRepresentative; else noAthleteRepresentative"
+                    class="value">{{ proceduralInformation.athleteRepresentative!.lastName | formatParticipantName:proceduralInformation.athleteRepresentative!.firstName }} </div>
+                <ng-template #noAthleteRepresentative>
+                    <div class="value"></div>
+                </ng-template>
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <app-view-entry id="dco">
+            <app-view-entry-name
+                i18n="@@dopingControlOfficer"
+                [invalid]="missingFields | setHas:fields.Dco"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Doping Control Officer</app-view-entry-name>
+            <app-view-entry-value>
+                <div
+                    *ngIf="proceduralInformation.dco; else noDco"
+                    class="value">{{ proceduralInformation.dco!.lastName | formatParticipantName:proceduralInformation.dco!.firstName }}</div>
+                <ng-template #noDco>
+                    <div class="value"></div>
+                </ng-template>
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <app-view-entry id="consentForResearch">
+            <app-view-entry-name
+                i18n="@@consentForResearch"
+                [invalid]="missingFields | setHas:fields.ConsentForResearch"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Consent for Research</app-view-entry-name>
+            <app-view-entry-value>
+                <div
+                    *ngIf="proceduralInformation.consentForResearch === true;"
+                    class="value" data-qa="consentForResearchYes"
+                    i18n="@@yes">Yes</div>
+                <div
+                    *ngIf="proceduralInformation.consentForResearch === false;"
+                    class="value" data-qa="consentForResearchNo"
+                    i18n="@@no">No</div>
+                <div
+                    *ngIf="proceduralInformation.consentForResearch !== true && proceduralInformation.consentForResearch !== false;"
+                    class="value"></div>
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <app-view-entry data-qa="proceduralIrregularities" id="confirmationOfProcedure">
+            <app-view-entry-name i18n="@@proceduralIrregularities">Procedural Irregularities</app-view-entry-name>
+            <app-view-entry-value>
+                {{ proceduralInformation.irregularities }}
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <app-view-entry data-qa="declarationOfTransfusion" id="bloodTransfusionDeclaration">
+            <app-view-entry-name i18n="@@bloodTransfusionsDeclaration">Declaration of Blood Transfusions</app-view-entry-name>
+            <app-view-entry-value>
+                {{ proceduralInformation.declarationOfTransfusion }}
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <app-view-entry data-qa="declarationOfSupplements" id="medicationSupplementDeclaration">
+            <app-view-entry-name i18n="@@declarationMedicationSupplements">Declaration of Medication Supplements</app-view-entry-name>
+            <app-view-entry-value>
+                {{ proceduralInformation.declarationOfSupplements }}
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <app-multiple-field-row-view
+            dataQA="procedureEndDate"
+            id="procedureEndDate"
+            [items]="[proceduralInformation.timezone?.shortName]"
+            [mainItem]="proceduralInformation.endOfProcedureDate | formatDatetime | uppercase">
+            <app-view-entry-name i18n="@@endOfProcedureDate" role="mainField">Date of End of Procedure</app-view-entry-name>
+            <app-view-entry-name
+                i18n="@@timeZone"
+                role="field-0"
+                [invalid]="missingFields | setHas:fields.Timezone"
+                [required]="isSampleTimezoneRequired$ | async">Time Zone</app-view-entry-name>
+        </app-multiple-field-row-view>
+    
+        <app-view-entry id="dcoComment">
+            <app-view-entry-name i18n="@@dcoComment">DCO Comment</app-view-entry-name>
+            <app-view-entry-value>
+                <div *ngIf="proceduralInformation.dcoComment" class="value">{{ proceduralInformation.dcoComment }}</div>
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <app-view-entry id="athleteComment">
+            <app-view-entry-name i18n="@@athleteComment">Athlete Comment</app-view-entry-name>
+            <app-view-entry-value>
+                <div *ngIf="proceduralInformation.athleteComment" class="value">{{ proceduralInformation.athleteComment }}</div>
+            </app-view-entry-value>
+        </app-view-entry>
+    
+        <ng-container>
+            <app-view-subsection *ngFor="let item of proceduralInformation.nonConformities; let i=index">
+                <app-view-subsection-title i18n="@@nonConformityX">Non-Conformity&nbsp;{{ i + 1 }}</app-view-subsection-title>
+    
+                <app-view-entry data-qa="categoryNonConformity" id="nonConformities">
+                    <app-view-entry-name
+                        i18n="@@nonConformityCategory"
+                        [invalid]="item.category ? false : true"
+                        [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Category of Non-Conformity</app-view-entry-name>
+                    <app-view-entry-value>
+                        <div *ngIf="item.category; else noCategory" class="value">{{ item.category.description }}</div>
+                        <ng-template #noCategory><div class="value"></div></ng-template>
+                    </app-view-entry-value>
+                </app-view-entry>
+    
+                <app-view-entry data-qa="descriptionNonConformity" id="nonConformities">
+                    <app-view-entry-name i18n="@@nonConformityDescription">Description of Non-Conformity</app-view-entry-name>
+                    <app-view-entry-value>
+                        {{ item.description }}
+                    </app-view-entry-value>
+                </app-view-entry>
+            </app-view-subsection>
+        </ng-container>
+    </app-view-section-content>
+</app-view-section>

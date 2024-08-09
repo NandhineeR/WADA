@@ -1,0 +1,42 @@
+<div class="wrapper" appInheritDir *ngIf="participants?.length > 0">
+    <table aria-label="view-doping-personnel-table" *ngIf="canViewField(controls.TEST_PARTICIPANT_INFORMATION); else unavailable">
+        <thead>
+            <tr>
+                <th colspan="2" scope="colgroup"><span i18n="@@role">Role</span></th>
+                <th colspan="2" scope="colgroup"><span i18n="@@lastNameFirstName">Last Name, First Name</span></th>
+                <th colspan="1" scope="col"><span i18n="@@arrivalTime">Arrival Time</span></th>
+                <th colspan="1" scope="col"><span i18n="@@status">Status</span></th>
+                <th colspan="3" scope="colgroup"><span i18n="@@message">Message</span></th>
+            </tr>
+        </thead>
+        <tbody>
+        <ng-container *ngFor="let participant of participants; let i = index">
+            <ng-container>
+                <tr [attr.data-qa-role]="participant.type?.code">
+                    <td colspan="2">
+                        <div *ngIf="participant.type?.code !== LEAD_DCO; else noLeadDCO" [attr.data-qa]="'participantRole'" [attr.data-qa-precision]="i">
+                            {{ participant.type?.description }}
+                        </div>
+                        <ng-template #noLeadDCO>
+                            <span i18n="@@leadDco" [attr.data-qa]="'participantLeadDcoRole'" [attr.data-qa-precision]="i">Lead DCO</span>
+                        </ng-template>
+                    </td>
+                    <td colspan="2">
+                        <span [attr.data-qa]="'participantName'" [attr.data-qa-precision]="i"> {{ participant.displayName }} </span>
+                    </td>
+                    <td colspan="1">
+                        <span [attr.data-qa]="'participantArrivalTime'" [attr.data-qa-precision]="i"> {{ participant.arrivalHour | formatHourMinute:participant.arrivalMinute }} </span>
+                    </td>
+                    <td colspan="1">
+                        <span [attr.data-qa]="'participantStatus'" [attr.data-qa-precision]="i"> {{ participant.status?.description }} </span>
+                    </td>
+                    <td colspan="3">
+                        <span [attr.data-qa]="'participantMessage'" [attr.data-qa-precision]="i"> {{ participant.comment }} </span>
+                    </td>
+                </tr>
+            </ng-container>
+        </ng-container>
+        </tbody>
+    </table>
+    <ng-template #unavailable i18n="@@testParticipantsUnavailable">You don't have the right to view the test participants of this Testing Order.</ng-template>
+</div>

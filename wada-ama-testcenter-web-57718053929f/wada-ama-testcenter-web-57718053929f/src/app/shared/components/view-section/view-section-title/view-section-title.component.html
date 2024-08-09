@@ -1,0 +1,153 @@
+<div appInheritDir [ngClass]="theme">
+    <span>
+        <span *ngIf="sectionNumber >= 0" class="number">{{ sectionNumber }}</span>
+        <h2
+            *ngIf="(sectionTitle || '').toString().length > 0"
+            class="title"
+            data-qa="title">{{ sectionTitle }}</h2>
+        <h2
+            *ngIf="(sectionTitle || '').toString().length == 0"
+            class="title"
+            data-qa="title">
+            <ng-content select=".step-title"></ng-content>
+        </h2>
+    </span>
+    <span *ngIf="!rightControls && numberErrors === 0 && canWrite" class="complete">
+        <img alt="Saved" i18n-alt="@@saved" src="assets/saved.svg">
+    </span>
+    <span *ngIf="!rightControls && (numberErrors > 0 || formatErrors > 0) && canWrite" class="missing-field">
+        <span class="inner-circle">
+            <img alt="Error" i18n-alt="@@error" src="assets/error.svg">
+        </span>
+        <span class="label-error">
+            <ng-template [ngTemplateOutlet]="numberErrorTemplate"></ng-template>
+        </span>
+        <span class="label-error">
+            <ng-template [ngTemplateOutlet]="formatErrorTemplate"></ng-template>
+        </span>
+    </span>
+    <span *ngIf="!rightControls && canWrite" class="link">
+        <a [queryParams]="queryParams" [routerLink]="link">
+            <img alt="Edit" i18n-alt="@@edit" src="assets/edit.svg" [attr.data-qa]="dataQA">
+        </a>
+    </span>
+
+    <span *ngIf="rightControls && canWrite" class="right-control">
+        <span *ngIf="(numberErrors > 0 || formatErrors > 0) && !inCreation" class="missing-field">
+            <span class="inner-circle">
+                <img src="assets/error.svg" alt="Error" i18n-alt="@@error">
+            </span>
+            <span class="label-error">
+                <ng-template [ngTemplateOutlet]="numberErrorTemplate"></ng-template>
+                <span
+                    *ngIf="numberErrors && formatErrors && !businessErrors"
+                    i18n="@@and_wrappedInBlankSpaces"
+                    style="white-space: pre"> and </span>
+                <span
+                    *ngIf="numberErrors && formatErrors && businessErrors"
+                    style="white-space: pre">, </span>
+                <ng-template [ngTemplateOutlet]="formatErrorTemplate"></ng-template>
+                <span
+                    *ngIf="(numberErrors && businessErrors) || (formatErrors && businessErrors)"
+                    i18n="@@and_wrappedInBlankSpaces"
+                    style="white-space: pre"> and </span>
+                    <ng-template [ngTemplateOutlet]="businessErrorTemplate"></ng-template>
+            </span>
+        </span>
+
+        <span *ngIf="(formatErrors > 0 || businessErrors > 0) && inCreation" class="missing-field">
+            <span class="inner-circle">
+                <img alt="Error" i18n-alt="@@error" src="assets/error.svg">
+            </span>
+            <span class="label-error">
+                <ng-template [ngTemplateOutlet]="businessErrorTemplate"></ng-template>
+                <span *ngIf="businessErrors && formatErrors" i18n="@@and_wrappedInBlankSpaces" style="white-space: pre"> and </span>
+                <ng-template [ngTemplateOutlet]="formatErrorTemplate"></ng-template>
+            </span>
+        </span>
+
+        <span *ngIf="rightInfo && hasBeenSaved && !inCreation" class="right-field">
+            <span class="inner-circle" *ngIf="rightInfoIcon">
+                <img src="assets/saved.svg" alt="Saved" i18n-alt="@@saved">
+            </span>
+            <span class="right-info">{{ rightInfo }}</span>
+        </span>
+
+        <span class="chevron" *ngIf="!singleForm">
+            <a href="javascript:void(0)" role="button">
+                <img alt="Arrow Icon" i18n="@@arrowIcon" src="assets/arrow.svg" [class]="arrowDirection">
+            </a>
+        </span>
+
+        <span *ngIf="isDelete && !inEdit && !inView" class="image">
+            <a href="javascript:void(0)" role="button" (click)="deleteElement($event)">
+                <img alt="Delete Icon" i18n-alt="@@deleteIcon" src="assets/delete_padding.svg" [attr.data-qa]="dataQA">
+            </a>
+        </span>
+        <span *ngIf="inView" class="edit">
+            <span class="link">
+                <a [queryParams]="queryParams" [routerLink]="link">
+                    <img alt="Edit" i18n-alt="@@edit" src="assets/edit.svg" [attr.data-qa]="dataQA">
+                </a>
+            </span>
+        </span>
+    </span>
+
+    <span *ngIf="isInModal" class="right-control">
+        <span *ngIf="rightInfo" class="right-field">
+            <span class="right-info">{{ rightInfo }}</span>
+        </span>
+
+        <span *ngIf="!singleForm" class="chevron">
+            <a href="javascript:void(0)" role="button">
+                <img alt="Arrow Icon" i18n="@@arrowIcon" src="assets/arrow.svg" [class]="arrowDirection">
+            </a>
+        </span>
+    </span>
+
+    <div *ngIf="isActive" class="frame-arrow"></div>
+</div>
+
+<app-confirm-leave
+    #deleteAthleteConfirmModal
+    hasCustomNoText="true"
+    hasCustomTitleText="true"
+    hasCustomYesText="true"
+    (confirm)="delete.emit($event)">
+    <div title>
+        <span i18n="@@remove">Remove</span>
+    </div>
+    <div primary-message>
+        <ng-content select="[deleteSectionConfirmationMessage]"></ng-content>
+    </div>
+    <div yes>
+        <span i18n="@@remove">Remove</span>
+    </div>
+    <div no>
+        <span i18n="@@cancel">Cancel</span>
+    </div>
+
+    <ng-template #numberErrorTemplate>
+        <ng-container [ngSwitch]="numberErrors">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" i18n="@@1missingValue">1 missing value</span>
+            <span *ngSwitchDefault i18n="@@xMissingValues">{{ numberErrors }} missing values</span>
+        </ng-container>
+    </ng-template>
+
+    <ng-template #formatErrorTemplate>
+        <ng-container [ngSwitch]="formatErrors">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" i18n="@@1formatError">1 format error</span>
+            <span *ngSwitchDefault i18n="@@xFormatErrors">{{ formatErrors }} format errors</span>
+        </ng-container>
+    </ng-template>
+
+    <ng-template #businessErrorTemplate>
+        <ng-container [ngSwitch]="businessErrors">
+            <span *ngSwitchCase="0"></span>
+            <span *ngSwitchCase="1" i18n="@@1businessError">1 business error</span>
+            <span *ngSwitchDefault i18n="@@xBusinessErrors">{{ businessErrors }} business errors</span>
+        </ng-container>
+    </ng-template>
+</app-confirm-leave>

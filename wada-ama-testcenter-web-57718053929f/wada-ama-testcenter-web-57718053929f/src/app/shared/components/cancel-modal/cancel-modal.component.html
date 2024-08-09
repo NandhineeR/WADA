@@ -1,0 +1,57 @@
+<app-popover
+    appInheritDir
+    [arrowTranslateX]="407"
+    [popoverTranslateX]="-26"
+    [standardWidth]="'680'"
+    (closePopover)="onClose()"
+    (openPopover)="onOpen()">
+
+    <ng-container *ngIf="isCancellable">
+        <div class="link__changeStatus fake-link" data-qa="cancelTestingOrder" i18n="@@cancel">Cancel</div>
+    </ng-container>
+
+    <div popover-title class="popover__title" i18n="@@changeStatusToCancelled">Change status to cancelled</div>
+
+    <div popover-body class="popover-body">
+        <div class="notification">
+            <ng-content select="[notifications]"></ng-content>
+        </div>
+
+        <label class="primary__message">
+            <ng-content select="[field-label]"></ng-content>
+        </label>
+
+        <form [formGroup]="form">
+            <label>
+                <span class="secondary__message" i18n="@@reason">Reason</span><span class="green-asterisk"> *</span>
+            </label>
+            <div field-error *ngIf="textareaReasonHasErrors" class="div__errorReasonMandatory" i18n="@@pleaseEnterAValue">Please enter a value.</div>
+            <textarea
+                #textareaReason
+                field-input
+                class="textarea__reason"
+                data-qa="reasonCancelling"
+                fieldId="reason"
+                formControlName="reason"
+                maxlength="4000"
+                rows="5"
+                [class.error]="textareaReasonHasErrors"></textarea>
+        </form>
+        <div class="popover-buttons">
+            <app-button 
+                class="button"
+                dataQA="confirmCancelling"
+                i18n="@@yes_uppercase"
+                type="primary"
+                [class.disabled]="_hasError"
+                [disabled]="_hasError"
+                (click)="changeStatusToCancel()">YES</app-button>
+            <app-button 
+                class="button"
+                dataQA="cancelCancelling"
+                i18n="@@no_uppercase"
+                type="secondary"
+                (click)="requestClose()">NO</app-button>
+        </div>
+    </div>
+</app-popover>

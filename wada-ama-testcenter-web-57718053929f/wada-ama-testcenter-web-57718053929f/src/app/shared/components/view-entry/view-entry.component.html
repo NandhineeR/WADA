@@ -1,0 +1,17 @@
+<div
+    appInheritDir
+    class="view-entry"
+    [ngClass]="{ 'space-between-instructions': addTopPadding }">
+    
+    <div class="view-entry-name">
+        <ng-content select="app-view-entry-name, [entry-name]"></ng-content>
+    </div>
+    
+    <div *ngIf="showEntryValue" class="view-entry-value">
+        <ng-content></ng-content>
+    </div>
+
+    <div *ngIf="showEntryLink" class="view-entry-link">
+        <ng-content select="app-view-entry-link"></ng-content>
+    </div>
+</div>

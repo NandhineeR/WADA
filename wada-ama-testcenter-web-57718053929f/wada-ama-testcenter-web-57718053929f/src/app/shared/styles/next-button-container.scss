@@ -1,0 +1,23 @@
+@import '~sass/variables';
+
+@mixin next-button-container($left, $right) {
+    position: absolute;
+    bottom: 0;
+    // 30% is the width of the labels
+    // 20px the padding between the labels and the controls
+    #{$left}: calc(30% + 20px);
+    // 21 px is half the height of the button
+    transform: translateY(calc(100% - 21px));
+
+    app-button {
+        min-width: 150px;
+        height: 42px;
+    }
+
+    .message {
+        font-size: 11px;
+        color: $messageColor;
+        text-align: center;
+        width: 100%;
+    }
+}

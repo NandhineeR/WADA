@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: testcenter-web-ingress
+  namespace: default
+  annotations:
+    konghq.com/protocol: "https"
+    konghq.com/strip-path: "true"
+    konghq.com/preserve-host: "true"
+spec:
+  ingressClassName: kong
+  rules:
+  - host: "localhost"
+    http:
+      paths:
+      - path: /ng
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: testcenter-web-service
+            port:
+              number: 9443

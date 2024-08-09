@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testcenter-web-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: testcenter-web
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: testcenter-web
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: testcenter-web
+        envFrom:
+          - configMapRef:
+              name: testcenter-web-configmap
+        image: 814043437137.dkr.ecr.ca-central-1.amazonaws.com/wada/testcenter-web:2.38.2-2102801
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 101
+          runAsNonRoot: true
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        livenessProbe:
+          httpGet:
+            path: /ng/healthcheck
+            port: 4200
+            scheme: HTTPS
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          timeoutSeconds: 10
+        ports:
+        - containerPort: 4200

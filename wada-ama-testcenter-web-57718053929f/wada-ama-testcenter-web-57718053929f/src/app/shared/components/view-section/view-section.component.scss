@@ -1,0 +1,35 @@
+@import '~sass/variables';
+
+.view-section {
+    width: 100%;
+
+    .view-section-content {
+        padding-top: 20px;
+        padding-bottom: 40px;
+        font-size: 13px;
+        background-color: $section-content-background;
+    }
+
+    .view-section-loading {
+        padding-top: 20px;
+        padding-bottom: 40px;
+        text-align: center;
+        vertical-align: middle;
+        width: 100%;
+
+        .loading-img {
+            display: inline-block;
+            height: 60px;
+            animation: rotation 2s infinite linear;
+        }
+
+        @keyframes rotation {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(359deg);
+            }
+        }
+    }
+}

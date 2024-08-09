@@ -1,0 +1,235 @@
+{
+    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+    "version": 1,
+    "newProjectRoot": "projects",
+    "projects": {
+        "ui": {
+            "root": "",
+            "sourceRoot": "src",
+            "projectType": "application",
+            "architect": {
+                "build": {
+                    "builder": "@angular-devkit/build-angular:browser",
+                    "options": {
+                        "aot": true,
+                        "baseHref": "/ng/",
+                        "outputPath": "dist",
+                        "index": "src/index.html",
+                        "main": "src/main.ts",
+                        "tsConfig": "src/tsconfig.app.json",
+                        "polyfills": "src/polyfills.ts",
+                        "stylePreprocessorOptions": {
+                            "includePaths": [
+                                "node_modules/bootstrap/scss"
+                            ]
+                        },
+                        "assets": [
+                            "src/assets",
+                            "src/healthcheck",
+                            "src/config.js",
+                            "src/config.template.js",
+                            "src/keycloak.json",
+                            "src/build-manifest.json"
+                        ],
+                        "styles": [
+                            "src/sass/styles.scss"
+                        ],
+                        "scripts": [],
+                        "allowedCommonJsDependencies": [
+                            "css-element-queries",
+                            "ng2-flatpickr",
+                            "uuid",
+                            "opentracing",
+                            "error-stack-parser",
+                            "moment-timezone"
+                        ]
+                    },
+                    "configurations": {
+                        "production": {
+                            "budgets": [{
+                                "type": "anyComponentStyle",
+                                "maximumWarning": "1mb"
+                            }],
+                            "optimization": true,
+                            "deleteOutputPath": false,
+                            "localize": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": false,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
+                                },
+                                {
+                                    "replace": "src/environments/store-dev-tools-module.ts",
+                                    "with": "src/environments/store-dev-tools-module.prod.ts"
+                                }
+                            ]
+                        },
+                        "testing": {
+                            "budgets": [{
+                                "type": "anyComponentStyle",
+                                "maximumWarning": "1mb"
+                            }],
+                            "optimization": true,
+                            "deleteOutputPath": false,
+                            "localize": true,
+                            "outputHashing": "all",
+                            "sourceMap": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": false,
+                            "buildOptimizer": true,
+                            "fileReplacements": [{
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "serve": {
+                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "options": {
+                        "browserTarget": "ui:build",
+                        "sslKey": "./server/ssl/server.key",
+                        "sslCert": "./server/ssl/server.crt"
+                    },
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "ui:build:production"
+                        },
+                        "testing": {
+                            "browserTarget": "ui:build:testing"
+                        }
+                    }
+                },
+                "extract-i18n": {
+                    "builder": "@angular-devkit/build-angular:extract-i18n",
+                    "options": {
+                        "browserTarget": "ui:build",
+                        "format": "xlf",
+                        "outputPath": "src/i18n",
+                        "outFile": "messages.xlf"
+                    }
+                },
+                "test": {
+                    "builder": "@angular-devkit/build-angular:karma",
+                    "options": {
+                        "main": "src/test.ts",
+                        "karmaConfig": "./karma.conf.js",
+                        "polyfills": "src/polyfills.ts",
+                        "tsConfig": "src/tsconfig.spec.json",
+                        "scripts": [],
+                        "styles": [
+                            "src/sass/styles.scss"
+                        ],
+                        "assets": [
+                            "src/assets",
+                            "src/healthcheck",
+                            "src/config.js",
+                            "src/config.template.js",
+                            "src/keycloak.json"
+                        ]
+                    }
+                },
+                "lint": {
+                    "builder": "@angular-devkit/build-angular:tslint",
+                    "options": {
+                        "tsConfig": [
+                            "src/tsconfig.app.json",
+                            "src/tsconfig.spec.json"
+                        ],
+                        "exclude": [
+                            "**/node_modules/**"
+                        ]
+                    }
+                }
+            },
+            "i18n": {
+                "sourceLocale": "en-CA",
+                "locales": {
+                    "am": "src/i18n/messages.am.xlf",
+                    "ar": "src/i18n/messages.ar.xlf",
+                    "az": "src/i18n/messages.az.xlf",
+                    "bg": "src/i18n/messages.bg.xlf",
+                    "cs": "src/i18n/messages.cs.xlf",
+                    "de": "src/i18n/messages.de.xlf",
+                    "en": "src/i18n/messages.en.xlf",
+                    "es": "src/i18n/messages.es.xlf",
+                    "et": "src/i18n/messages.et.xlf",
+                    "fa-IR": "src/i18n/messages.fa_IR.xlf",
+                    "fi": "src/i18n/messages.fi.xlf",
+                    "fr": "src/i18n/messages.fr.xlf",
+                    "hu": "src/i18n/messages.hu.xlf",
+                    "it": "src/i18n/messages.it.xlf",
+                    "ja": "src/i18n/messages.ja.xlf",
+                    "ko": "src/i18n/messages.ko.xlf",
+                    "lv": "src/i18n/messages.lv.xlf",
+                    "nl-NL": "src/i18n/messages.nl.xlf",
+                    "nl": "src/i18n/messages.nl-BE.xlf",
+                    "om": "src/i18n/messages.om.xlf",
+                    "pl": "src/i18n/messages.pl.xlf",
+                    "pt": "src/i18n/messages.pt_BR.xlf",
+                    "pt-PT": "src/i18n/messages.pt.xlf",
+                    "ru": "src/i18n/messages.ru.xlf",
+                    "ro": "src/i18n/messages.ro.xlf",
+                    "sk": "src/i18n/messages.sk.xlf",
+                    "sr": "src/i18n/messages.sr.xlf",
+                    "sw": "src/i18n/messages.sw.xlf",
+                    "ti": "src/i18n/messages.ti.xlf",
+                    "tr": "src/i18n/messages.tr.xlf",
+                    "uk-UA": "src/i18n/messages.uk_UA.xlf",
+                    "zh-CH": "src/i18n/messages.zh.xlf",
+                    "zh": "src/i18n/messages.zh_tw.xlf"
+                }
+            }
+        },
+        "ui-e2e": {
+            "root": "e2e",
+            "sourceRoot": "e2e",
+            "projectType": "application",
+            "architect": {
+                "e2e": {
+                    "builder": "@angular-devkit/build-angular:protractor",
+                    "options": {
+                        "protractorConfig": "./protractor.conf.js",
+                        "devServerTarget": "ui:serve"
+                    }
+                },
+                "lint": {
+                    "builder": "@angular-devkit/build-angular:tslint",
+                    "options": {
+                        "tsConfig": [
+                            "e2e/tsconfig.e2e.json",
+                            "src/tsconfig.app.json",
+                            "src/tsconfig.spec.json"
+                        ],
+                        "exclude": [
+                            "**/node_modules/**"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "defaultProject": "ui",
+    "schematics": {
+        "@schematics/angular:component": {
+            "prefix": "app",
+            "style": "scss"
+        },
+        "@schematics/angular:directive": {
+            "prefix": "app"
+        }
+    },
+    "cli": {
+        "analytics": "5370f9bc-2bad-491d-945e-c715ff51c915"
+    }
+}

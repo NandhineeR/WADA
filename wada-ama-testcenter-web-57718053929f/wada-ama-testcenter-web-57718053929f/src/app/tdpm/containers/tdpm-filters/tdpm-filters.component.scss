@@ -1,0 +1,94 @@
+$expandTextColor: #414042;
+$filterBorder: #c0c0c0;
+$filterBackground: #efefef;
+$filterBackground2: #ececec;
+
+.wrapper {
+    padding: 5px 20px 5px 20px;
+
+    &.expanded {
+        //background: white;
+        padding-bottom: 15px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .expand-text {
+        font-weight: bold;
+        color: $expandTextColor;
+        font-size: 14px;
+    }
+
+    .table-row {
+        margin-left: 5px;
+    }
+
+    .minimal-info {
+        font-weight: bold;
+        color: $expandTextColor;
+        font-size: 11px;
+
+        &-label {
+            font-weight: normal;
+        }
+    }
+
+    .filter-layout {
+        display: flex;
+    }
+
+    .radio-button-group-margin {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .date-placement {
+        display: -webkit-box;
+    }
+
+    .type-placement {
+        display: -webkit-box;
+    }
+
+    .test-type-placement {
+        display: flex;
+    }
+
+    .row-height  {
+        height: 24px;
+    }
+
+    input[type="radio"] {
+        display: none;
+    }
+
+    input[type="radio"] + span {
+        margin-right: 5px;
+        display: inline-block;
+        position: relative;
+        height: 15px;
+        width: 15px;
+        border-radius: 100%;
+        background-color: #fff;
+        border: 2px solid #909090;
+    }
+
+    input[type="radio"] + span:before {
+        content: '';
+        position: absolute;
+        height: 7px;
+        width: 7px;
+        border-radius: 100%;
+        top: 2px;
+        left: 2px;
+        transition: background 0.1s linear;
+    }
+
+    input[type="radio"]:checked + span:before {
+        background-color: #3F8532;
+    }
+
+    input[type="radio"]:checked + span {
+        border: 2px solid #3F8532;
+    }
+}

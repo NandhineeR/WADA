@@ -1,0 +1,79 @@
+<app-view-section [isLoading]="!athlete">
+    <app-view-section-content appHideControl *ngIf="athlete" [permissions]="whiteList">
+        <app-view-entry id="address">
+            <app-view-entry-name
+                i18n="@@athleteMailingAddress"
+                [invalid]="missingFields | setHas:fields.Address"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Athlete Mailing Address</app-view-entry-name>
+            <app-view-entry-value>
+                {{ athlete?.address | formatAddress }}
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="email">
+            <app-view-entry-name
+                i18n="@@emailAddress"
+                [invalid]="missingFields | setHas:fields.Email"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Email Address</app-view-entry-name>
+            <app-view-entry-value>
+                <div *ngIf="athlete?.email; else emailNotProvided">{{ athlete?.email }}</div>
+                <ng-template #emailNotProvided>
+                    <span *ngIf="athlete?.emailNotProvided" i18n="@@emailNotProvided">(Athlete hasn't provided an email address)</span>
+                </ng-template>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="phone">
+            <app-view-entry-name i18n="@@phoneNumber">Phone Number</app-view-entry-name>
+            <app-view-entry-value>
+                {{ athlete?.phone | phoneInternationalFormat }}
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="sportDiscipline">
+            <app-view-entry-name
+                i18n="@@sportDiscipline_slash"
+                [invalid]="missingFields | setHas:fields.SportDiscipline"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Sport / Discipline</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="athlete?.sportDiscipline">{{ athlete?.sportDiscipline?.sportDescription }} / {{ athlete?.sportDiscipline?.disciplineDescription }}</span>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="athleteLevel">
+            <app-view-entry-name
+                i18n="@@athleteLevel"
+                [invalid]="missingFields | setHas:fields.AthleteLevel"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Athlete Level</app-view-entry-name>
+            <app-view-entry-value>
+                {{ athlete?.athleteLevel }}
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="coach">
+            <app-view-entry-name
+                i18n="@@coach"
+                [invalid]="missingFields | setHas:fields.Coach"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Coach</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="athlete?.coach; else coachNotApplicable">{{ athlete?.coach?.lastName | formatParticipantName:athlete?.coach?.firstName  }}</span>
+                <ng-template #coachNotApplicable>
+                    <span *ngIf="athlete?.coachNotApplicable" i18n="@@notApplicable_parentheses">(Not applicable)</span>
+                </ng-template>
+            </app-view-entry-value>
+        </app-view-entry>
+        
+        <app-view-entry id="doctor">
+            <app-view-entry-name
+                i18n="@@doctor"
+                [invalid]="missingFields | setHas:fields.Doctor"
+                [required]="(actions | isActionAvailable:actionRight.Edit) && !isCancelled">Doctor</app-view-entry-name>
+            <app-view-entry-value>
+                <span *ngIf="athlete?.doctor; else doctorNotApplicable">{{ athlete?.doctor?.lastName | formatParticipantName:athlete?.doctor?.firstName  }} </span>
+                <ng-template #doctorNotApplicable>
+                    <span *ngIf="athlete?.doctorNotApplicable" i18n="@@notApplicable_parentheses">(Not applicable)</span>
+                </ng-template>
+            </app-view-entry-value>
+        </app-view-entry>
+    </app-view-section-content>
+</app-view-section>

@@ -1,0 +1,25 @@
+<app-notification *ngIf="!isStepValid" type="warning">
+    <span i18n="@@stepNavigationDisabledWarning">Step navigation is disabled until all mandatory fields are filled.</span>
+</app-notification>
+
+<app-procedural-information-input
+    [autoCompletes]="autoCompletes$ | async"
+    [conflictException]="conflictException$ | async"
+    [dcfId]="dcfId$ | async"
+    [dcfStatus]="dcfStatus"
+    [fieldsSecurity]="fieldsSecurity$ | async"
+    [inCreation]="inCreation"
+    [isCurrentStepValid$]="isCurrentStepValid$"
+    [isEditMode]="isEditMode$ | async"
+    [isMultipleDCF]="false"
+    [locale]="locale$ | async"
+    [nonConformitiesControl]="(proceduralInformation$ | async)?.nonConformities"
+    [proceduralInformation]="proceduralInformation$ | async"
+    [route]="route$ | async"
+    [saveError]="saveError"
+    [showErrors]="showErrors$ | async"
+    [timezones]="timezones$ | async"
+    (initializeProcedureInfo)="initStep3()"
+    (submitError)="submitError($event)"
+    (submitStep)="submitForm($event)">
+</app-procedural-information-input>

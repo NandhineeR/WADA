@@ -1,0 +1,34 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+
+
+@mixin container($left, $right) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 100%;
+    justify-content: space-between;
+    width: 100%;
+    height: 50%;
+    column-gap: 10px;
+}
+
+.body-section-item {
+    height: 40%;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.body-section-testing {
+    height: 87.3%;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.dashboard-body {
+    @include ltr {
+        @include container(left, right);
+    }
+    @include rtl {
+        @include container(right, left);
+    }
+}

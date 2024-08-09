@@ -1,0 +1,32 @@
+@import '~sass/mixins';
+@import '~app/shared/components/notification/mixins';
+
+$link-color: #3A782C;
+
+@mixin step($left, $right) {
+    .error-link-list {
+        @include notification-error-list($left, $right);
+    }
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}
+
+.dcf-view {
+    color: $link-color;
+}
+
+.dcf-view-link,
+.dcf-view-link:not([href]),
+.dcf-view-link:not([tabindex]),
+.dcf-view-link:not([href]):not([tabindex]):hover {
+    color: $link-color;
+    text-decoration: underline;
+    cursor: pointer;
+}

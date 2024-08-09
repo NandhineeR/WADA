@@ -1,0 +1,86 @@
+@import '~sass/mixins';
+@import '~sass/variables';
+
+$nameColor: #414042;
+$statusColor: #414042;
+$default-color: #212529;
+
+@mixin header($left, $right) {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+
+    .athlete-field {
+        font-size: 14px;
+        font-weight: bold;
+        color: $nameColor;
+
+        height: 30px;
+        line-height: 30px;
+
+        label {
+            display: inline-block;
+            width: 250px;
+            font-weight: normal;
+        }
+    }
+
+    .round-bottom-border {
+        border-bottom-#{$left}-radius: 35px;
+        border-bottom-#{$right}-radius: 35px;
+    }
+
+    .round-top-border {
+        border-top-#{$left}-radius: 35px;
+        border-top-#{$right}-radius: 35px;
+    }
+
+    .side-padding {
+        padding-#{$right}: 30px;
+        padding-#{$left}: 30px;
+    }
+
+    .status {
+        font-size: 13px;
+        color: $statusColor;
+        background-color: rgba(255, 255, 255, 0.75);
+
+        height: 40px;
+        line-height: 40px;
+
+        .cancelled {
+            color: #9A5713;
+        }
+
+        .completed {
+            color: #3A782C;
+        }
+
+        .default {
+            color: $default-color;
+        }
+
+        .draft {
+            color: #952406;
+        }
+
+        .inner-status {
+            font-weight: bold;
+        }
+
+        .spacer {
+            width: 10px;
+            display: inline-block;
+        }
+    }
+}
+
+.header {
+    @include ltr {
+        @include header(left, right);
+    }
+    @include rtl {
+        @include header(right, left);
+    }
+}

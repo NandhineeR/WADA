@@ -1,0 +1,59 @@
+<div class="wrapper" appInheritDir *appLet="{isMissionOrderReader: isMissionOrderReader$ | async, isTDPReader: isTDPReader$ | async} as currentRoles">
+    <div class="sidebar" [class.opened]="sidebarExpanded$ | async">
+        <div class="menu">
+
+            <a *ngIf="currentRoles.isTDPReader" class="menu-element" routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+                <img src="assets/navigation-menu/icon-white-home.svg" alt="Dashboard" i18n-alt="@@dashboard"><br/>
+                <span i18n="@@dashboard">Dashboard</span>
+            </a>
+
+            <a class="menu-element not-implemented" routerLink="/athlete" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+                <img src="assets/navigation-menu/icon-white-athlete.svg" alt="Athletes" i18n-alt="@@athletes"><br/>
+                <span i18n="@@athletes">Athletes</span>
+            </a>
+
+            <app-generic-menu *ngIf="currentRoles.isTDPReader || currentRoles.isMissionOrderReader" hasCustomLook="true" class="menu-element" isSidebarMenu="true" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+                <a menu-look>
+                    <img src="assets/navigation-menu/icon-white-tdp.svg" alt="Testing" data-qa="testingMenuItem" i18n-alt="@@testing"><br/>
+                    <span i18n="@@testing">Testing</span>
+                </a>
+                <ng-container>
+                    <div>
+                        <app-menu-item *ngIf="currentRoles.isTDPReader" isSidebarMenu="true" dataQA="testDistributionPlanAppMenu" routerLink="/tdp">
+                            <a i18n="@@testDistributionPlan">Test Distribution Plan</a>
+                        </app-menu-item>
+                        <app-menu-item *ngIf="currentRoles.isTDPReader" isSidebarMenu="true" dataQA="tdpMonitoringAppMenu" routerLink="/tdpm">
+                            <a i18n="@@tdpMonitoring">TDP Monitoring</a>
+                        </app-menu-item>
+                        <app-menu-item *ngIf="currentRoles.isTDPReader" isSidebarMenu="true" dataQA="tdssaMonitoringAppMenu" routerLink="/tdssa">
+                            <a i18n="@@tdssaMonitoring">TDSSA Monitoring</a>
+                        </app-menu-item>
+                        <app-menu-item *ngIf="currentRoles.isMissionOrderReader" isSidebarMenu="true" dataQA="viewTestingOrdersAppMenu" routerLink="/tos">
+                            <a i18n="@@testingOrderManagement">Testing Order Management</a>
+                        </app-menu-item>
+                    </div>
+                </ng-container>
+            </app-generic-menu>
+
+            <a class="menu-element not-implemented" routerLink="/tue" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+                <img src="assets/navigation-menu/icon-white-tue.svg" alt="Therapeutic Use Exemption (TUE)" i18n-alt="@@therapeuticUseExemptionTUE"><br/>
+                <span i18n="@@tue_uppercase">TUE</span>
+            </a>
+
+            <a class="menu-element not-implemented" routerLink="/abp" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+                <img src="assets/navigation-menu/icon-white-abp.svg" alt="Athlete Biological Passport (ABP)" i18n-alt="@@athleteBiologicalPassportABP"><br/>
+                <span i18n="@@abp_uppercase">ABP</span>
+            </a>
+
+            <a class="menu-element not-implemented" routerLink="/report" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+                <img src="assets/navigation-menu/icon-white-reports.svg" alt="Reports" i18n-alt="@@reports"><br/>
+                <span i18n="@@reports">Reports</span>
+            </a>
+
+            <a class="menu-element" [href]="adamsUrl" (click)="logoutAndNavigateToAdams($event)">
+                <img src="assets/navigation-menu/icon-white-back-to-classic.svg" alt="Back to Classic" i18n-alt="@@backToClassic"><br/>
+                <span i18n="@@backToClassic">Back to Classic</span>
+            </a>
+        </div>
+    </div>
+</div>

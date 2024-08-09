@@ -1,0 +1,43 @@
+<div class="wrapper" appInheritDir>
+    <div class="header">
+        <div class="title">
+            <span i18n="@@tdssaMonitoring">TDSSA Monitoring</span>&nbsp;-&nbsp;{{ organizationShortName$ | async }}
+        </div>
+        <app-switch-organization
+            *ngIf="isWada$ | async"
+            [organizationsSuggestions]="organizationSuggestions"
+            (changeOrganization)="changeOrganization($event)"
+            [organizationName]="organizationName$ | async"
+            page="TDSSA Monitoring">
+        </app-switch-organization>
+    </div>
+    <div class="content" *appLet="tdssaSheet$ | async as tdssaSheet">
+        <app-tdssa-filters></app-tdssa-filters>
+
+        <div *ngIf="loading$ | async; else error" class="section">
+            <app-loading-animation [isTable]="true"></app-loading-animation>
+        </div>
+
+        <ng-template #error>
+            <div *ngIf="(error$ | async) || (tdssaSheet | isEmpty); else tdssa" class="section">
+                <div class="message">
+                    <span i18n="@@thereIsNoTdssa">There is no TDSSA.</span>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #tdssa>
+            <div *ngIf="tdssa" class="section">
+                <app-tdssa-table
+                    [tdssaSheet]="tdssaSheetFiltered$ | async"
+                    [mlaArray]="mlaArray$ | async"
+                    (search)="onSearch($event)"
+                    (mlaChange)="onMLAChange($event)">
+                </app-tdssa-table>
+            </div>
+        </ng-template>
+    </div>
+    <div class="legend">
+        <app-mla-legend></app-mla-legend>
+    </div>
+</div>

@@ -1,0 +1,159 @@
+<app-view-section-content
+    appHideControl
+    *ngIf="ua"
+    [permissions]="whiteList">
+    <div
+        *ngIf="(isUserCorrector$ | async) && (actions | isActionAvailable:actionRight.Delete)"
+        class="button-delete noprint">
+        <app-button
+            class="button"
+            dataQA="deleteUaButton"
+            i18n="@@deleteUnsuccessfulAttempt_uppercase"
+            type="delete"
+            (click)="showDeleteUA(ua)">
+            DELETE UNSUCCESSFUL ATTEMPT
+        </app-button>
+    </div>
+
+    <app-view-entry id="{{controls.ATHLETE_ADAMS_ID}}">
+        <app-view-entry-name i18n="@@adamsIdNumber">ADAMS ID Number</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.adamsId" dataQA="adamsIdNumber">{{ ua.adamsId }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATHLETE_DATE_OF_BIRTH}}">
+        <app-view-entry-name i18n="@@dateOfBirth">Date of Birth</app-view-entry-name>
+        <app-view-entry-value
+            *ngIf="ua?.dateOfBirth"
+            dataQA="dateOfBirth"
+            i18n="@@xDateOfBirth">{{ ua?.dateOfBirth | date :'dd MMM yyyy':'-0000' | uppercase }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATHLETE_DATE_OF_BIRTH}}">
+        <app-view-entry-name i18n="@@age">Age</app-view-entry-name>
+        <app-view-entry-value
+            *ngIf="ua?.dateOfBirth"
+            dataQA="age"
+            i18n="@@xUAAthleteAge">{{ ua?.dateOfBirth | calculateAge }} years old</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATHLETE_SPORT_NATIONALITY}}">
+        <app-view-entry-name i18n="@@sportNationality">Sport Nationality</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua?.sportNationality" dataQA="sportNationality">{{ ua.sportNationality?.name || '' }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TEST_SPORT}}">
+        <app-view-entry-name i18n="@@sport">Sport</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.sportDiscipline" dataQA="sportDiscipline">{{ ua.sportDiscipline.displayDescriptionName }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TEST_TESTING_ORDER_ID}}">
+        <app-view-entry-name *ngIf="ua.toNumber" i18n="@@testingOrderNumber">Testing Order Number</app-view-entry-name>
+        <app-view-entry-value>
+            <a
+                class="link"
+                dataQA="testingOrderNumber"
+                i18n="@@ua_viewTo"
+                [routerLink]="['/','to', 'view', ua.toNumber | trimToNumber]"
+                (click)="resetUA()">{{ ua.toNumber }}</a>
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TEST_TEST_AUTHORITY}}">
+        <app-view-entry-name i18n="@@testingAuthority">Testing Authority</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.testingAuthority" dataQA="testingAuthority">{{ ua.testingAuthority.displayDescriptionName }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TEST_SAMPLE_COLLECTION_AUTHORITY}}">
+        <app-view-entry-name i18n="@@sampleCollectionAuthority">Sample Collection Authority</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.sampleCollectionAuthority" dataQA="sampleCollectionAuthority">{{ ua.sampleCollectionAuthority.displayDescriptionName }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TEST_RESULT_MANAGEMENT_AUTHORITY}}">
+        <app-view-entry-name i18n="@@resultManagementAuthority" [invalid]="errors | setHas:fields.ResultManagementAuthority" [required]="true">Result Management Authority</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.resultManagementAuthority" dataQA="resultManagementAuthority">{{ ua.resultManagementAuthority.displayDescriptionName }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TEST_TEST_COORDINATOR}}">
+        <app-view-entry-name i18n="@@testCoordinator">Test Coordinator</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.testCoordinator" dataQA="testCoordinator">{{ ua.testCoordinator.displayDescriptionName }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TEST_TYPE}}">
+        <app-view-entry-name i18n="@@testType">Test Type</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.testType !== null && ua.testType" dataQA="testTypeInCompetition" i18n="@@inCompetition">In Competition</app-view-entry-value>
+        <app-view-entry-value *ngIf="ua.testType !== null && !ua.testType" dataQA="testTypeOutOfCompetition" i18n="@@outOfCompetition">Out of Competition</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.WHEREABOUTS_LAST_CHECKED_DATE}}">
+        <app-view-entry-name i18n="@@athleteWhereaboutsLastCheckedDate">Athlete Whereabouts Last Checked Date</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.whereaboutsLastCheckedDate" dataQA="whereAboutsLastCheckedDate">{{ ua.whereaboutsLastCheckedDate | date :'dd-MMM-yyyy':'-0000' | uppercase }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.WHEREABOUTS_LAST_CHECKED_TIME_HOUR}}">
+        <app-view-entry-name i18n="@@athleteWhereaboutsLastCheckedTime">Athlete Whereabouts Last Checked Time</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.whereaboutsLastCheckedTime" dataQA="whereaboutsLastCheckedTime">{{ ua.whereaboutsLastCheckedTime }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.TIME_SLOT_START_HOUR}}">
+        <app-view-entry-name i18n="@@whenWas60minTimeSlotSupposedToStart">When was the 60-Min Time Slot supposed to start?</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.timeSlot" dataQA="whenWas60minTimeSlotSupposedToStart">{{ ua.timeSlot }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ADDRESS}}">
+        <app-view-entry-name i18n="@@attemptLocationAddress" [invalid]="(errors | setHas:fields.City) || (errors | setHas:fields.Country)" [required]="true">Attempt Location Address</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.address" dataQA="attemptLocationAddress">
+            {{ ua.address | formatAddress }}
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.LOCATION}}">
+        <app-view-entry-name i18n="@@locationDescription" [invalid]="errors | setHas:fields.Location" [required]="true">Description of Location</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.location">
+            <span *ngIf="ua.location === locationEnum.TrainingVenue" class="radio-label" data-qa="trainingVenue" i18n="@@trainingVenue">Training Venue</span>
+            <span *ngIf="ua.location === locationEnum.AthleteHome" class="radio-label" data-qa="athleteHome" i18n="@@athleteHome">Athlete's Home</span>
+            <span *ngIf="ua.location === locationEnum.Other" class="radio-label" data-qa="other" i18n="@@other">Other</span>
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.LOCATION_DESCRIPTION}}">
+        <app-view-entry-name i18n="@@specify" [invalid]="errors | setHas:fields.SpecifyLocation" [required]="true">Specify</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.specifyLocation" dataQA="specifyLocation">{{ ua.specifyLocation }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATTEMPT_DATE}}">
+        <app-view-entry-name i18n="@@attemptDate" [invalid]="errors | setHas:fields.AttemptDate" [required]="true">Attempt Date</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.attemptDate" dataQA="attemptDate">{{ ua.attemptDate | date :'dd-MMM-yyyy':'-0000' | uppercase }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATTEMPT_START_HOUR}}">
+        <app-view-entry-name i18n="@@attemptTimeFrom" [invalid]="errors | setHas:fields.AttemptTimeFrom" [required]="true">Attempt Time From</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.attemptTimeFrom" dataQA="attemptTimeFrom">{{ ua.attemptTimeFrom }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATTEMPT_END_HOUR}}">
+        <app-view-entry-name i18n="@@attemptTimeTo" [invalid]="errors | setHas:fields.AttemptTimeTo" [required]="true">Attempt Time To</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.attemptTimeTo" dataQA="attemptTimeTo">{{ ua.attemptTimeTo }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATTEMPT_METHODS}}">
+        <app-view-entry-name i18n="@@howContactWasAttempted" [invalid]="errors | setHas:fields.AttemptedContactMethods" [required]="true">How contact was attempted</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.attemptedContactMethods" dataQA="howContactWasAttempted">{{ methods }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.ATTEMPT_DESCRIPTION}}">
+        <app-view-entry-name i18n="@@attemptDescription">Description of Attempt</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.descriptionOfAttempt" dataQA="descriptionOfAttempt">{{ ua.descriptionOfAttempt }}</app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.DCO}}">
+        <app-view-entry-name i18n="@@dopingControlOfficer" [invalid]="errors | setHas:fields.DopingControlOfficer" [required]="true">Doping Control Officer</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.dopingControlOfficer">
+            <span data-qa="dopingControlOfficer">{{ ua.dopingControlOfficer.lastName | formatParticipantName:ua.dopingControlOfficer.firstName }}</span>
+        </app-view-entry-value>
+    </app-view-entry>
+    
+    <app-view-entry id="{{controls.REPORT_DATE}}">
+        <app-view-entry-name i18n="@@reportDate" [invalid]="errors | setHas:fields.DateOfReport" [required]="true">Date of Report</app-view-entry-name>
+        <app-view-entry-value *ngIf="ua.dateOfReport" dataQA="dateOfReport">{{ ua.dateOfReport | date :'dd-MMM-yyyy':'-0000' | uppercase }}</app-view-entry-value>
+    </app-view-entry>
+</app-view-section-content>

@@ -1,0 +1,136 @@
+<div class="correction_form__wrapper">
+    <app-popover appInheritDir (closePopover)="onClose()" (openPopover)="onOpen()">
+        <ng-container *ngIf="sampleTargetField === sampleTargetFieldEnum.MATCH_TYPE; else defaultLink">
+            <div class="link__changeStatus fake-link">{{translations$ | getSampleCorrector:sampleTargetField | async | capitalizeFirst}}</div>
+        </ng-container>
+        
+        <ng-template #defaultLink>
+            <div i18n="@@change" class="link__changeStatus fake-link">Change</div>
+        </ng-template>
+
+        <div popover-title class="popover__title">
+            <ng-container [ngSwitch]="sampleTargetField">
+                <span *ngSwitchCase="sampleTargetFieldEnum.MATCH_TYPE"></span>
+                <span *ngSwitchDefault i18n="@@changeSample">Change Sample</span>
+            </ng-container>
+            {{ translations$ | getSampleCorrector:sampleTargetField | async }}
+        </div>
+
+        <div popover-body class="popover-body">
+            <app-notification *ngIf="hasAdverseResult || hasSampleResults" type="warning">
+                <span i18n="@@sampleHasAdverseResult">This sample has an adverse result.</span>
+            </app-notification>
+            
+            <app-notification *ngIf="sampleTargetField === sampleTargetFieldEnum.MATCH_TYPE && isLastMatchedSample && dcfToBeDeleted" type="warning">
+                <span i18n="@@warningBreakingOlderMatch">You are about to break the match on a DCF that is older than {{ dcfRetentionPeriod }} months. Please note that unmatched DCFs older than {{ dcfRetentionPeriod }} months will be deleted.</span>
+            </app-notification>
+
+            <label class="primary__message">
+                <ng-container [ngSwitch]="sampleTargetField">
+                    <span *ngSwitchCase="sampleTargetFieldEnum.MATCH_TYPE" i18n="@@breakMatchForSampleXQuestion">Are you sure you want to {{ translations$ | getSampleCorrector:sampleTargetField | async }} for {{ translations$ | getSampleType:currentSampleType | async | lowercase}} sample {{ currentSampleCode }}?</span>
+                    <span *ngSwitchDefault i18n="@@changeTargetFieldXForSampleXQuestion">Are you sure you want to change the {{ translations$ | getSampleCorrector:sampleTargetField | async }} for {{ translations$ | getSampleType:currentSampleType | async | lowercase}} sample {{ currentSampleCode }}?</span>
+                </ng-container>
+            </label>
+
+            <form appInheritDir *ngIf="isPopoverActive" [formGroup]="sampleForm">
+                <app-form-field
+                    *ngIf="sampleTargetField !== sampleTargetFieldEnum.MATCH_TYPE"
+                    class="radio-field"
+                    [columns]="columns"
+                    [hasAsterisk]="true"
+                    [labelAlign]="false">
+                    <label class="radio-field-label" for="changeSampleField">{{ translations$ | getSampleCorrector:sampleTargetField | async | capitalizeFirst }}</label>
+                    <div field-input>
+                        <!--Change Sample Type -->
+                        <ng-container *ngIf="sampleTargetField === sampleTargetFieldEnum.SAMPLE_TYPE">
+                            <label class="radio-container" *ngFor="let sampleType of sampleTypes">
+                                    <input
+                                        #firstFormElement
+                                        appRadioOnFocus
+                                        id="sampleTypeSpecificCode"
+                                        formControlName="sampleTypeSpecificCode"
+                                        type="radio"
+                                        [value]="sampleType.specificCode"
+                                        (click)="toggleReason(currentSampleType === sampleType.specificCode)">
+                                    <span class="checkmark"></span>
+                                    <span class="radio-label">{{ sampleType.description }}</span>
+                            </label>
+                        </ng-container>
+
+                        <!--Change Sample Validity -->
+                        <ng-container *ngIf="sampleTargetField === sampleTargetFieldEnum.VALIDITY">
+                            <label class="radio-container">
+                                <input
+                                    #firstFormElement
+                                    appRadioOnFocus
+                                    formControlName="sampleValidity"
+                                    name="sampleValidity"
+                                    type="radio"
+                                    [value]="true"
+                                    (click)="toggleReason(currentValidity === true)">
+                                <span class="checkmark"></span>
+                                <span class="radio-label" i18n="@@valid">Valid</span>
+                            </label>
+                            <label class="radio-container">
+                                <input
+                                    appRadioOnFocus
+                                    formControlName="sampleValidity"
+                                    type="radio"
+                                    [value]="false"
+                                    (click)="toggleReason(currentValidity === false)">
+                                <span class="checkmark"></span>
+                                <span class="radio-label" i18n="@@invalid">Invalid</span>
+                            </label>
+                        </ng-container>
+
+                        <!--Change Sample Code -->
+                        <ng-container *ngIf="sampleTargetField === sampleTargetFieldEnum.SAMPLE_CODE">
+                            <input #firstFormElement class="input-field" formControlName="sampleCode" type="text">
+                        </ng-container>
+                    </div>
+                </app-form-field>
+                
+                <label>
+                    <span class="secondary__message" i18n="@@reason">Reason</span><span class="field-asterisk" [class.error]="textareaReasonHasErrors">*</span>
+                </label>
+                
+                <div field-error *ngIf="textareaReasonHasErrors" class="div__errorReasonMandatory" i18n="@@pleaseEnterAValue">Please enter a value.</div>
+                
+                <textarea
+                    field-input
+                    #textareaReason
+                    class="textarea__reason"
+                    fieldId="reason"
+                    formControlName="reason"
+                    maxlength="4000"
+                    rows="8"
+                    [class.error]="textareaReasonHasErrors">
+                </textarea>
+            </form>
+
+            <div correction-form-buttons class="popover-buttons">
+                <app-button
+                class="button"
+                type="primary"
+                [class.disabled]="!isTextAreaActive || isReasonEmpty"
+                [disabled]="!isTextAreaActive || isReasonEmpty"
+                (click)="changeSample()">
+                    <span>
+                        <span i18n="@@yes_uppercaseColon">YES, </span>
+                        <ng-container [ngSwitch]="sampleTargetField">
+                            <span *ngSwitchCase="sampleTargetFieldEnum.MATCH_TYPE"></span>
+                            <span *ngSwitchDefault i18n="@@changeSample_uppercase">CHANGE SAMPLE</span>
+                        </ng-container>
+                        {{ translations$ | getSampleCorrector:sampleTargetField | async }}
+                    </span>
+                </app-button>
+                <app-button
+                    class="button"
+                    type="secondary"
+                    (click)="requestClose()">
+                    <span i18n="@@cancel_uppercase">CANCEL</span>
+                </app-button>
+            </div>
+        </div>
+    </app-popover>
+</div>

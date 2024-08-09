@@ -1,0 +1,43 @@
+@import '~sass/variables';
+
+$initials-background: #5B5B5B;
+$initials-text: #ffffff;
+
+.label {
+    color: #414042;
+    font-size: 10px;
+    font-weight: normal;
+    text-align: center;
+    &.alone {
+        text-align: right;
+        font-size: 12px;
+    }
+}
+
+div[tooltip-content] {
+    color: #414042;
+    font-size: 12px;
+}
+
+.outer {
+    align-items: center;
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    max-width: 100%;
+    resize:both;
+}
+
+.svg {
+    height: 100%;
+}
+
+.circle {
+    fill: $initials-background;
+}
+
+.text {
+    fill: $initials-text;
+    font-size: 13px;
+}
+

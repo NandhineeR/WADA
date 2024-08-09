@@ -1,0 +1,22 @@
+<div *ngIf="hasCustomLook" [matMenuTriggerFor]="menu"><ng-content select="[menu-look]"></ng-content></div>
+
+<app-button
+    *ngIf="!hasCustomLook"
+    type="secondary"
+    [dataQA]="dataQA"
+    [disabled]="disabled"
+    [matMenuTriggerFor]="menu"
+    [ngClass]="{ 'disabled': disabled }"
+    (click)="changeDirection()"
+    (menuClosed)="changeDirection()">
+    <ng-content select="[menu-name]"></ng-content>
+    <span class="chevron">
+        <img src="assets/arrow_to.svg" alt="arrow icon" [class]="direction" [ngClass]="{ 'disabled': disabled }">
+    </span>
+</app-button>
+
+<mat-menu #menu="matMenu">
+    <div class="{{ isSidebarMenu ? 'sidebar-menu' : '' }} mat-menu">
+        <ng-content></ng-content>
+    </div>
+</mat-menu>

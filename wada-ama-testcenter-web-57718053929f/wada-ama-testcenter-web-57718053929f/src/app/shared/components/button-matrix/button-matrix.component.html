@@ -1,0 +1,10 @@
+<div class="matrix">
+    <div *ngFor="let label of labels; let i = index" class="matrix-item">
+        <div
+            class="matrix-item-button"
+            [class.selected]="selectedIndex === i"
+            (click)="onSelect(i)">
+            {{ label }}
+        </div>
+    </div>
+</div>

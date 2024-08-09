@@ -1,0 +1,20 @@
+.bar {
+    height: 15px;
+    border-radius: 5px;
+    background: white;
+    border: 1px solid black;
+    overflow: hidden;
+    padding: 1px;
+
+    span {
+        box-sizing: border-box;
+        height: 100%;
+        border-radius: 5px;
+        background: #5b5b5b;
+        display: flex;
+    }
+
+    .full {
+        background: #2d6828;
+    }
+}

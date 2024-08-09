@@ -1,0 +1,16 @@
+<div
+    appInheritDir
+    class="wrapper">
+    <app-test-participants-input
+        [bloodOfficials]="bloodOfficials$ | async"
+        [chaperones]="chaperones$ | async"
+        [hasAccessToTestParticipants]="isSCA"
+        [moParticipants]="moParticipant$ | async"
+        [participantTypes]="participantTypes$ | async"
+        [participantStatuses]="participantStatuses$ | async"
+        [testParticipants]="testParticipants$ | async"
+        [witnessChaperones]="witnessChaperones$ | async"
+        [emitSubmitData]="emitSubmitData"
+        (submitData)="submitData($event)">
+    </app-test-participants-input>
+</div>

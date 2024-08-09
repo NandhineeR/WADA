@@ -1,0 +1,14 @@
+<div
+    appInheritDir
+    class="wrapper">
+    <app-doping-control-personnel-input
+        [dcos]="dcos$ | async"
+        [dcpParticipants]="dcpParticipants$ | async"
+        [emitSubmitData]="emitSubmitData"
+        [hasAccessToDCP]="isSCA"
+        [instructions]="instructions$ | async"
+        [participantStatuses]="participantStatuses$ | async"
+        [participantTypes]="participantTypes$ | async"
+        (submitData)="submitData($event)">
+    </app-doping-control-personnel-input>
+</div>

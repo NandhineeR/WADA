@@ -1,0 +1,23 @@
+<div appInheritDir appTabFocus *ngIf="showModal" class="modal__wrapper">
+    <div class="modal__header">
+        <div class="modal__title">
+            <span i18n="@@duplicateAthletes">Duplicate Athletes</span>
+        </div>
+        <div class="modal__close" (click)="onExit()">&times;</div>
+    </div>
+    <div class="modal__body">
+        <div class="modal__messages">
+            <app-notification type="warning">
+                <ng-content select="[warning-message]"></ng-content>
+            </app-notification>
+            <div class="primary__message">
+                <ng-content select="[primary-message]"></ng-content>
+            </div>
+        </div>
+        <div class="modal__buttons">
+            <app-button focus="true" i18n="@@noReturnToForm" type="secondary" (click)="onCancel()">No, Return to Form</app-button>
+            <app-button i18n="@@yesContinue" type="primary" (click)="onConfirm()">Yes, Continue</app-button>
+        </div>
+    </div>
+</div>
+<div class="modal__overlay" *ngIf="showModal"></div>

@@ -1,0 +1,18 @@
+$bullet-color: #333333;
+
+@mixin notification-error-list($left, $right) {
+    padding-#{$left}: 18px;
+    margin-bottom: 0;
+    list-style: none;
+    font-size: 14px;
+    margin-top: 5px;
+
+    li::before {
+        color: $bullet-color;
+        content: "\2022 ";
+        font-weight: bold;
+        display: inline-block;
+        width: 16px;
+        margin-#{$left}: -16px;
+    }
+}

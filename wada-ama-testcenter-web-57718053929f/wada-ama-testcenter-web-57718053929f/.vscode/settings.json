@@ -1,0 +1,7 @@
+{
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "deepscan.enable": true,
+    "sonarlint.connectedMode.project": {
+        "projectKey": "ADAMS-NG_testcenter-web",
+    }
+}

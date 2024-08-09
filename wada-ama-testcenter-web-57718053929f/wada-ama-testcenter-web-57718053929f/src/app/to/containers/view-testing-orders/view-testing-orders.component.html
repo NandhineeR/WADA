@@ -1,0 +1,193 @@
+<div appInheritDir class="wrapper">
+    <span
+        title
+        class="title"
+        i18n="@@testingOrderManagement">Testing Order Management</span>
+
+    <div class="actions-wrapper">
+        <div class="search-action">
+            <app-form-field [columns]="''">
+                <label for="testingOrderNumber" i18n="@@testingOrderNumber">Testing Order Number</label>
+                <input
+                    field-input
+                    autocomplete="disabled"
+                    data-qa="viewTestingOrders.testingOrderNumber"
+                    type="text"
+                    [(ngModel)]="toNumberSearchString"
+                    (click)="resetNotFoundAlert()">
+            </app-form-field>
+
+            <app-button 
+                dataQA="viewTestingOrders.viewTestingOrderButton"
+                i18n="@@view_uppercase"
+                type="secondary"
+                (click)="navigateToViewTestingOrder()">
+                VIEW
+            </app-button>
+        </div>
+
+        <div
+            *ngIf="isMissionOrderWriter$ | async"
+            class="create-action">
+            <app-button
+                dataQA="viewTestingOrders.createTestingOrderButton"
+                i18n="@@createTestingOrder_uppercase"
+                routerLink="/to/new"
+                type="primary">
+                CREATE TESTING ORDER
+            </app-button>
+        </div>
+   </div>
+   
+   <div class="notifications">
+        <app-notification
+            *ngIf="(hasListTOsError$ | async); else notFoundAlert"
+            type="error">
+            <span i18n="@@toListCouldNotBeRetrieved">The list of testing orders could not be retrieved.</span>
+        </app-notification>
+        <ng-template #notFoundAlert>
+            <app-notification
+                *ngIf="showNotFoundAlert"
+                type="error">
+                <span i18n="@@toDoesNotExist">{{ translations$ | getErrorMessage:errorMessageKey | async }}</span>
+            </app-notification>
+            <app-notification *ngIf="showLimitListWarning" type="informative">
+                <span i18n="@@toWarningMaxLengthList">This list only shows the last {{ maxResults }} testing orders.</span>
+            </app-notification>
+        </ng-template>
+   </div>
+
+   <div class="filter-action">
+        <app-collapse-button
+            dataQA="viewTestingOrders.filters"
+            [collapsed]="isFilterCollapsed"
+            (click)="toggleCollapse()">
+            <span class="expand-text" i18n="@@filters">Filters</span>
+        </app-collapse-button>
+        <div class="search-action">
+            <app-form-field [columns]="''">
+                <label i18n="@@adoReferenceNumber">ADO Reference Number</label>
+                <input
+                    field-input
+                    *ngIf="!isFilterCollapsed"
+                    autocomplete="disabled"
+                    data-qa="viewTestingOrders.adoReferenceNumber"
+                    type="text"
+                    [ngModel]="searchcriteria.adoReferenceNumber"
+                    (click)="resetNotFoundAlert()"
+                    (ngModelChange)="updateSearchCriteria($event, 'adoReferenceNumber')">
+                <label class="collapsed-label" *ngIf="isFilterCollapsed">
+                    <label *ngIf="searchcriteria.adoReferenceNumber.length === 0; else valueTemplate" i18n="@@all">All</label>
+                    <ng-template #valueTemplate i18n="@@adoReferenceNumberSearch">{{ searchcriteria.adoReferenceNumber }}</ng-template>
+                </label>
+            </app-form-field>
+            <app-form-field [columns]="''">
+                <label i18n="@@dateRange">Date Range</label>
+                <app-daterange
+                    #dateRange
+                    *ngIf="!isFilterCollapsed"
+                    class="form-control"
+                    id="daterange"
+                    type="text"
+                    [dateFormat]="dateFormat"
+                    [fromDate]="searchcriteria.fromDate"
+                    [toDate]="searchcriteria.toDate"
+                    (valueChanged)="updateSearchCriteria($event, 'dateRange')">
+                </app-daterange>
+                <label class="collapsed-label" *ngIf="isFilterCollapsed">
+                    <label
+                        *ngIf="isDateRangeEmpty(); else valueTemplate"
+                        i18n="@@all">All</label>
+                    <ng-template #valueTemplate i18n="@@dateRangeSearch">{{ displayDate(searchcriteria.fromDate) }} - {{ displayDate(searchcriteria.toDate) }}</ng-template>
+                </label>
+            </app-form-field>
+        </div>
+        <div class="clear-action">
+            <app-button
+                *ngIf="!isFilterCollapsed"
+                dataQA="viewTestingOrders.filtersClear"
+                i18n="@@clearAll_uppercase"
+                type="secondary"
+                [disabled]="clearButtonDisabled"
+                (click)="clearFilter()">
+                CLEAR ALL
+            </app-button>
+        </div>
+   </div>
+
+    <div class="search-results-table__wrapper">
+        <app-data-table
+            #table
+            *ngIf="true"
+            [allowMultiSelect]="false"
+            [columnDefs]="columns"
+            [dataSource]="dataSource"
+            [defaultPaginator]="1"
+            [error]="hasListTOsError$ | async"
+            [loading]="loading$ | async"
+            [paginatorChoices]="[10, 25, 50, 100]"
+            [showColumnMenu]="testingOrderRows$ | async"
+            [showDrag]="false"
+            [showOrder]="false"
+            [showPaginator]="true"
+            [showRemove]="false"
+            [showSelect]="false"
+            [whiteBackground]="true">
+            <ng-container *columnCell="'testingOrderNumber'; let e; let i=index;">
+                <a
+                    data-qa="viewTestingOrdersTable.testingOrderNumber"
+                    [attr.data-qa-precision]="i"
+                    [routerLink]="['/', 'to', 'view', e.id]" >
+                    {{ e.testingOrderNumber }}
+                </a>
+            </ng-container>
+
+            <ng-container *columnCell="'adoReferenceNumber'; let e; let i=index;">
+                <span [attr.data-qa]="'viewTestingOrdersTable.adoReferenceNumber'" [attr.data-qa-precision]="i">{{ e.adoReferenceNumber }}</span>
+            </ng-container>
+
+            <ng-container *columnCell="'issuedDate'; let e;">
+                <span [attr.data-qa]="'viewTestingOrdersTable.issuedDate'">{{ e.issuedDate | formatDate :'DD MMM YYYY' | uppercase }}</span>
+            </ng-container>
+
+            <ng-container *columnCell="'startDate'; let e;">
+                <span [attr.data-qa]="'viewTestingOrdersTable.startDate'">{{ e.startDate | formatDate :'DD MMM YYYY' | uppercase }}</span>
+            </ng-container>
+
+        </app-data-table>
+    </div>
+
+    <ng-template #testingOrderNumberHeader>
+        <div i18n="@@testingOrderNumber">Testing Order Number</div>
+    </ng-template>
+
+    <ng-template #adoReferenceNumberHeader>
+        <div i18n="@@adoReferenceNumber">ADO Reference Number</div>
+    </ng-template>
+
+    <ng-template #testingAuthorityHeader>
+        <div i18n="@@testingAuthority">Testing Authority</div>
+    </ng-template>
+
+    <ng-template #testingDescriptionHeader>
+        <div i18n="@@testingDescription">Description of Testing</div>
+    </ng-template>
+
+    <ng-template #testingOrderStatusHeader>
+        <div i18n="@@testingOrderStatus">Testing Order Status</div>
+    </ng-template>
+
+    <ng-template #issuedDateHeader>
+        <div i18n="@@issuedDate">Issued Date</div>
+    </ng-template>
+
+    <ng-template #startDateHeader>
+        <div i18n="@@startDate">Start Date</div>
+    </ng-template>
+
+    <ng-template #testingCityHeader>
+        <div i18n="@@testingCity">City of Testing</div>
+    </ng-template>
+</div>
+
+<div class="footer"></div>

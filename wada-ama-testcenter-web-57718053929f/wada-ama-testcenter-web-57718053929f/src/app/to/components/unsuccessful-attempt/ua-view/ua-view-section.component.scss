@@ -1,0 +1,39 @@
+@import '~sass/variables';
+@import '~app/shared/styles/radio';
+@import '~sass/mixins';
+
+$bg-color-white: #ffffff;
+$location-form-label-color: #0c5460;
+
+@mixin step($left, $right) {
+
+    .link {
+        color: $link-color;
+        font-family: Montserrat, sans-serif;
+        font-size: 13px;
+        text-decoration: underline;
+    }
+
+}
+
+.button-delete {
+    position: absolute;
+    right: 0;
+    margin-right: 25px;
+}
+
+.wrapper {
+    @include ltr {
+        @include step(left, right);
+    }
+    @include rtl {
+        @include step(right, left);
+    }
+}
+
+
+@media print {
+    .noprint {
+       visibility: hidden;
+    }
+ }
